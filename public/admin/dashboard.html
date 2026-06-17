@@ -158,6 +158,7 @@
   <div class="nav-item" onclick="setSeccion('becas_cursos', this)">💻 Becas Cursos</div>
   <div class="nav-item" onclick="setSeccion('test_results', this)">✏️ Test CHASIDE</div>
   <div class="nav-item" onclick="setSeccion('riasec', this)">🧠 Perfiles RIASEC</div>
+  <div class="nav-item" onclick="setSeccion('valeria_review', this)">🔍 Revisor Valeria</div>
   <div class="sidebar-footer">
     <button class="btn-theme" id="theme-btn" onclick="toggleAdminTheme()">☀️ Modo claro</button>
     <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
@@ -215,6 +216,14 @@
     <h2>Perfiles Vocacionales — Modelo RIASEC</h2>
     <div id="riasec-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:8px"></div>
     <div id="riasec-empty" style="display:none;text-align:center;color:var(--text-faint);padding:40px">Sin perfiles aún.</div>
+  </div>
+
+  <!-- Revisor Valeria -->
+  <div class="section" id="sec-valeria_review">
+    <h2>Revisor de Conversaciones — Valeria</h2>
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:20px">Análisis automático diario de las conversaciones con Valeria para mejorar su prompt.</p>
+    <div id="review-list"></div>
+    <div id="review-empty" style="display:none;text-align:center;color:var(--text-faint);padding:40px">Sin análisis disponibles aún.</div>
   </div>
 
   <!-- Test CHASIDE -->
@@ -420,7 +429,38 @@
     }).join('');
   }
 
-  const loaders = { stats:cargarStats, users:cargarUsers, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec };
+  async function cargarValeriaReview() {
+    const list = document.getElementById('review-list');
+    const empty = document.getElementById('review-empty');
+    list.innerHTML = '<p style="color:var(--text-faint);font-size:.85rem">Cargando análisis...</p>';
+
+    const r = await fetch('/api/admin/data?seccion=prompt_suggestions', { headers: { 'Authorization': 'Bearer ' + token } });
+    const d = await r.json();
+
+    if (!d.rows || d.rows.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+
+    list.innerHTML = d.rows.map(row => {
+      const sugerencias = (row.sugerencias || []).map((s, i) => `
+        <div style="background:var(--bg2);border-radius:8px;padding:14px 16px;margin-bottom:10px">
+          <div style="font-size:.75rem;font-weight:700;color:#f59e0b;text-transform:uppercase;margin-bottom:4px">Problema ${i+1}</div>
+          <div style="font-size:.88rem;color:var(--text);margin-bottom:6px">${s.problema}</div>
+          <div style="font-size:.75rem;font-weight:700;color:#22c55e;text-transform:uppercase;margin-bottom:4px">Mejora propuesta</div>
+          <div style="font-size:.88rem;color:var(--text);margin-bottom:${s.ejemplo?'6px':'0'}">${s.mejora}</div>
+          ${s.ejemplo ? `<div style="font-size:.75rem;font-weight:700;color:#60a5fa;text-transform:uppercase;margin-bottom:4px">Ejemplo</div><div style="font-size:.85rem;color:var(--text-muted);font-style:italic">${s.ejemplo}</div>` : ''}
+        </div>`).join('');
+
+      return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <span style="font-size:.75rem;font-weight:700;color:var(--text-muted)">${new Date(row.created_at).toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+          <span style="font-size:.75rem;background:var(--accent-soft);color:var(--accent);padding:3px 10px;border-radius:20px">${row.convs_analizadas} conversaciones analizadas</span>
+        </div>
+        <div style="font-size:.88rem;color:var(--text-muted);line-height:1.6;margin-bottom:16px;padding:12px;background:var(--bg2);border-radius:8px">${row.analisis}</div>
+        ${sugerencias}
+      </div>`;
+    }).join('');
+  }
+
+  const loaders = { stats:cargarStats, users:cargarUsers, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview };
   const loaded = new Set();
 
   function setSeccion(sec, el) {

@@ -1,0 +1,18 @@
+name: Revisor diario de conversaciones Valeria
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # Todos los días a las 6am UTC (1am hora Perú)
+  workflow_dispatch:        # También permite ejecutarlo manualmente desde GitHub
+
+jobs:
+  analizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar al endpoint de análisis
+        run: |
+          curl -s -X POST "${{ secrets.VERCEL_URL }}/api/admin/analizar-conversaciones" \
+            -H "x-admin-key: ${{ secrets.ADMIN_SECRET_KEY }}" \
+            -H "Content-Type: application/json" \
+            --max-time 120 \
+            -w "\nHTTP status: %{http_code}\n"

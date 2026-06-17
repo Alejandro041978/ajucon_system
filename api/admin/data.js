@@ -60,6 +60,15 @@ export default async function handler(req, res) {
     return res.status(200).json(data);
   }
 
+  if (seccion === 'prompt_suggestions') {
+    const { data } = await supabase
+      .from('prompt_suggestions')
+      .select('id, analisis, sugerencias, convs_analizadas, created_at')
+      .order('created_at', { ascending: false })
+      .limit(10);
+    return res.status(200).json({ rows: data || [] });
+  }
+
   if (seccion === 'stats') {
     const [u, bp, bc, tr] = await Promise.all([
       supabase.from('users').select('id', { count: 'exact', head: true }),
