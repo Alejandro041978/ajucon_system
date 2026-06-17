@@ -14,16 +14,15 @@ function generateCode() {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { nombre, email, grado, ciudad } = req.body;
+  const { nombre, email, grado, ciudad, colegio } = req.body;
 
   if (!nombre || !email || !grado || !ciudad) {
     return res.status(400).json({ error: 'Faltan campos requeridos.' });
   }
 
-  // Crear o actualizar usuario
   const { error: upsertError } = await supabase
     .from('users')
-    .upsert({ nombre, email, grado, ciudad }, { onConflict: 'email' });
+    .upsert({ nombre, email, grado, ciudad, colegio: colegio || null }, { onConflict: 'email' });
 
   if (upsertError) {
     return res.status(500).json({ error: 'Error al registrar usuario.' });

@@ -85,7 +85,7 @@
       <label>Email</label>
       <input type="email" id="email-reg" placeholder="tu@email.com" required />
       <label>Grado escolar</label>
-      <select id="grado" required>
+      <select id="grado" required onchange="toggleColegio(this.value)">
         <option value="">Selecciona tu grado</option>
         <option>Secundaria - 1er Año</option>
         <option>Secundaria - 2do Año</option>
@@ -98,6 +98,10 @@
         <option>Maestría Completa</option>
         <option>Doctorado Completo</option>
       </select>
+      <div id="campo-colegio" style="display:none">
+        <label>Nombre del colegio</label>
+        <input type="text" id="colegio" placeholder="Ej: I.E. Jorge Basadre Grohmann" />
+      </div>
       <label>Ciudad de residencia</label>
       <select id="ciudad" required>
         <option value="">Selecciona tu región</option>
@@ -157,6 +161,15 @@
 </div>
 
 <script>
+  function toggleColegio(grado) {
+    const campo = document.getElementById('campo-colegio');
+    const input = document.getElementById('colegio');
+    const esSecundaria = grado.includes('Secundaria');
+    campo.style.display = esSecundaria ? 'block' : 'none';
+    input.required = esSecundaria;
+    if (!esSecundaria) input.value = '';
+  }
+
   function setTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     event.target.classList.add('active');
@@ -173,11 +186,13 @@
 
   async function handleRegistro(e) {
     e.preventDefault();
+    const grado = document.getElementById('grado').value;
     const body = {
       nombre: document.getElementById('nombre').value,
       email: document.getElementById('email-reg').value,
-      grado: document.getElementById('grado').value,
+      grado,
       ciudad: document.getElementById('ciudad').value,
+      colegio: grado.includes('Secundaria') ? document.getElementById('colegio').value : null,
     };
     const r = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await r.json();
