@@ -169,7 +169,10 @@ export default async function handler(req, res) {
       dims.forEach(d => {
         if (delta[d] > 0) nuevosPerfil[d] = Math.min(30, (perfil[d] || 0) + delta[d]);
       });
-      nuevosPerfil.completitud = calcularCompletitud(nuevosPerfil);
+      nuevosPerfil.completitud = calcularCompletitud({
+        R: nuevosPerfil.R, I: nuevosPerfil.I, A: nuevosPerfil.A,
+        S: nuevosPerfil.S, E: nuevosPerfil.E, C: nuevosPerfil.C,
+      });
       await supabase
         .from('riasec_profiles')
         .update({
