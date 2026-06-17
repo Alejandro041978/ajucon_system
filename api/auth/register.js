@@ -37,7 +37,7 @@ export default async function handler(req, res) {
 
   // Enviar email
   const { error: emailError } = await resend.emails.send({
-    from: 'AJUCON <noreply@ajucon.cl>',
+    from: 'AJUCON <onboarding@resend.dev>',
     to: email,
     subject: 'Tu código de acceso AJUCON',
     html: `
