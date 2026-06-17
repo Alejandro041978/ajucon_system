@@ -113,6 +113,7 @@
   <div class="nav-item" onclick="setSeccion('test_results', this)">✏️ Test CHASIDE</div>
   <div class="nav-item" onclick="setSeccion('riasec', this)">🧠 Perfiles RIASEC</div>
   <div class="sidebar-footer">
+    <button onclick="toggleAdminTheme()" style="width:100%;margin-bottom:8px;padding:8px;background:none;border:1px solid #334155;border-radius:8px;color:#94a3b8;cursor:pointer;font-size:.85rem;" id="theme-btn">☀️ Modo claro</button>
     <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
   </div>
 </div>
@@ -400,6 +401,35 @@
   function logout() {
     localStorage.removeItem('ajucon_admin_token');
     window.location.href = '/admin/login.html';
+  }
+
+  (function() {
+    var t = localStorage.getItem('ajucon_admin_theme') || 'dark';
+    applyAdminTheme(t);
+  })();
+
+  function applyAdminTheme(t) {
+    var isDark = t === 'dark';
+    var body = document.body;
+    var sidebar = document.querySelector('.sidebar');
+    var main = document.querySelector('.main');
+    if (isDark) {
+      body.style.background = '#0f172a';
+      body.style.color = '#e2e8f0';
+      if (sidebar) sidebar.style.background = '#1e293b';
+    } else {
+      body.style.background = '#f0f4ff';
+      body.style.color = '#1e293b';
+      if (sidebar) { sidebar.style.background = '#1e293b'; }
+    }
+    var btn = document.getElementById('theme-btn');
+    if (btn) btn.textContent = isDark ? '☀️ Modo claro' : '🌙 Modo oscuro';
+    localStorage.setItem('ajucon_admin_theme', t);
+  }
+
+  function toggleAdminTheme() {
+    var current = localStorage.getItem('ajucon_admin_theme') || 'dark';
+    applyAdminTheme(current === 'dark' ? 'light' : 'dark');
   }
 
   // Panel lateral de usuario
