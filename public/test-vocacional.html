@@ -331,20 +331,21 @@ function mostrarResultado() {
 
 async function guardarResultado(scores, resultado, carreras) {
   try {
-    await fetch('/api/test/vocacional', {
+    const r = await fetch('/api/test/vocacional', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token,
       },
-      body: JSON.stringify({
-        respuestas,
-        resultado,
-        carreras,
-        scores,
-      }),
+      body: JSON.stringify({ respuestas, resultado, carreras, scores }),
     });
-  } catch {}
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      console.error('Error guardando test:', data);
+    }
+  } catch (err) {
+    console.error('Error de red al guardar test:', err);
+  }
 }
 
 function confirmarSalida() {
