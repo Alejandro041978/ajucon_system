@@ -182,8 +182,8 @@
     <h2>Usuarios registrados</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Nombre</th><th>Email</th><th>Grado</th><th>Ciudad</th><th>Registro</th></tr></thead>
-        <tbody id="tbody-users"><tr><td colspan="5" class="empty">Cargando...</td></tr></tbody>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Grado</th><th>Colegio</th><th>Ciudad</th><th>Registro</th></tr></thead>
+        <tbody id="tbody-users"><tr><td colspan="6" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -334,7 +334,7 @@
     const tbody = document.getElementById('tbody-users');
     tbody.innerHTML = data.length ? data.map(u => `
       <tr onclick="abrirUsuario('${u.id}')" style="cursor:pointer">
-        <td>${u.nombre}</td><td>${u.email}</td><td>${u.grado}</td><td>${u.ciudad || '—'}</td><td>${fecha(u.created_at)}</td>
+        <td>${u.nombre}</td><td>${u.email}</td><td>${u.grado}</td><td>${u.colegio || '—'}</td><td>${u.ciudad || '—'}</td><td>${fecha(u.created_at)}</td>
       </tr>`).join('') : '<tr><td colspan="5" class="empty">Sin usuarios aún.</td></tr>';
   }
 
