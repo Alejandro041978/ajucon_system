@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
+import { Resend } from 'resend';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Protegido por clave secreta para uso desde GitHub Actions o admin
 function autenticado(req) {
@@ -108,6 +110,40 @@ export default async function handler(req, res) {
     analisis: resultado.analisis,
     sugerencias: resultado.sugerencias,
     convs_analizadas: conversacionesTexto.length,
+  });
+
+  // Enviar resumen por email al administrador
+  const sugerenciasHtml = resultado.sugerencias.map((s, i) => `
+    <div style="background:#f8fafc;border-left:4px solid #6366f1;padding:14px 16px;margin-bottom:16px;border-radius:0 8px 8px 0">
+      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#f59e0b">⚠️ Problema ${i + 1}</p>
+      <p style="margin:0 0 10px;font-size:14px;color:#1e293b">${s.problema}</p>
+      <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#22c55e">✅ Mejora propuesta</p>
+      <p style="margin:0 0 ${s.ejemplo ? '10px' : '0'};font-size:14px;color:#1e293b">${s.mejora}</p>
+      ${s.ejemplo ? `<p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#60a5fa">💬 Ejemplo</p><p style="margin:0;font-size:13px;color:#475569;font-style:italic">${s.ejemplo}</p>` : ''}
+    </div>`).join('');
+
+  const fecha = new Date().toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  await resend.emails.send({
+    from: 'AJUCON <noreply@ajucon.org.pe>',
+    to: 'admin@balticec.com',
+    subject: `Revisor Valeria — ${fecha} (${conversacionesTexto.length} conversaciones)`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:620px;margin:0 auto;padding:32px 24px">
+        <div style="background:#6366f1;border-radius:12px;padding:24px;color:white;margin-bottom:24px">
+          <h1 style="margin:0 0 6px;font-size:20px">🔍 Revisor diario — Valeria</h1>
+          <p style="margin:0;opacity:.85;font-size:14px">${fecha} · ${conversacionesTexto.length} conversaciones analizadas</p>
+        </div>
+        <div style="background:#f1f5f9;border-radius:10px;padding:16px 18px;margin-bottom:24px;font-size:14px;color:#334155;line-height:1.6">
+          <strong style="display:block;margin-bottom:6px;color:#1e293b">Análisis general</strong>
+          ${resultado.analisis}
+        </div>
+        <h2 style="font-size:16px;color:#1e293b;margin-bottom:16px">Sugerencias de mejora</h2>
+        ${sugerenciasHtml}
+        <p style="text-align:center;margin-top:28px">
+          <a href="https://system.ajucon.org.pe/admin/dashboard.html" style="background:#6366f1;color:white;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Ver en el panel admin</a>
+        </p>
+      </div>`,
   });
 
   return res.status(200).json({
