@@ -94,6 +94,13 @@ export default async function handler(req, res) {
   const { mensaje, conversation_id } = req.body;
   if (!mensaje) return res.status(400).json({ error: 'Mensaje requerido.' });
 
+  // Cargar datos del usuario
+  const { data: usuario } = await supabase
+    .from('users')
+    .select('nombre, grado')
+    .eq('id', payload.id)
+    .single();
+
   // Cargar perfil RIASEC existente
   let { data: perfil } = await supabase
     .from('riasec_profiles')
@@ -132,8 +139,10 @@ export default async function handler(req, res) {
     .order('created_at', { ascending: true })
     .limit(20);
 
-  // Contexto del perfil para Claude
-  const perfilContext = `\n[PERFIL RIASEC ACTUAL DEL ESTUDIANTE — R:${perfil.R} I:${perfil.I} A:${perfil.A} S:${perfil.S} E:${perfil.E} C:${perfil.C} — Completitud: ${perfil.completitud}%]\n`;
+  // Contexto del perfil y datos del usuario para Claude
+  const nombreEstudiante = usuario?.nombre?.split(' ')[0] || 'el estudiante';
+  const gradoEstudiante = usuario?.grado || '';
+  const perfilContext = `\n[DATOS DEL ESTUDIANTE — Nombre: ${nombreEstudiante}, Grado: ${gradoEstudiante}]\n[PERFIL RIASEC ACTUAL — R:${perfil.R} I:${perfil.I} A:${perfil.A} S:${perfil.S} E:${perfil.E} C:${perfil.C} — Completitud: ${perfil.completitud}%]\nNOTA: Ya conoces el nombre y grado del estudiante. NO los preguntes. Salúdalo por su nombre directamente y pregunta qué lo trae aquí o qué le interesa explorar.\n`;
 
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',

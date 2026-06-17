@@ -144,20 +144,22 @@
 
   const params = new URLSearchParams(window.location.search);
   const agente = params.get('agente') || 'psicologa';
+  const user = JSON.parse(localStorage.getItem('ajucon_user') || '{}');
+  const primerNombre = (user.nombre || '').split(' ')[0] || '';
 
   const config = {
     psicologa: {
       name: 'Valeria — Psicóloga Vocacional',
       avatar: '🧠',
       color: '#7c3aed',
-      bienvenida: '¡Hola! Soy Valeria, tu psicóloga vocacional de AJUCON. Estoy aquí para acompañarte a descubrir tu vocación y orientarte sobre tu futuro en Perú.\n\n¿Me cuentas tu nombre y en qué año de secundaria estás?',
+      bienvenida: `¡Hola${primerNombre ? ', ' + primerNombre : ''}! Soy Valeria, tu psicóloga vocacional de AJUCON. Estoy aquí para acompañarte a descubrir tu vocación y orientarte sobre tu futuro en Perú.\n\n¿Qué te trae por aquí hoy? ¿Tienes alguna carrera o área que te llame la atención, o todavía estás explorando?`,
       endpoint: '/api/chat/psicologa',
     },
     profesor: {
       name: 'Profesor Carlos — Preuniversitario',
       avatar: '📚',
       color: '#0369a1',
-      bienvenida: '¡Hola! Soy el profesor Carlos. Puedo ayudarte con matemáticas, comunicación, ciencias, historia y prepararte para el examen de admisión. ¿Qué necesitas repasar hoy?',
+      bienvenida: `¡Hola${primerNombre ? ', ' + primerNombre : ''}! Soy el profesor Carlos. Puedo ayudarte con matemáticas, comunicación, ciencias, historia y prepararte para el examen de admisión. ¿Qué necesitas repasar hoy?`,
       endpoint: '/api/chat/profesor',
     },
   };
