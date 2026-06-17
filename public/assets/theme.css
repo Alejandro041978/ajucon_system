@@ -47,6 +47,27 @@ body {
   min-height: 100vh;
 }
 
+/* ===== User info chip (header de páginas internas) ===== */
+.user-chip { display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; gap: 10px; margin-left: auto; }
+.user-chip .chip-grado { font-size: .8rem; color: var(--text-muted); display: none; }
+@media (min-width: 600px) { .user-chip .chip-grado { display: block; } }
+.user-chip .chip-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--accent); color: white;
+  font-weight: 700; font-size: .9rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.user-chip .chip-nombre { font-size: .85rem; font-weight: 600; color: var(--text); display: none; }
+@media (min-width: 480px) { .user-chip .chip-nombre { display: block; } }
+.btn-salir {
+  background: none; border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: 5px 12px;
+  font-size: .82rem; color: var(--text-muted); cursor: pointer;
+  transition: var(--transition); white-space: nowrap;
+}
+.btn-salir:hover { border-color: #ef4444; color: #ef4444; }
+
 /* ===== Toggle button ===== */
 .theme-toggle {
   background: var(--surface);
