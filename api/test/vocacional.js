@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Token inválido.' });
   }
 
-  const { respuestas, resultado, carreras, scores } = req.body;
+  const { respuestas, resultado, carreras } = req.body;
 
   if (!respuestas || !resultado || !carreras) {
     return res.status(400).json({ error: 'Datos incompletos.' });
@@ -27,7 +27,6 @@ export default async function handler(req, res) {
     respuestas,
     resultado,
     carreras,
-    scores: scores || null,
   });
 
   if (error) {
