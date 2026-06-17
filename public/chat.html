@@ -191,10 +191,29 @@
     document.getElementById('riasec-panel').style.display = 'block';
   }
 
-  let conversation_id = null;
+  let conversation_id = localStorage.getItem(`ajucon_conv_${agente}`) || null;
   const chatArea = document.getElementById('chat-area');
 
-  addBubble('assistant', cfg.bienvenida);
+  // Cargar historial de conversación previa
+  (async function cargarHistorial() {
+    try {
+      const r = await fetch(`/api/chat/historial?agente=${agente}`, {
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      if (!r.ok) { addBubble('assistant', cfg.bienvenida); return; }
+      const data = await r.json();
+      if (data.conversation_id && data.messages && data.messages.length > 0) {
+        conversation_id = data.conversation_id;
+        localStorage.setItem(`ajucon_conv_${agente}`, conversation_id);
+        data.messages.forEach(m => addBubble(m.role, m.content));
+        if (data.perfil) updateRiasec(data.perfil);
+      } else {
+        addBubble('assistant', cfg.bienvenida);
+      }
+    } catch {
+      addBubble('assistant', cfg.bienvenida);
+    }
+  })();
 
   function updateRiasec(perfil) {
     if (!perfil || agente !== 'psicologa') return;
@@ -253,6 +272,7 @@
 
       if (r.ok) {
         conversation_id = data.conversation_id;
+        localStorage.setItem(`ajucon_conv_${agente}`, conversation_id);
         addBubble('assistant', data.respuesta);
         updateRiasec(data.perfil);
       } else {
