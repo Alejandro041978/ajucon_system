@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AJUCON — Panel Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; }
+
+    /* Sidebar */
+    .sidebar { width: 220px; background: #1e293b; border-right: 1px solid #334155; padding: 24px 0; flex-shrink: 0; display: flex; flex-direction: column; }
+    .sidebar .logo { padding: 0 20px 24px; font-size: 1.1rem; font-weight: 800; color: #6366f1; border-bottom: 1px solid #334155; margin-bottom: 16px; }
+    .sidebar .logo span { font-size: .7rem; font-weight: 400; color: #64748b; display: block; }
+    .nav-item { padding: 10px 20px; cursor: pointer; font-size: .9rem; color: #94a3b8; border-left: 3px solid transparent; transition: all .15s; }
+    .nav-item:hover { color: #e2e8f0; background: #0f172a; }
+    .nav-item.active { color: #6366f1; border-left-color: #6366f1; background: #0f172a; font-weight: 600; }
+    .sidebar-footer { margin-top: auto; padding: 16px 20px; }
+    .btn-logout { width: 100%; padding: 8px; background: none; border: 1px solid #334155; border-radius: 8px; color: #64748b; cursor: pointer; font-size: .85rem; }
+    .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
+
+    /* Main */
+    .main { flex: 1; padding: 32px; overflow-y: auto; }
+    .main h2 { font-size: 1.3rem; margin-bottom: 24px; color: #f1f5f9; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+    .stat-card .num { font-size: 2rem; font-weight: 800; color: #6366f1; }
+    .stat-card .label { font-size: .8rem; color: #64748b; margin-top: 4px; }
+
+    /* Tabla */
+    .table-wrap { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    th { background: #0f172a; padding: 12px 16px; text-align: left; color: #64748b; font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; }
+    td { padding: 12px 16px; border-top: 1px solid #334155; color: #cbd5e1; vertical-align: middle; }
+    tr:hover td { background: #0f172a30; }
+    .empty { text-align: center; color: #64748b; padding: 40px; }
+
+    /* Badge estado */
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+    .badge.pendiente { background: #1e3a5f; color: #93c5fd; }
+    .badge.en_revision { background: #3b2f00; color: #fcd34d; }
+    .badge.aprobada { background: #14532d; color: #86efac; }
+    .badge.rechazada { background: #450a0a; color: #fca5a5; }
+
+    select.estado-select { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: .8rem; cursor: pointer; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">AJUCON <span>Panel Admin</span></div>
+  <div class="nav-item active" onclick="setSeccion('stats', this)">📊 Resumen</div>
+  <div class="nav-item" onclick="setSeccion('users', this)">👤 Usuarios</div>
+  <div class="nav-item" onclick="setSeccion('becas_profesionales', this)">🎓 Becas Profesionales</div>
+  <div class="nav-item" onclick="setSeccion('becas_cursos', this)">💻 Becas Cursos</div>
+  <div class="nav-item" onclick="setSeccion('test_results', this)">✏️ Test CHASIDE</div>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Resumen -->
+  <div class="section active" id="sec-stats">
+    <h2>Resumen general</h2>
+    <div class="stats" id="stats-grid">
+      <div class="stat-card"><div class="num" id="stat-usuarios">—</div><div class="label">Usuarios registrados</div></div>
+      <div class="stat-card"><div class="num" id="stat-bp">—</div><div class="label">Becas Profesionales</div></div>
+      <div class="stat-card"><div class="num" id="stat-bc">—</div><div class="label">Becas Cursos</div></div>
+      <div class="stat-card"><div class="num" id="stat-tr">—</div><div class="label">Tests completados</div></div>
+    </div>
+  </div>
+
+  <!-- Usuarios -->
+  <div class="section" id="sec-users">
+    <h2>Usuarios registrados</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Grado</th><th>Registro</th></tr></thead>
+        <tbody id="tbody-users"><tr><td colspan="4" class="empty">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Becas Profesionales -->
+  <div class="section" id="sec-becas_profesionales">
+    <h2>Postulaciones — Becas Profesionales</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Carrera</th><th>Institución</th><th>Promedio</th><th>Estado</th></tr></thead>
+        <tbody id="tbody-becas_profesionales"><tr><td colspan="6" class="empty">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Becas Cursos -->
+  <div class="section" id="sec-becas_cursos">
+    <h2>Postulaciones — Becas Cursos Online</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Plataforma</th><th>Curso</th><th>Estado</th></tr></thead>
+        <tbody id="tbody-becas_cursos"><tr><td colspan="5" class="empty">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Test CHASIDE -->
+  <div class="section" id="sec-test_results">
+    <h2>Resultados — Test Vocacional CHASIDE</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Área dominante</th><th>Carreras sugeridas</th><th>Fecha</th></tr></thead>
+        <tbody id="tbody-test_results"><tr><td colspan="5" class="empty">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const token = localStorage.getItem('ajucon_admin_token');
+  if (!token) window.location.href = '/admin/login.html';
+
+  const AREAS = { C: 'Ciencias Exactas', H: 'Humanidades', A: 'Arte', S: 'Sociales', I: 'Investigación', D: 'Dirección', E: 'Empresa' };
+
+  async function api(seccion) {
+    const r = await fetch('/api/admin/data?seccion=' + seccion, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (r.status === 401) { logout(); return null; }
+    return r.json();
+  }
+
+  async function setEstado(tabla, id, valor) {
+    await fetch('/api/admin/estado', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ tabla, id, estado: valor }),
+    });
+  }
+
+  function fecha(iso) {
+    return new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  function badgeEstado(estado, tabla, id) {
+    return `<select class="estado-select" onchange="setEstado('${tabla}','${id}',this.value)">
+      ${['pendiente','en_revision','aprobada','rechazada'].map(e =>
+        `<option value="${e}" ${e === estado ? 'selected' : ''}>${e.replace('_',' ')}</option>`
+      ).join('')}
+    </select>`;
+  }
+
+  async function cargarStats() {
+    const d = await api('stats');
+    if (!d) return;
+    document.getElementById('stat-usuarios').textContent = d.usuarios ?? 0;
+    document.getElementById('stat-bp').textContent = d.becas_profesionales ?? 0;
+    document.getElementById('stat-bc').textContent = d.becas_cursos ?? 0;
+    document.getElementById('stat-tr').textContent = d.test_results ?? 0;
+  }
+
+  async function cargarUsers() {
+    const data = await api('users'); if (!data) return;
+    const tbody = document.getElementById('tbody-users');
+    tbody.innerHTML = data.length ? data.map(u => `
+      <tr>
+        <td>${u.nombre}</td>
+        <td>${u.email}</td>
+        <td>${u.grado}</td>
+        <td>${fecha(u.created_at)}</td>
+      </tr>`).join('') : '<tr><td colspan="4" class="empty">Sin usuarios aún.</td></tr>';
+  }
+
+  async function cargarBecasProfesionales() {
+    const data = await api('becas_profesionales'); if (!data) return;
+    const tbody = document.getElementById('tbody-becas_profesionales');
+    tbody.innerHTML = data.length ? data.map(b => `
+      <tr>
+        <td>${b.users?.nombre || '—'}</td>
+        <td>${b.users?.email || '—'}</td>
+        <td>${b.carrera_interes}</td>
+        <td>${b.institucion}</td>
+        <td>${b.promedio_notas}</td>
+        <td>${badgeEstado(b.estado, 'becas_profesionales', b.id)}</td>
+      </tr>`).join('') : '<tr><td colspan="6" class="empty">Sin postulaciones aún.</td></tr>';
+  }
+
+  async function cargarBecasCursos() {
+    const data = await api('becas_cursos'); if (!data) return;
+    const tbody = document.getElementById('tbody-becas_cursos');
+    tbody.innerHTML = data.length ? data.map(b => `
+      <tr>
+        <td>${b.users?.nombre || '—'}</td>
+        <td>${b.users?.email || '—'}</td>
+        <td>${b.plataforma}</td>
+        <td>${b.curso_nombre}</td>
+        <td>${badgeEstado(b.estado, 'becas_cursos', b.id)}</td>
+      </tr>`).join('') : '<tr><td colspan="5" class="empty">Sin solicitudes aún.</td></tr>';
+  }
+
+  async function cargarTestResults() {
+    const data = await api('test_results'); if (!data) return;
+    const tbody = document.getElementById('tbody-test_results');
+    tbody.innerHTML = data.length ? data.map(t => `
+      <tr>
+        <td>${t.users?.nombre || '—'}</td>
+        <td>${t.users?.email || '—'}</td>
+        <td>${t.resultado} — ${AREAS[t.resultado] || ''}</td>
+        <td>${Array.isArray(t.carreras) ? t.carreras.slice(0,3).join(', ') : '—'}</td>
+        <td>${fecha(t.created_at)}</td>
+      </tr>`).join('') : '<tr><td colspan="5" class="empty">Sin tests aún.</td></tr>';
+  }
+
+  const loaders = {
+    stats: cargarStats,
+    users: cargarUsers,
+    becas_profesionales: cargarBecasProfesionales,
+    becas_cursos: cargarBecasCursos,
+    test_results: cargarTestResults,
+  };
+
+  const loaded = new Set();
+
+  function setSeccion(sec, el) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('sec-' + sec).classList.add('active');
+    el.classList.add('active');
+    if (!loaded.has(sec)) { loaders[sec](); loaded.add(sec); }
+  }
+
+  function logout() {
+    localStorage.removeItem('ajucon_admin_token');
+    window.location.href = '/admin/login.html';
+  }
+
+  // Carga inicial
+  cargarStats();
+  loaded.add('stats');
+</script>
+</body>
+</html>

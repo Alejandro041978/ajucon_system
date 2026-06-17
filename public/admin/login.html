@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AJUCON Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #0f172a; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { background: #1e293b; border-radius: 16px; padding: 40px; width: 100%; max-width: 380px; border: 1px solid #334155; }
+    h1 { color: #f1f5f9; font-size: 1.4rem; margin-bottom: 4px; }
+    .sub { color: #64748b; font-size: .85rem; margin-bottom: 28px; }
+    label { display: block; font-size: .8rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px; }
+    input { width: 100%; padding: 11px 14px; background: #0f172a; border: 1.5px solid #334155; border-radius: 8px; color: #f1f5f9; font-size: .95rem; outline: none; margin-bottom: 16px; transition: border-color .2s; }
+    input:focus { border-color: #6366f1; }
+    button { width: 100%; padding: 13px; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .2s; }
+    button:hover { background: #4f46e5; }
+    .err { background: #450a0a; color: #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: .85rem; margin-top: 14px; display: none; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>AJUCON Admin</h1>
+  <p class="sub">Panel de administración</p>
+  <form onsubmit="login(event)">
+    <label>Email</label>
+    <input type="email" id="email" required />
+    <label>Contraseña</label>
+    <input type="password" id="password" required />
+    <button type="submit" id="btn">Ingresar</button>
+    <div class="err" id="err"></div>
+  </form>
+</div>
+<script>
+  if (localStorage.getItem('ajucon_admin_token')) window.location.href = '/admin/dashboard.html';
+
+  async function login(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn');
+    btn.textContent = 'Ingresando...'; btn.disabled = true;
+
+    const r = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value }),
+    });
+    const data = await r.json();
+    if (r.ok) {
+      localStorage.setItem('ajucon_admin_token', data.token);
+      window.location.href = '/admin/dashboard.html';
+    } else {
+      const el = document.getElementById('err');
+      el.textContent = data.error; el.style.display = 'block';
+      btn.textContent = 'Ingresar'; btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
