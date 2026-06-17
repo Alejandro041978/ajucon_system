@@ -242,6 +242,77 @@ if (!token) window.location.href = '/index.html';
 let currentIdx = 0;
 let respuestas = {};
 
+// Cargar resultado previo al iniciar
+(async function cargarResultadoPrevio() {
+  try {
+    const r = await fetch('/api/test/resultado', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await r.json();
+    if (data.resultado) {
+      mostrarResultadoGuardado(data);
+    }
+  } catch {}
+})();
+
+function mostrarResultadoGuardado(data) {
+  document.getElementById('screen-intro').style.display = 'none';
+  document.getElementById('screen-test').style.display = 'none';
+  document.getElementById('screen-resultado').style.display = 'block';
+
+  const { resultado, carreras } = data;
+  const cfg1 = AREAS[resultado];
+  if (!cfg1) return;
+
+  // Recalcular scores desde respuestas guardadas si existen
+  const scores = { C: 0, H: 0, A: 0, S: 0, I: 0, D: 0, E: 0 };
+  if (data.respuestas) {
+    Object.values(data.respuestas).forEach(r => { if (r.valor === 1) scores[r.area]++; });
+  }
+  const orden = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const [top1, top2] = orden;
+
+  // Barras
+  const barsContainer = document.getElementById('bars-container');
+  barsContainer.innerHTML = '';
+  orden.forEach(([area, score]) => {
+    const cfg = AREAS[area];
+    const pct = (score / 8) * 100;
+    barsContainer.innerHTML += `
+      <div class="bar-row">
+        <div class="bar-label"><span>${area}</span> — ${cfg.nombre}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${cfg.color}"></div></div>
+        <div class="bar-score">${score}/8</div>
+      </div>`;
+  });
+
+  // Perfil dominante
+  const cfg2 = AREAS[top2[0]];
+  document.getElementById('perfil-dominante').innerHTML = `
+    <h3 style="color:${cfg1.color}">Área dominante: ${resultado} — ${cfg1.nombre}</h3>
+    <p style="margin-top:8px">${cfg1.perfil}</p>
+    ${top2[1] >= 6 ? `<p style="margin-top:12px;font-size:.85rem;color:#64748b">También muestras afinidad con el área <strong>${top2[0]} — ${cfg2.nombre}</strong>.</p>` : ''}
+  `;
+  document.getElementById('perfil-dominante').style.background = cfg1.bg;
+
+  // Carreras
+  const carrerasGrid = document.getElementById('carreras-grid');
+  carrerasGrid.innerHTML = '';
+  (Array.isArray(carreras) ? carreras : []).forEach(c => {
+    carrerasGrid.innerHTML += `<div class="carrera-tag">${c}</div>`;
+  });
+
+  // Estado de guardado
+  const statusEl = document.getElementById('save-status');
+  const fechaStr = data.created_at ? new Date(data.created_at).toLocaleDateString('es-PE', { day:'2-digit', month:'2-digit', year:'numeric' }) : '';
+  statusEl.style.background = '#dbeafe';
+  statusEl.style.color = '#1e40af';
+  statusEl.textContent = `📋 Resultado del ${fechaStr} — ya guardado.`;
+
+  document.getElementById('btn-volver').disabled = false;
+  document.getElementById('btn-volver').style.opacity = '1';
+}
+
 function iniciarTest() {
   document.getElementById('screen-intro').style.display = 'none';
   document.getElementById('screen-test').style.display = 'block';
