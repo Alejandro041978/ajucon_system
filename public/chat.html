@@ -84,7 +84,13 @@
     <h2 id="agent-name"></h2>
     <p><span class="status-dot"></span>En línea</p>
   </div>
-  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" style="margin-left:auto">🌙</button>
+  <div class="user-chip">
+    <span class="chip-grado" id="h-grado"></span>
+    <div class="chip-avatar" id="h-avatar"></div>
+    <span class="chip-nombre" id="h-nombre"></span>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙</button>
+    <button class="btn-salir" onclick="logout()">Salir</button>
+  </div>
 </header>
 
 <!-- Panel RIASEC (solo psicóloga) -->
@@ -168,6 +174,17 @@
   document.getElementById('agent-name').textContent = cfg.name;
   document.getElementById('agent-avatar').textContent = cfg.avatar;
   document.getElementById('agent-avatar').style.background = cfg.color + '22';
+
+  // Poblar chip de usuario
+  document.getElementById('h-grado').textContent = user.grado || '';
+  document.getElementById('h-avatar').textContent = (user.nombre || '?')[0].toUpperCase();
+  document.getElementById('h-nombre').textContent = primerNombre;
+
+  function logout() {
+    localStorage.removeItem('ajucon_token');
+    localStorage.removeItem('ajucon_user');
+    window.location.href = '/index.html';
+  }
 
   // Mostrar panel RIASEC solo para psicóloga
   if (agente === 'psicologa') {

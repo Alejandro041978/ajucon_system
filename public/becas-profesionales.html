@@ -10,7 +10,7 @@
     header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; transition: var(--transition); }
     .back-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; padding: 4px 8px; border-radius: var(--radius-sm); }
     .back-btn:hover { background: var(--surface2); }
-    header h2 { font-size: 1rem; color: var(--text); }
+    header h2 { font-size: 1rem; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     main { max-width: 680px; margin: 0 auto; padding: 32px 24px; }
 
@@ -61,7 +61,13 @@
 <header>
   <button class="back-btn" onclick="window.location.href='/dashboard.html'">←</button>
   <h2>Postulación a Becas de Estudios Profesionales</h2>
-  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" style="margin-left:auto">🌙</button>
+  <div class="user-chip">
+    <span class="chip-grado" id="h-grado"></span>
+    <div class="chip-avatar" id="h-avatar"></div>
+    <span class="chip-nombre" id="h-nombre"></span>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙</button>
+    <button class="btn-salir" onclick="logout()">Salir</button>
+  </div>
 </header>
 
 <main>
@@ -149,6 +155,19 @@
 <script>
   const token = localStorage.getItem('ajucon_token');
   if (!token) window.location.href = '/index.html';
+
+  (function() {
+    const u = JSON.parse(localStorage.getItem('ajucon_user') || '{}');
+    document.getElementById('h-grado').textContent = u.grado || '';
+    document.getElementById('h-avatar').textContent = (u.nombre || '?')[0].toUpperCase();
+    document.getElementById('h-nombre').textContent = (u.nombre || '').split(' ')[0] || '';
+  })();
+
+  function logout() {
+    localStorage.removeItem('ajucon_token');
+    localStorage.removeItem('ajucon_user');
+    window.location.href = '/index.html';
+  }
 
   async function enviarPostulacion(e) {
     e.preventDefault();
