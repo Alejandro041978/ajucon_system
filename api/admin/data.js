@@ -52,6 +52,14 @@ export default async function handler(req, res) {
     return res.status(200).json(data);
   }
 
+  if (seccion === 'riasec') {
+    const { data } = await supabase
+      .from('riasec_profiles')
+      .select('*, users(nombre, email, grado)')
+      .order('completitud', { ascending: false });
+    return res.status(200).json(data);
+  }
+
   if (seccion === 'stats') {
     const [u, bp, bc, tr] = await Promise.all([
       supabase.from('users').select('id', { count: 'exact', head: true }),
