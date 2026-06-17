@@ -139,11 +139,15 @@
 
     <div class="resultado-card">
       <div class="perfil-dominante" id="perfil-dominante"></div>
-      <h3 style="margin-bottom:14px;color:#1e293b">Carreras sugeridas</h3>
+      <h3 style="margin-bottom:14px;color:var(--text)">Carreras sugeridas</h3>
       <div class="carreras-grid" id="carreras-grid"></div>
     </div>
 
-    <button class="btn-primary" onclick="window.location.href='/dashboard.html'">Volver al inicio</button>
+    <div id="save-status" style="text-align:center;padding:12px;border-radius:10px;font-size:.9rem;margin-bottom:12px;background:var(--surface2);color:var(--text-muted)">
+      💾 Guardando resultados...
+    </div>
+
+    <button class="btn-primary" id="btn-volver" onclick="window.location.href='/dashboard.html'" disabled style="opacity:.5">Volver al inicio</button>
     <button class="btn-secondary" onclick="reiniciarTest()">Repetir test</button>
   </div>
 
@@ -330,6 +334,9 @@ function mostrarResultado() {
 }
 
 async function guardarResultado(scores, resultado, carreras) {
+  const statusEl = document.getElementById('save-status');
+  const btnVolver = document.getElementById('btn-volver');
+
   try {
     const r = await fetch('/api/test/vocacional', {
       method: 'POST',
@@ -339,12 +346,26 @@ async function guardarResultado(scores, resultado, carreras) {
       },
       body: JSON.stringify({ respuestas, resultado, carreras, scores }),
     });
-    if (!r.ok) {
+
+    if (r.ok) {
+      statusEl.style.background = '#dcfce7';
+      statusEl.style.color = '#166534';
+      statusEl.textContent = '✅ Resultados guardados correctamente.';
+    } else {
       const data = await r.json().catch(() => ({}));
       console.error('Error guardando test:', data);
+      statusEl.style.background = '#fee2e2';
+      statusEl.style.color = '#991b1b';
+      statusEl.textContent = '⚠️ No se pudo guardar: ' + (data.detail || data.error || 'error desconocido');
     }
   } catch (err) {
     console.error('Error de red al guardar test:', err);
+    statusEl.style.background = '#fee2e2';
+    statusEl.style.color = '#991b1b';
+    statusEl.textContent = '⚠️ Error de conexión al guardar. Revisa tu red.';
+  } finally {
+    btnVolver.disabled = false;
+    btnVolver.style.opacity = '1';
   }
 }
 
