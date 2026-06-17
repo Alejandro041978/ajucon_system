@@ -4,74 +4,56 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AJUCON — Becas de Estudios Profesionales</title>
+  <link rel="stylesheet" href="/assets/theme.css" />
   <script src="/assets/theme.js"></script>
   <style>
-    [data-theme="dark"] body { background: #0f172a; }
-    [data-theme="dark"] header { background: #1e293b; border-color: #334155; }
-    [data-theme="dark"] header h2 { color: #f1f5f9; }
-    [data-theme="dark"] .card { background: #1e293b; }
-    [data-theme="dark"] label { color: #94a3b8; }
-    [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea { background: #0f172a; border-color: #334155; color: #f1f5f9; }
-    [data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: #475569; }
-    [data-theme="dark"] .section-title { color: #f59e0b; }
-    [data-theme="dark"] .info-box { background: #3b2f00; border-color: #78350f; color: #fcd34d; }
-    [data-theme="dark"] #screen-exito h2 { color: #f1f5f9; }
-    [data-theme="dark"] #screen-exito p { color: #94a3b8; }
-    .theme-toggle { background: none; border: 1px solid #e2e8f0; border-radius: 50%; width: 34px; height: 34px; font-size: .9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: auto; }
-    [data-theme="dark"] .theme-toggle { border-color: #334155; }
-  </style>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; }
-    header { background: white; border-bottom: 1px solid #e2e8f0; padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
-    .back-btn { background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.2rem; padding: 4px 8px; border-radius: 8px; }
-    .back-btn:hover { background: #f1f5f9; }
-    header h2 { font-size: 1rem; color: #1e293b; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; transition: var(--transition); }
+    .back-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; padding: 4px 8px; border-radius: var(--radius-sm); }
+    .back-btn:hover { background: var(--surface2); }
+    header h2 { font-size: 1rem; color: var(--text); }
 
     main { max-width: 680px; margin: 0 auto; padding: 32px 24px; }
 
-    .hero { background: linear-gradient(135deg, #d97706, #f59e0b); border-radius: 16px; padding: 28px; color: white; margin-bottom: 28px; }
+    .hero { background: linear-gradient(135deg, #d97706, #f59e0b); border-radius: var(--radius); padding: 28px; color: white; margin-bottom: 28px; }
     .hero h1 { font-size: 1.4rem; margin-bottom: 6px; }
     .hero p { font-size: .9rem; opacity: .9; line-height: 1.5; }
 
-    .card { background: white; border-radius: 16px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .card { background: var(--surface); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: var(--transition); }
     .section-title { font-size: .8rem; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: .05em; margin: 24px 0 16px; }
     .section-title:first-child { margin-top: 0; }
 
     .field { margin-bottom: 18px; }
-    label { display: block; font-size: .85rem; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    label { display: block; font-size: .85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
     input, select, textarea {
       width: 100%; padding: 11px 14px;
-      border: 2px solid #e2e8f0; border-radius: 10px;
-      font-size: .95rem; font-family: inherit;
-      outline: none; transition: border-color .2s;
+      border: 2px solid var(--border); border-radius: 10px;
+      font-size: .95rem; font-family: inherit; outline: none;
+      background: var(--surface2); color: var(--text);
+      transition: var(--transition);
     }
+    input::placeholder, textarea::placeholder { color: var(--text-faint); }
     input:focus, select:focus, textarea:focus { border-color: #d97706; }
     textarea { resize: vertical; min-height: 100px; }
     .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-    .info-box { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; font-size: .85rem; color: #92400e; line-height: 1.55; }
-    .info-box strong { display: block; margin-bottom: 4px; }
+    .info-box { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; font-size: .85rem; color: var(--text-muted); line-height: 1.55; }
+    [data-theme="dark"] .info-box { background: #3b2f00; border-color: #78350f; color: #fcd34d; }
+    .info-box strong { display: block; margin-bottom: 4px; color: var(--text); }
+    [data-theme="dark"] .info-box strong { color: #fcd34d; }
 
-    button[type=submit] {
-      width: 100%; padding: 14px;
-      background: #d97706; color: white;
-      border: none; border-radius: 10px;
-      font-size: 1rem; font-weight: 700;
-      cursor: pointer; transition: background .2s; margin-top: 8px;
-    }
+    button[type=submit] { width: 100%; padding: 14px; background: #d97706; color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background .2s; margin-top: 8px; }
     button[type=submit]:hover { background: #b45309; }
-    button[type=submit]:disabled { background: #94a3b8; cursor: default; }
+    button[type=submit]:disabled { background: var(--text-faint); cursor: default; }
 
-    /* Éxito */
     #screen-exito { display: none; text-align: center; padding: 48px 32px; }
     #screen-exito .icon { font-size: 3rem; margin-bottom: 16px; }
-    #screen-exito h2 { font-size: 1.4rem; color: #1e293b; margin-bottom: 8px; }
-    #screen-exito p { color: #64748b; line-height: 1.6; margin-bottom: 24px; }
-    .btn-dashboard { display: inline-block; padding: 12px 28px; background: #2563eb; color: white; border-radius: 10px; font-weight: 600; text-decoration: none; }
+    #screen-exito h2 { font-size: 1.4rem; color: var(--text); margin-bottom: 8px; }
+    #screen-exito p { color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+    .btn-dashboard { display: inline-block; padding: 12px 28px; background: var(--accent); color: white; border-radius: 10px; font-weight: 600; text-decoration: none; }
 
-    .msg { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: .9rem; display: none; }
+    .msg { margin-top: 16px; padding: 12px; border-radius: var(--radius-sm); font-size: .9rem; display: none; }
     .msg.err { background: #fee2e2; color: #991b1b; display: block; }
+    [data-theme="dark"] .msg.err { background: #450a0a; color: #fca5a5; }
   </style>
 </head>
 <body>

@@ -4,41 +4,66 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AJUCON — Plataforma Escolar</title>
+  <link rel="stylesheet" href="/assets/theme.css" />
   <script src="/assets/theme.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; transition: background .3s; }
-    .card { background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 420px; box-shadow: 0 4px 24px rgba(0,0,0,.08); transition: background .3s; }
-    h1 { font-size: 2rem; color: #2563eb; margin-bottom: 4px; }
-    .subtitle { color: #64748b; margin-bottom: 32px; font-size: .95rem; }
+    body { display: flex; align-items: center; justify-content: center; }
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 40px;
+      width: 100%; max-width: 420px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+    h1 { font-size: 2rem; color: var(--accent); margin-bottom: 4px; }
+    .subtitle { color: var(--text-muted); margin-bottom: 32px; font-size: .95rem; }
     .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
-    .tab { flex: 1; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer; font-size: .9rem; color: #475569; transition: all .2s; }
-    .tab.active { border-color: #2563eb; color: #2563eb; font-weight: 600; }
-    /* Dark mode */
-    [data-theme="dark"] body { background: #0f172a; }
-    [data-theme="dark"] .card { background: #1e293b; box-shadow: 0 4px 24px rgba(0,0,0,.3); }
-    [data-theme="dark"] h1 { color: #60a5fa; }
-    [data-theme="dark"] .subtitle { color: #94a3b8; }
-    [data-theme="dark"] .tab { background: #1e293b; border-color: #334155; color: #94a3b8; }
-    [data-theme="dark"] .tab.active { border-color: #60a5fa; color: #60a5fa; }
-    [data-theme="dark"] label { color: #94a3b8; }
-    [data-theme="dark"] input, [data-theme="dark"] select { background: #0f172a; border-color: #334155; color: #f1f5f9; }
-    [data-theme="dark"] input::placeholder { color: #475569; }
-    [data-theme="dark"] .msg.ok { background: #14532d; color: #86efac; }
-    [data-theme="dark"] .msg.err { background: #450a0a; color: #fca5a5; }
-    [data-theme="dark"] #admin-link { color: #475569; }
-    /* Toggle */
-    .theme-toggle { position: fixed; top: 16px; right: 16px; background: white; border: 1px solid #e2e8f0; border-radius: 50%; width: 36px; height: 36px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: all .2s; z-index: 10; }
-    [data-theme="dark"] .theme-toggle { background: #1e293b; border-color: #334155; }
-    label { display: block; font-size: .85rem; font-weight: 600; color: #374151; margin-bottom: 6px; }
-    input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: .95rem; outline: none; transition: border-color .2s; margin-bottom: 16px; }
-    input:focus, select:focus { border-color: #2563eb; }
-    button[type=submit] { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .2s; }
-    button[type=submit]:hover { background: #1d4ed8; }
-    .msg { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: .9rem; display: none; }
+    .tab {
+      flex: 1; padding: 10px;
+      border: 2px solid var(--border2);
+      border-radius: var(--radius-sm);
+      background: var(--surface2);
+      cursor: pointer; font-size: .9rem;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .tab.active { border-color: var(--accent); color: var(--accent); font-weight: 600; background: var(--accent-soft); }
+    label { display: block; font-size: .85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    input, select {
+      width: 100%; padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: .95rem; outline: none;
+      background: var(--surface2);
+      color: var(--text);
+      transition: var(--transition);
+      margin-bottom: 16px;
+    }
+    input:focus, select:focus { border-color: var(--accent); }
+    input::placeholder { color: var(--text-faint); }
+    button[type=submit] {
+      width: 100%; padding: 14px;
+      background: var(--accent); color: white;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+    }
+    button[type=submit]:hover { background: var(--accent-hover); }
+    .msg { margin-top: 16px; padding: 12px; border-radius: var(--radius-sm); font-size: .9rem; display: none; }
     .msg.ok { background: #dcfce7; color: #166534; display: block; }
     .msg.err { background: #fee2e2; color: #991b1b; display: block; }
+    [data-theme="dark"] .msg.ok { background: #14532d; color: #86efac; }
+    [data-theme="dark"] .msg.err { background: #450a0a; color: #fca5a5; }
     .code-group { display: none; }
+    .theme-toggle {
+      position: fixed; top: 16px; right: 16px;
+      z-index: 10;
+      box-shadow: var(--shadow);
+    }
+    .admin-link { font-size: .75rem; color: var(--text-faint); text-decoration: none; }
+    .admin-link:hover { color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -93,8 +118,8 @@
   </form>
 
   <div class="msg" id="msg"></div>
-  <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid #f1f5f9">
-    <a href="/admin/login.html" style="font-size:.75rem;color:#cbd5e1;text-decoration:none">Acceso administrativo</a>
+  <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+    <a href="/admin/login.html" class="admin-link">Acceso administrativo</a>
   </div>
 </div>
 

@@ -4,38 +4,77 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AJUCON — Panel Admin</title>
+  <link rel="stylesheet" href="/assets/theme.css" />
+  <script>
+    /* Aplica tema antes de renderizar */
+    (function() {
+      var t = localStorage.getItem('ajucon_admin_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; }
+    body { display: flex; min-height: 100vh; }
 
-    /* Sidebar */
-    .sidebar { width: 220px; background: #1e293b; border-right: 1px solid #334155; padding: 24px 0; flex-shrink: 0; display: flex; flex-direction: column; }
-    .sidebar .logo { padding: 0 20px 24px; font-size: 1.1rem; font-weight: 800; color: #6366f1; border-bottom: 1px solid #334155; margin-bottom: 16px; }
-    .sidebar .logo span { font-size: .7rem; font-weight: 400; color: #64748b; display: block; }
-    .nav-item { padding: 10px 20px; cursor: pointer; font-size: .9rem; color: #94a3b8; border-left: 3px solid transparent; transition: all .15s; }
-    .nav-item:hover { color: #e2e8f0; background: #0f172a; }
-    .nav-item.active { color: #6366f1; border-left-color: #6366f1; background: #0f172a; font-weight: 600; }
-    .sidebar-footer { margin-top: auto; padding: 16px 20px; }
-    .btn-logout { width: 100%; padding: 8px; background: none; border: 1px solid #334155; border-radius: 8px; color: #64748b; cursor: pointer; font-size: .85rem; }
+    /* ===== Sidebar — siempre oscuro ===== */
+    .sidebar {
+      width: 220px; flex-shrink: 0;
+      background: #161b27;
+      border-right: 1px solid #1e293b;
+      padding: 24px 0;
+      display: flex; flex-direction: column;
+    }
+    .sidebar .logo { padding: 0 20px 24px; font-size: 1.1rem; font-weight: 800; color: #6366f1; border-bottom: 1px solid #1e293b; margin-bottom: 16px; }
+    .sidebar .logo span { font-size: .7rem; font-weight: 400; color: #475569; display: block; }
+    .nav-item { padding: 10px 20px; cursor: pointer; font-size: .9rem; color: #64748b; border-left: 3px solid transparent; transition: all .15s; }
+    .nav-item:hover { color: #e2e8f0; background: #0d1117; }
+    .nav-item.active { color: #818cf8; border-left-color: #818cf8; background: #0d1117; font-weight: 600; }
+    .sidebar-footer { margin-top: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+    .btn-theme {
+      width: 100%; padding: 8px;
+      background: none; border: 1px solid #1e293b;
+      border-radius: 8px; color: #64748b; cursor: pointer; font-size: .82rem;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-theme:hover { border-color: #818cf8; color: #818cf8; }
+    .btn-logout { width: 100%; padding: 8px; background: none; border: 1px solid #1e293b; border-radius: 8px; color: #64748b; cursor: pointer; font-size: .85rem; transition: border-color .2s, color .2s; }
     .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
 
-    /* Main */
-    .main { flex: 1; padding: 32px; overflow-y: auto; }
-    .main h2 { font-size: 1.3rem; margin-bottom: 24px; color: #f1f5f9; }
+    /* ===== Main — cambia con el tema ===== */
+    .main {
+      flex: 1; padding: 32px; overflow-y: auto;
+      background: var(--bg);
+      color: var(--text);
+      transition: var(--transition);
+    }
+    .main h2 { font-size: 1.3rem; margin-bottom: 24px; color: var(--text); }
 
     /* Stats */
     .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px; }
-    .stat-card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
-    .stat-card .num { font-size: 2rem; font-weight: 800; color: #6366f1; }
-    .stat-card .label { font-size: .8rem; color: #64748b; margin-top: 4px; }
+    .stat-card {
+      background: var(--surface);
+      border-radius: 12px; padding: 20px;
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+    .stat-card .num { font-size: 2rem; font-weight: 800; color: #818cf8; }
+    .stat-card .label { font-size: .8rem; color: var(--text-muted); margin-top: 4px; }
 
     /* Tabla */
-    .table-wrap { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
+    .table-wrap {
+      background: var(--surface);
+      border-radius: 12px; border: 1px solid var(--border); overflow: hidden;
+      transition: var(--transition);
+    }
     table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-    th { background: #0f172a; padding: 12px 16px; text-align: left; color: #64748b; font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; }
-    td { padding: 12px 16px; border-top: 1px solid #334155; color: #cbd5e1; vertical-align: middle; }
-    tr:hover td { background: #0f172a30; }
-    .empty { text-align: center; color: #64748b; padding: 40px; }
+    th {
+      background: var(--surface2);
+      padding: 12px 16px; text-align: left;
+      color: var(--text-muted); font-size: .75rem;
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+    td { padding: 12px 16px; border-top: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+    tr:hover td { background: var(--bg2); }
+    .empty { text-align: center; color: var(--text-faint); padding: 40px; }
 
     /* Badge estado */
     .badge { padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
@@ -44,19 +83,23 @@
     .badge.aprobada { background: #14532d; color: #86efac; }
     .badge.rechazada { background: #450a0a; color: #fca5a5; }
 
-    select.estado-select { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: .8rem; cursor: pointer; }
+    select.estado-select {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 6px;
+      padding: 4px 8px; font-size: .8rem; cursor: pointer;
+      transition: var(--transition);
+    }
 
     .section { display: none; }
     .section.active { display: block; }
 
-    /* Panel lateral usuario */
+    /* Panel lateral usuario — siempre oscuro (slide-in) */
     .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:100; }
     .overlay.open { display:block; }
     .user-panel {
       position:fixed; top:0; right:-480px; width:480px; height:100vh;
-      background:#1e293b; border-left:1px solid #334155;
-      overflow-y:auto; z-index:101; transition:right .3s ease;
-      padding:28px;
+      background: #161b27; border-left: 1px solid #1e293b;
+      overflow-y:auto; z-index:101; transition:right .3s ease; padding:28px;
     }
     .user-panel.open { right:0; }
     .user-panel h3 { font-size:1.1rem; color:#f1f5f9; margin-bottom:4px; }
@@ -64,9 +107,9 @@
     .up-close { position:absolute; top:20px; right:20px; background:none; border:none; color:#64748b; font-size:1.3rem; cursor:pointer; }
     .up-close:hover { color:#f1f5f9; }
     .up-section { margin-bottom:24px; }
-    .up-section-title { font-size:.72rem; font-weight:700; color:#6366f1; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid #334155; }
-    .up-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid #1e293b; font-size:.85rem; }
-    .up-row .up-key { color:#94a3b8; }
+    .up-section-title { font-size:.72rem; font-weight:700; color:#818cf8; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid #1e293b; }
+    .up-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid #0d1117; font-size:.85rem; }
+    .up-row .up-key { color:#64748b; }
     .up-row .up-val { color:#e2e8f0; font-weight:500; text-align:right; max-width:60%; }
     .up-badge { padding:3px 10px; border-radius:20px; font-size:.75rem; font-weight:600; }
     .up-badge.pendiente { background:#1e3a5f; color:#93c5fd; }
@@ -74,31 +117,34 @@
     .up-badge.aprobada { background:#14532d; color:#86efac; }
     .up-badge.rechazada { background:#450a0a; color:#fca5a5; }
     .up-empty { font-size:.82rem; color:#475569; font-style:italic; }
-    /* Mini barras RIASEC en panel */
     .up-riasec-dims { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; margin-top:10px; text-align:center; }
-    .up-dim-label { font-size:.65rem; font-weight:700; color:#94a3b8; margin-bottom:3px; }
-    .up-dim-bar { background:#0f172a; border-radius:4px; height:40px; position:relative; overflow:hidden; }
+    .up-dim-label { font-size:.65rem; font-weight:700; color:#64748b; margin-bottom:3px; }
+    .up-dim-bar { background:#0d1117; border-radius:4px; height:40px; position:relative; overflow:hidden; }
     .up-dim-fill { position:absolute; bottom:0; left:0; right:0; border-radius:4px 4px 0 0; transition:height .5s; }
     .up-dim-score { font-size:.65rem; color:#64748b; margin-top:2px; }
-    .up-pct-bar-wrap { background:#0f172a; border-radius:6px; height:8px; margin:6px 0 10px; }
+    .up-pct-bar-wrap { background:#0d1117; border-radius:6px; height:8px; margin:6px 0 10px; }
     .up-pct-bar-fill { height:8px; border-radius:6px; background:linear-gradient(90deg,#7c3aed,#a78bfa); }
 
     /* Tarjetas RIASEC */
-    .riasec-card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+    .riasec-card {
+      background: var(--surface); border-radius: 12px;
+      padding: 20px; border: 1px solid var(--border);
+      transition: var(--transition);
+    }
     .riasec-card .rc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
-    .riasec-card .rc-nombre { font-size: .95rem; font-weight: 700; color: #f1f5f9; }
-    .riasec-card .rc-email { font-size: .75rem; color: #64748b; }
-    .riasec-card .rc-grado { font-size: .72rem; color: #6366f1; font-weight: 600; background: #1e1b4b; padding: 2px 8px; border-radius: 10px; }
+    .riasec-card .rc-nombre { font-size: .95rem; font-weight: 700; color: var(--text); }
+    .riasec-card .rc-email { font-size: .75rem; color: var(--text-muted); }
+    .riasec-card .rc-grado { font-size: .72rem; color: #818cf8; font-weight: 600; background: var(--accent-soft); padding: 2px 8px; border-radius: 10px; }
     .rc-progress { margin: 12px 0 8px; }
-    .rc-progress-label { display: flex; justify-content: space-between; font-size: .75rem; color: #94a3b8; margin-bottom: 4px; }
+    .rc-progress-label { display: flex; justify-content: space-between; font-size: .75rem; color: var(--text-muted); margin-bottom: 4px; }
     .rc-progress-label span:last-child { color: #a78bfa; font-weight: 700; }
-    .rc-bar-wrap { background: #0f172a; border-radius: 6px; height: 8px; }
+    .rc-bar-wrap { background: var(--bg2); border-radius: 6px; height: 8px; }
     .rc-bar-fill { height: 8px; border-radius: 6px; background: linear-gradient(90deg,#7c3aed,#a78bfa); transition: width .6s; }
     .rc-dims { display: grid; grid-template-columns: repeat(6,1fr); gap: 6px; margin-top: 12px; text-align: center; }
-    .rc-dim-label { font-size: .65rem; font-weight: 700; color: #94a3b8; margin-bottom: 3px; }
-    .rc-dim-bar { background: #0f172a; border-radius: 4px; height: 36px; position: relative; overflow: hidden; }
+    .rc-dim-label { font-size: .65rem; font-weight: 700; color: var(--text-muted); margin-bottom: 3px; }
+    .rc-dim-bar { background: var(--bg2); border-radius: 4px; height: 36px; position: relative; overflow: hidden; }
     .rc-dim-fill { position: absolute; bottom: 0; left: 0; right: 0; border-radius: 4px 4px 0 0; transition: height .6s; }
-    .rc-dim-score { font-size: .65rem; color: #64748b; margin-top: 2px; }
+    .rc-dim-score { font-size: .65rem; color: var(--text-muted); margin-top: 2px; }
     .rc-perfil { margin-top: 10px; font-size: .78rem; color: #a78bfa; font-weight: 600; text-align: center; }
   </style>
 </head>
@@ -113,7 +159,7 @@
   <div class="nav-item" onclick="setSeccion('test_results', this)">✏️ Test CHASIDE</div>
   <div class="nav-item" onclick="setSeccion('riasec', this)">🧠 Perfiles RIASEC</div>
   <div class="sidebar-footer">
-    <button onclick="toggleAdminTheme()" style="width:100%;margin-bottom:8px;padding:8px;background:none;border:1px solid #334155;border-radius:8px;color:#94a3b8;cursor:pointer;font-size:.85rem;" id="theme-btn">☀️ Modo claro</button>
+    <button class="btn-theme" id="theme-btn" onclick="toggleAdminTheme()">☀️ Modo claro</button>
     <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
   </div>
 </div>
@@ -168,7 +214,7 @@
   <div class="section" id="sec-riasec">
     <h2>Perfiles Vocacionales — Modelo RIASEC</h2>
     <div id="riasec-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:8px"></div>
-    <div id="riasec-empty" style="display:none;text-align:center;color:#64748b;padding:40px">Sin perfiles aún.</div>
+    <div id="riasec-empty" style="display:none;text-align:center;color:var(--text-faint);padding:40px">Sin perfiles aún.</div>
   </div>
 
   <!-- Test CHASIDE -->
@@ -191,7 +237,6 @@
   <h3 id="up-nombre">—</h3>
   <div class="up-email" id="up-email">—</div>
 
-  <!-- Info básica -->
   <div class="up-section">
     <div class="up-section-title">Datos del estudiante</div>
     <div class="up-row"><span class="up-key">Grado</span><span class="up-val" id="up-grado">—</span></div>
@@ -200,10 +245,9 @@
     <div class="up-row"><span class="up-key">Sesiones con Profesor</span><span class="up-val" id="up-conv-prof">—</span></div>
   </div>
 
-  <!-- RIASEC -->
   <div class="up-section">
     <div class="up-section-title">Perfil Vocacional RIASEC</div>
-    <div style="display:flex;justify-content:space-between;font-size:.78rem;color:#94a3b8">
+    <div style="display:flex;justify-content:space-between;font-size:.78rem;color:#64748b">
       <span>Perfil detectado</span><span id="up-pct" style="color:#a78bfa;font-weight:700">0%</span>
     </div>
     <div class="up-pct-bar-wrap"><div class="up-pct-bar-fill" id="up-pct-bar" style="width:0%"></div></div>
@@ -211,19 +255,16 @@
     <div style="margin-top:10px;font-size:.8rem;color:#a78bfa;font-weight:600;text-align:center" id="up-perfil-dom"></div>
   </div>
 
-  <!-- Test CHASIDE -->
   <div class="up-section">
     <div class="up-section-title">Test Vocacional CHASIDE</div>
     <div id="up-test-content"><span class="up-empty">No ha realizado el test.</span></div>
   </div>
 
-  <!-- Becas Profesionales -->
   <div class="up-section">
     <div class="up-section-title">Postulaciones — Becas Profesionales</div>
     <div id="up-becas-prof-content"><span class="up-empty">Sin postulaciones.</span></div>
   </div>
 
-  <!-- Becas Cursos -->
   <div class="up-section">
     <div class="up-section-title">Solicitudes — Becas Cursos Online</div>
     <div id="up-becas-cur-content"><span class="up-empty">Sin solicitudes.</span></div>
@@ -234,12 +275,26 @@
   const token = localStorage.getItem('ajucon_admin_token');
   if (!token) window.location.href = '/admin/login.html';
 
-  const AREAS = { C: 'Ciencias Exactas', H: 'Humanidades', A: 'Arte', S: 'Sociales', I: 'Investigación', D: 'Dirección', E: 'Empresa' };
+  /* ===== Tema ===== */
+  function _syncThemeBtn() {
+    var t = document.documentElement.getAttribute('data-theme') || 'dark';
+    var btn = document.getElementById('theme-btn');
+    if (btn) btn.textContent = t === 'dark' ? '☀️ Modo claro' : '🌙 Modo oscuro';
+  }
+  function toggleAdminTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('ajucon_admin_theme', next);
+    _syncThemeBtn();
+  }
+  _syncThemeBtn();
+
+  /* ===== Data ===== */
+  const AREAS = { C:'Ciencias Exactas', H:'Humanidades', A:'Arte', S:'Sociales', I:'Investigación', D:'Dirección', E:'Empresa' };
 
   async function api(seccion) {
-    const r = await fetch('/api/admin/data?seccion=' + seccion, {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
+    const r = await fetch('/api/admin/data?seccion=' + seccion, { headers: { 'Authorization': 'Bearer ' + token } });
     if (r.status === 401) { logout(); return null; }
     return r.json();
   }
@@ -253,7 +308,7 @@
   }
 
   function fecha(iso) {
-    return new Date(iso).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return new Date(iso).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
 
   function badgeEstado(estado, tabla, id) {
@@ -265,8 +320,7 @@
   }
 
   async function cargarStats() {
-    const d = await api('stats');
-    if (!d) return;
+    const d = await api('stats'); if (!d) return;
     document.getElementById('stat-usuarios').textContent = d.usuarios ?? 0;
     document.getElementById('stat-bp').textContent = d.becas_profesionales ?? 0;
     document.getElementById('stat-bc').textContent = d.becas_cursos ?? 0;
@@ -278,10 +332,7 @@
     const tbody = document.getElementById('tbody-users');
     tbody.innerHTML = data.length ? data.map(u => `
       <tr onclick="abrirUsuario('${u.id}')" style="cursor:pointer">
-        <td>${u.nombre}</td>
-        <td>${u.email}</td>
-        <td>${u.grado}</td>
-        <td>${fecha(u.created_at)}</td>
+        <td>${u.nombre}</td><td>${u.email}</td><td>${u.grado}</td><td>${fecha(u.created_at)}</td>
       </tr>`).join('') : '<tr><td colspan="4" class="empty">Sin usuarios aún.</td></tr>';
   }
 
@@ -290,12 +341,9 @@
     const tbody = document.getElementById('tbody-becas_profesionales');
     tbody.innerHTML = data.length ? data.map(b => `
       <tr>
-        <td>${b.users?.nombre || '—'}</td>
-        <td>${b.users?.email || '—'}</td>
-        <td>${b.carrera_interes}</td>
-        <td>${b.institucion}</td>
-        <td>${b.promedio_notas}</td>
-        <td>${badgeEstado(b.estado, 'becas_profesionales', b.id)}</td>
+        <td>${b.users?.nombre||'—'}</td><td>${b.users?.email||'—'}</td>
+        <td>${b.carrera_interes}</td><td>${b.institucion}</td>
+        <td>${b.promedio_notas}</td><td>${badgeEstado(b.estado,'becas_profesionales',b.id)}</td>
       </tr>`).join('') : '<tr><td colspan="6" class="empty">Sin postulaciones aún.</td></tr>';
   }
 
@@ -304,11 +352,9 @@
     const tbody = document.getElementById('tbody-becas_cursos');
     tbody.innerHTML = data.length ? data.map(b => `
       <tr>
-        <td>${b.users?.nombre || '—'}</td>
-        <td>${b.users?.email || '—'}</td>
-        <td>${b.plataforma}</td>
-        <td>${b.curso_nombre}</td>
-        <td>${badgeEstado(b.estado, 'becas_cursos', b.id)}</td>
+        <td>${b.users?.nombre||'—'}</td><td>${b.users?.email||'—'}</td>
+        <td>${b.plataforma}</td><td>${b.curso_nombre}</td>
+        <td>${badgeEstado(b.estado,'becas_cursos',b.id)}</td>
       </tr>`).join('') : '<tr><td colspan="5" class="empty">Sin solicitudes aún.</td></tr>';
   }
 
@@ -317,10 +363,9 @@
     const tbody = document.getElementById('tbody-test_results');
     tbody.innerHTML = data.length ? data.map(t => `
       <tr>
-        <td>${t.users?.nombre || '—'}</td>
-        <td>${t.users?.email || '—'}</td>
-        <td>${t.resultado} — ${AREAS[t.resultado] || ''}</td>
-        <td>${Array.isArray(t.carreras) ? t.carreras.slice(0,3).join(', ') : '—'}</td>
+        <td>${t.users?.nombre||'—'}</td><td>${t.users?.email||'—'}</td>
+        <td>${t.resultado} — ${AREAS[t.resultado]||''}</td>
+        <td>${Array.isArray(t.carreras)?t.carreras.slice(0,3).join(', '):'—'}</td>
         <td>${fecha(t.created_at)}</td>
       </tr>`).join('') : '<tr><td colspan="5" class="empty">Sin tests aún.</td></tr>';
   }
@@ -332,42 +377,36 @@
     if (!data.length) { empty.style.display = 'block'; return; }
 
     const DIMS = [
-      { key: 'R', label: 'Realista',      color: '#f59e0b' },
-      { key: 'I', label: 'Investigador',  color: '#3b82f6' },
-      { key: 'A', label: 'Artístico',     color: '#ec4899' },
-      { key: 'S', label: 'Social',        color: '#22c55e' },
-      { key: 'E', label: 'Emprendedor',   color: '#f97316' },
-      { key: 'C', label: 'Convencional',  color: '#8b5cf6' },
+      { key:'R', label:'Realista',     color:'#f59e0b' },
+      { key:'I', label:'Investigador', color:'#3b82f6' },
+      { key:'A', label:'Artístico',    color:'#ec4899' },
+      { key:'S', label:'Social',       color:'#22c55e' },
+      { key:'E', label:'Emprendedor',  color:'#f97316' },
+      { key:'C', label:'Convencional', color:'#8b5cf6' },
     ];
-
     const NOMBRES = { R:'Realista', I:'Investigador', A:'Artístico', S:'Social', E:'Emprendedor', C:'Convencional' };
 
     container.innerHTML = data.map(p => {
-      const scores = { R: p.R||0, I: p.I||0, A: p.A||0, S: p.S||0, E: p.E||0, C: p.C||0 };
+      const scores = { R:p.R||0, I:p.I||0, A:p.A||0, S:p.S||0, E:p.E||0, C:p.C||0 };
       const top = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
       const pct = p.completitud || 0;
-
       const dimsHtml = DIMS.map(d => `
         <div>
           <div class="rc-dim-label" title="${d.label}">${d.key}</div>
-          <div class="rc-dim-bar">
-            <div class="rc-dim-fill" style="height:${Math.min(scores[d.key],10)*10}%;background:${d.color}"></div>
-          </div>
+          <div class="rc-dim-bar"><div class="rc-dim-fill" style="height:${Math.min(scores[d.key],10)*10}%;background:${d.color}"></div></div>
           <div class="rc-dim-score">${scores[d.key]}</div>
         </div>`).join('');
-
       const perfilLabel = top[1] > 0
         ? `Perfil dominante: <strong>${top[0]} — ${NOMBRES[top[0]]}</strong>`
         : 'Sin datos suficientes aún';
-
       return `
         <div class="riasec-card">
           <div class="rc-header">
             <div>
-              <div class="rc-nombre">${p.users?.nombre || '—'}</div>
-              <div class="rc-email">${p.users?.email || '—'}</div>
+              <div class="rc-nombre">${p.users?.nombre||'—'}</div>
+              <div class="rc-email">${p.users?.email||'—'}</div>
             </div>
-            <div class="rc-grado">${p.users?.grado || '—'}</div>
+            <div class="rc-grado">${p.users?.grado||'—'}</div>
           </div>
           <div class="rc-progress">
             <div class="rc-progress-label"><span>Perfil detectado</span><span>${pct}%</span></div>
@@ -379,15 +418,7 @@
     }).join('');
   }
 
-  const loaders = {
-    stats: cargarStats,
-    users: cargarUsers,
-    becas_profesionales: cargarBecasProfesionales,
-    becas_cursos: cargarBecasCursos,
-    test_results: cargarTestResults,
-    riasec: cargarRiasec,
-  };
-
+  const loaders = { stats:cargarStats, users:cargarUsers, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec };
   const loaded = new Set();
 
   function setSeccion(sec, el) {
@@ -403,48 +434,16 @@
     window.location.href = '/admin/login.html';
   }
 
-  (function() {
-    var t = localStorage.getItem('ajucon_admin_theme') || 'dark';
-    applyAdminTheme(t);
-  })();
-
-  function applyAdminTheme(t) {
-    var isDark = t === 'dark';
-    var body = document.body;
-    var sidebar = document.querySelector('.sidebar');
-    var main = document.querySelector('.main');
-    if (isDark) {
-      body.style.background = '#0f172a';
-      body.style.color = '#e2e8f0';
-      if (sidebar) sidebar.style.background = '#1e293b';
-    } else {
-      body.style.background = '#f0f4ff';
-      body.style.color = '#1e293b';
-      if (sidebar) { sidebar.style.background = '#1e293b'; }
-    }
-    var btn = document.getElementById('theme-btn');
-    if (btn) btn.textContent = isDark ? '☀️ Modo claro' : '🌙 Modo oscuro';
-    localStorage.setItem('ajucon_admin_theme', t);
-  }
-
-  function toggleAdminTheme() {
-    var current = localStorage.getItem('ajucon_admin_theme') || 'dark';
-    applyAdminTheme(current === 'dark' ? 'light' : 'dark');
-  }
-
-  // Panel lateral de usuario
+  /* ===== Panel usuario ===== */
   async function abrirUsuario(id) {
     document.getElementById('overlay').classList.add('open');
     document.getElementById('user-panel').classList.add('open');
     document.getElementById('up-nombre').textContent = 'Cargando...';
 
-    const r = await fetch('/api/admin/usuario?id=' + id, {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
+    const r = await fetch('/api/admin/usuario?id=' + id, { headers: { 'Authorization': 'Bearer ' + token } });
     if (!r.ok) return;
     const d = await r.json();
 
-    // Info básica
     document.getElementById('up-nombre').textContent = d.user.nombre;
     document.getElementById('up-email').textContent = d.user.email;
     document.getElementById('up-grado').textContent = d.user.grado;
@@ -452,7 +451,6 @@
     document.getElementById('up-conv-psi').textContent = d.conversaciones.psicologa + ' sesión(es)';
     document.getElementById('up-conv-prof').textContent = d.conversaciones.profesor + ' sesión(es)';
 
-    // RIASEC
     const DIMS = [
       { key:'R', label:'Realista',     color:'#f59e0b' },
       { key:'I', label:'Investigador', color:'#3b82f6' },
@@ -484,33 +482,30 @@
       document.getElementById('up-perfil-dom').textContent = 'No ha iniciado sesión con Valeria.';
     }
 
-    // Test CHASIDE
     const testEl = document.getElementById('up-test-content');
     if (d.test) {
       testEl.innerHTML = `
-        <div class="up-row"><span class="up-key">Área dominante</span><span class="up-val">${d.test.resultado} — ${NOMBRES[d.test.resultado] || ''}</span></div>
-        <div class="up-row"><span class="up-key">Carreras sugeridas</span><span class="up-val">${Array.isArray(d.test.carreras) ? d.test.carreras.slice(0,3).join(', ') : '—'}</span></div>
+        <div class="up-row"><span class="up-key">Área dominante</span><span class="up-val">${d.test.resultado} — ${NOMBRES[d.test.resultado]||''}</span></div>
+        <div class="up-row"><span class="up-key">Carreras sugeridas</span><span class="up-val">${Array.isArray(d.test.carreras)?d.test.carreras.slice(0,3).join(', '):'—'}</span></div>
         <div class="up-row"><span class="up-key">Realizado</span><span class="up-val">${fecha(d.test.created_at)}</span></div>`;
     } else {
       testEl.innerHTML = '<span class="up-empty">No ha realizado el test.</span>';
     }
 
-    // Becas Profesionales
     const bpEl = document.getElementById('up-becas-prof-content');
     if (d.becas_profesionales.length) {
       bpEl.innerHTML = d.becas_profesionales.map(b => `
         <div class="up-row"><span class="up-key">${b.carrera_interes}</span><span class="up-val"><span class="up-badge ${b.estado}">${b.estado.replace('_',' ')}</span></span></div>
-        <div class="up-row" style="font-size:.75rem"><span class="up-key">Institución</span><span class="up-val">${b.institucion}</span></div>`).join('<hr style="border-color:#334155;margin:6px 0">');
+        <div class="up-row" style="font-size:.75rem"><span class="up-key">Institución</span><span class="up-val">${b.institucion}</span></div>`).join('<hr style="border-color:#1e293b;margin:6px 0">');
     } else {
       bpEl.innerHTML = '<span class="up-empty">Sin postulaciones.</span>';
     }
 
-    // Becas Cursos
     const bcEl = document.getElementById('up-becas-cur-content');
     if (d.becas_cursos.length) {
       bcEl.innerHTML = d.becas_cursos.map(b => `
         <div class="up-row"><span class="up-key">${b.plataforma}</span><span class="up-val"><span class="up-badge ${b.estado}">${b.estado.replace('_',' ')}</span></span></div>
-        <div class="up-row" style="font-size:.75rem"><span class="up-key">Curso</span><span class="up-val">${b.curso_nombre}</span></div>`).join('<hr style="border-color:#334155;margin:6px 0">');
+        <div class="up-row" style="font-size:.75rem"><span class="up-key">Curso</span><span class="up-val">${b.curso_nombre}</span></div>`).join('<hr style="border-color:#1e293b;margin:6px 0">');
     } else {
       bcEl.innerHTML = '<span class="up-empty">Sin solicitudes.</span>';
     }
@@ -521,7 +516,6 @@
     document.getElementById('user-panel').classList.remove('open');
   }
 
-  // Carga inicial
   cargarStats();
   loaded.add('stats');
 </script>

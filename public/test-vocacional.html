@@ -4,131 +4,84 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AJUCON — Test Vocacional CHASIDE</title>
+  <link rel="stylesheet" href="/assets/theme.css" />
   <script src="/assets/theme.js"></script>
   <style>
-    [data-theme="dark"] body { background: #0f172a; }
-    [data-theme="dark"] header { background: #1e293b; border-color: #334155; }
-    [data-theme="dark"] header h2 { color: #f1f5f9; }
-    [data-theme="dark"] #screen-intro { background: #1e293b; }
-    [data-theme="dark"] #screen-intro h1 { color: #f1f5f9; }
-    [data-theme="dark"] #screen-intro p { color: #94a3b8; }
-    [data-theme="dark"] .question-card { background: #1e293b; }
-    [data-theme="dark"] .question-num { color: #64748b; }
-    [data-theme="dark"] .question-text { color: #f1f5f9; }
-    [data-theme="dark"] .option-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
-    [data-theme="dark"] .resultado-card { background: #1e293b; }
-    [data-theme="dark"] .resultado-card h2 { color: #f1f5f9; }
-    [data-theme="dark"] .resultado-card .subtitulo { color: #64748b; }
-    [data-theme="dark"] .resultado-card h3 { color: #f1f5f9; }
-    [data-theme="dark"] .bar-label { color: #94a3b8; }
-    [data-theme="dark"] .bar-track { background: #0f172a; }
-    [data-theme="dark"] .bar-score { color: #94a3b8; }
-    [data-theme="dark"] .carrera-tag { background: #1e3a5f; color: #93c5fd; }
-    [data-theme="dark"] .progress-label { color: #94a3b8; }
-    [data-theme="dark"] .progress-bar-wrap { background: #334155; }
-    .theme-toggle { background: none; border: 1px solid #e2e8f0; border-radius: 50%; width: 34px; height: 34px; font-size: .9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: auto; }
-    [data-theme="dark"] .theme-toggle { border-color: #334155; }
-  </style>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; }
-
-    header {
-      background: white;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .back-btn { background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.2rem; padding: 4px 8px; border-radius: 8px; }
-    .back-btn:hover { background: #f1f5f9; }
-    header h2 { font-size: 1rem; color: #1e293b; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; transition: var(--transition); }
+    .back-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; padding: 4px 8px; border-radius: var(--radius-sm); }
+    .back-btn:hover { background: var(--surface2); }
+    header h2 { font-size: 1rem; color: var(--text); }
 
     main { max-width: 720px; margin: 0 auto; padding: 32px 24px; }
 
-    /* Progress */
-    .progress-bar-wrap { background: #e2e8f0; border-radius: 8px; height: 8px; margin-bottom: 8px; }
-    .progress-bar { background: #2563eb; border-radius: 8px; height: 8px; transition: width .4s; }
-    .progress-label { font-size: .8rem; color: #64748b; margin-bottom: 24px; }
+    .progress-bar-wrap { background: var(--border); border-radius: 8px; height: 8px; margin-bottom: 8px; }
+    .progress-bar { background: var(--accent); border-radius: 8px; height: 8px; transition: width .4s; }
+    .progress-label { font-size: .8rem; color: var(--text-muted); margin-bottom: 24px; }
 
-    /* Intro */
-    #screen-intro { background: white; border-radius: 16px; padding: 36px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-    #screen-intro h1 { font-size: 1.5rem; color: #1e293b; margin-bottom: 8px; }
-    #screen-intro p { color: #475569; line-height: 1.65; margin-bottom: 12px; }
+    #screen-intro { background: var(--surface); border-radius: var(--radius); padding: 36px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: var(--transition); }
+    #screen-intro h1 { font-size: 1.5rem; color: var(--text); margin-bottom: 8px; }
+    #screen-intro p { color: var(--text-muted); line-height: 1.65; margin-bottom: 12px; }
     .areas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin: 20px 0 28px; }
     .area-pill { padding: 8px 14px; border-radius: 8px; font-size: .85rem; font-weight: 600; text-align: center; }
 
-    /* Pregunta */
     #screen-test { display: none; }
-    .question-card { background: white; border-radius: 16px; padding: 36px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .question-card { background: var(--surface); border-radius: var(--radius); padding: 36px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: var(--transition); }
     .area-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: .75rem; font-weight: 700; margin-bottom: 20px; }
-    .question-num { font-size: .85rem; color: #94a3b8; margin-bottom: 8px; }
-    .question-text { font-size: 1.1rem; color: #1e293b; font-weight: 500; line-height: 1.5; margin-bottom: 32px; }
+    .question-num { font-size: .85rem; color: var(--text-faint); margin-bottom: 8px; }
+    .question-text { font-size: 1.1rem; color: var(--text); font-weight: 500; line-height: 1.5; margin-bottom: 32px; }
 
     .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .option-btn {
-      padding: 14px;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      background: white;
-      cursor: pointer;
-      font-size: .95rem;
-      font-weight: 500;
-      transition: all .15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      padding: 14px; border: 2px solid var(--border); border-radius: 12px;
+      background: var(--surface2); color: var(--text-muted);
+      cursor: pointer; font-size: .95rem; font-weight: 500;
+      transition: var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .option-btn:hover { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+    .option-btn:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
     .option-btn.si { border-color: #22c55e; background: #f0fdf4; color: #16a34a; }
     .option-btn.no { border-color: #ef4444; background: #fef2f2; color: #dc2626; }
+    [data-theme="dark"] .option-btn.si { background: #14532d; color: #86efac; }
+    [data-theme="dark"] .option-btn.no { background: #450a0a; color: #fca5a5; }
 
-    /* Resultados */
     #screen-resultado { display: none; }
-    .resultado-card { background: white; border-radius: 16px; padding: 36px; box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 20px; }
+    .resultado-card { background: var(--surface); border-radius: var(--radius); padding: 36px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; transition: var(--transition); }
     .resultado-card h2 { font-size: 1.3rem; color: #1e293b; margin-bottom: 4px; }
-    .resultado-card .subtitulo { color: #64748b; margin-bottom: 24px; font-size: .9rem; }
+    .resultado-card .subtitulo { color: var(--text-muted); margin-bottom: 24px; font-size: .9rem; }
 
-    /* Barras de resultado */
     .bars { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
     .bar-row { display: flex; align-items: center; gap: 12px; }
-    .bar-label { width: 220px; font-size: .9rem; color: #374151; font-weight: 500; flex-shrink: 0; }
-    .bar-label span { font-weight: 700; }
-    .bar-track { flex: 1; background: #f1f5f9; border-radius: 8px; height: 18px; overflow: hidden; }
+    .bar-label { width: 220px; font-size: .9rem; color: var(--text-muted); font-weight: 500; flex-shrink: 0; }
+    .bar-label span { font-weight: 700; color: var(--text); }
+    .bar-track { flex: 1; background: var(--surface2); border-radius: 8px; height: 18px; overflow: hidden; }
     .bar-fill { height: 18px; border-radius: 8px; transition: width 1s ease-out; }
-    .bar-score { width: 32px; text-align: right; font-size: .85rem; font-weight: 700; color: #475569; }
+    .bar-score { width: 32px; text-align: right; font-size: .85rem; font-weight: 700; color: var(--text-muted); }
 
-    /* Perfil dominante */
     .perfil-dominante { border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
     .perfil-dominante h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
     .perfil-dominante p { font-size: .9rem; line-height: 1.6; }
 
-    /* Carreras */
     .carreras-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-    .carrera-tag { padding: 8px 14px; background: #f0f4ff; color: #2563eb; border-radius: 8px; font-size: .85rem; font-weight: 500; text-align: center; }
+    .carrera-tag { padding: 8px 14px; background: var(--accent-soft); color: var(--accent); border-radius: 8px; font-size: .85rem; font-weight: 500; text-align: center; }
 
     .btn-primary {
-      display: block; width: 100%;
-      padding: 14px;
-      background: #2563eb; color: white;
+      display: block; width: 100%; padding: 14px;
+      background: var(--accent); color: white;
       border: none; border-radius: 10px;
       font-size: 1rem; font-weight: 600;
       cursor: pointer; transition: background .2s;
       text-align: center; margin-top: 24px;
     }
-    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:hover { background: var(--accent-hover); }
     .btn-secondary {
-      display: block; width: 100%;
-      padding: 14px;
-      background: white; color: #2563eb;
-      border: 2px solid #2563eb; border-radius: 10px;
+      display: block; width: 100%; padding: 14px;
+      background: var(--surface); color: var(--accent);
+      border: 2px solid var(--accent); border-radius: 10px;
       font-size: 1rem; font-weight: 600;
-      cursor: pointer; transition: all .2s;
+      cursor: pointer; transition: var(--transition);
       text-align: center; margin-top: 12px;
     }
-    .btn-secondary:hover { background: #eff6ff; }
+    .btn-secondary:hover { background: var(--accent-soft); }
   </style>
 </head>
 <body>

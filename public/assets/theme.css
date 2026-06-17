@@ -1,0 +1,65 @@
+/* ===== AJUCON Design Tokens ===== */
+:root {
+  --bg:           #f0f4ff;
+  --bg2:          #e8edf8;
+  --surface:      #ffffff;
+  --surface2:     #f8fafc;
+  --border:       #e2e8f0;
+  --border2:      #cbd5e1;
+  --text:         #1e293b;
+  --text-muted:   #64748b;
+  --text-faint:   #94a3b8;
+  --accent:       #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft:  #dbeafe;
+  --shadow:       0 2px 12px rgba(0,0,0,.07);
+  --shadow-lg:    0 8px 24px rgba(0,0,0,.10);
+  --radius:       14px;
+  --radius-sm:    8px;
+  --transition:   background .2s, color .2s, border-color .2s;
+}
+
+[data-theme="dark"] {
+  --bg:           #0d1117;
+  --bg2:          #0f172a;
+  --surface:      #161b27;
+  --surface2:     #1e293b;
+  --border:       #1e293b;
+  --border2:      #334155;
+  --text:         #e2e8f0;
+  --text-muted:   #94a3b8;
+  --text-faint:   #475569;
+  --accent:       #60a5fa;
+  --accent-hover: #93c5fd;
+  --accent-soft:  #1e3a5f;
+  --shadow:       0 2px 12px rgba(0,0,0,.3);
+  --shadow-lg:    0 8px 24px rgba(0,0,0,.4);
+}
+
+/* ===== Base reset con variables ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: var(--transition);
+  min-height: 100vh;
+}
+
+/* ===== Toggle button ===== */
+.theme-toggle {
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  font-size: .95rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}

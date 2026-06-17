@@ -4,79 +4,55 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AJUCON — Dashboard</title>
+  <link rel="stylesheet" href="/assets/theme.css" />
   <script src="/assets/theme.js"></script>
   <style>
-    [data-theme="dark"] body { background: #0f172a; }
-    [data-theme="dark"] header { background: #1e293b; border-color: #334155; }
-    [data-theme="dark"] header h1 { color: #60a5fa; }
-    [data-theme="dark"] .user-info span { color: #94a3b8; }
-    [data-theme="dark"] .btn-logout { border-color: #334155; color: #64748b; }
-    [data-theme="dark"] .welcome h2 { color: #f1f5f9; }
-    [data-theme="dark"] .welcome p { color: #64748b; }
-    [data-theme="dark"] .card { background: #1e293b; }
-    [data-theme="dark"] .card h3 { color: #f1f5f9; }
-    [data-theme="dark"] .card p { color: #94a3b8; }
-  </style>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; }
-
-    /* Header */
     header {
-      background: white;
-      border-bottom: 1px solid #e2e8f0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
       padding: 16px 32px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: var(--transition);
     }
-    header h1 { font-size: 1.5rem; color: #2563eb; font-weight: 800; }
-    .user-info { display: flex; align-items: center; gap: 16px; }
-    .user-info span { font-size: .9rem; color: #475569; }
+    header h1 { font-size: 1.5rem; color: var(--accent); font-weight: 800; }
+    .user-info { display: flex; align-items: center; gap: 12px; }
+    .user-info span { font-size: .9rem; color: var(--text-muted); }
     .user-avatar {
       width: 38px; height: 38px;
-      background: #2563eb;
+      background: var(--accent);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       color: white; font-weight: 700; font-size: 1rem;
     }
     .btn-logout {
-      background: none; border: 1px solid #e2e8f0;
-      border-radius: 8px; padding: 6px 14px;
-      font-size: .85rem; color: #64748b; cursor: pointer;
-      transition: all .2s;
+      background: none; border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); padding: 6px 14px;
+      font-size: .85rem; color: var(--text-muted); cursor: pointer;
+      transition: var(--transition);
     }
     .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
-    .theme-toggle { background: none; border: 1px solid #e2e8f0; border-radius: 50%; width: 34px; height: 34px; font-size: .95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 4px; transition: all .2s; }
-    [data-theme="dark"] .theme-toggle { border-color: #334155; }
 
-    /* Main */
     main { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
     .welcome { margin-bottom: 32px; }
-    .welcome h2 { font-size: 1.6rem; color: #1e293b; }
-    .welcome p { color: #64748b; margin-top: 4px; }
+    .welcome h2 { font-size: 1.6rem; color: var(--text); }
+    .welcome p { color: var(--text-muted); margin-top: 4px; }
 
-    /* Grid de tarjetas */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
 
     .card {
-      background: white;
-      border-radius: 16px;
+      background: var(--surface);
+      border-radius: var(--radius);
       padding: 28px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
       cursor: pointer;
-      transition: transform .2s, box-shadow .2s;
-      border: 2px solid transparent;
+      transition: transform .2s, box-shadow .2s, border-color .2s, background .2s;
       text-decoration: none;
       display: block;
     }
     .card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,.1);
+      box-shadow: var(--shadow-lg);
       border-color: var(--color);
     }
     .card-icon {
@@ -84,25 +60,18 @@
       border-radius: 14px;
       background: var(--bg);
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.6rem;
-      margin-bottom: 16px;
+      font-size: 1.6rem; margin-bottom: 16px;
     }
-    .card h3 { font-size: 1rem; color: #1e293b; margin-bottom: 8px; }
-    .card p { font-size: .85rem; color: #64748b; line-height: 1.5; }
+    .card h3 { font-size: 1rem; color: var(--text); margin-bottom: 8px; }
+    .card p { font-size: .85rem; color: var(--text-muted); line-height: 1.5; }
     .card .badge {
-      display: inline-block;
-      margin-top: 14px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: .75rem;
-      font-weight: 600;
-      background: var(--bg);
-      color: var(--color);
+      display: inline-block; margin-top: 14px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: .75rem; font-weight: 600;
+      background: var(--bg); color: var(--color);
     }
-
-    /* Tarjeta próximamente */
-    .card.soon { opacity: .55; cursor: default; }
-    .card.soon:hover { transform: none; box-shadow: 0 2px 12px rgba(0,0,0,.06); border-color: transparent; }
+    .card.soon { opacity: .5; cursor: default; }
+    .card.soon:hover { transform: none; box-shadow: var(--shadow); border-color: var(--border); }
   </style>
 </head>
 <body>
