@@ -4,6 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AJUCON — Chat</title>
+  <script src="/assets/theme.js"></script>
+  <style>
+    [data-theme="dark"] body { background: #0f172a; }
+    [data-theme="dark"] header { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] .agent-info h2 { color: #f1f5f9; }
+    [data-theme="dark"] .agent-info p { color: #94a3b8; }
+    [data-theme="dark"] #riasec-panel { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] .riasec-label { color: #94a3b8; }
+    [data-theme="dark"] .riasec-bar-wrap { background: #0f172a; }
+    [data-theme="dark"] .dim-bar-wrap { background: #0f172a; }
+    [data-theme="dark"] .dim-name { color: #64748b; }
+    [data-theme="dark"] .dim-score { color: #64748b; }
+    [data-theme="dark"] .bubble.assistant { background: #1e293b; color: #f1f5f9; }
+    [data-theme="dark"] .input-area { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] textarea { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+    [data-theme="dark"] textarea::placeholder { color: #475569; }
+    .theme-toggle { background: none; border: 1px solid #e2e8f0; border-radius: 50%; width: 34px; height: 34px; font-size: .9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: auto; transition: all .2s; }
+    [data-theme="dark"] .theme-toggle { border-color: #334155; }
+  </style>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, sans-serif; background: #f0f4ff; height: 100vh; display: flex; flex-direction: column; }
@@ -81,6 +100,7 @@
     <h2 id="agent-name"></h2>
     <p><span class="status-dot"></span>En línea</p>
   </div>
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" style="margin-left:auto">🌙</button>
 </header>
 
 <!-- Panel RIASEC (solo psicóloga) -->

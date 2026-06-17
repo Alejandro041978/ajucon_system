@@ -4,6 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AJUCON — Becas para Cursos Online</title>
+  <script src="/assets/theme.js"></script>
+  <style>
+    [data-theme="dark"] body { background: #0f172a; }
+    [data-theme="dark"] header { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] header h2 { color: #f1f5f9; }
+    [data-theme="dark"] .card { background: #1e293b; }
+    [data-theme="dark"] label { color: #94a3b8; }
+    [data-theme="dark"] input, [data-theme="dark"] textarea { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+    [data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder { color: #475569; }
+    [data-theme="dark"] .section-title { color: #f472b6; }
+    [data-theme="dark"] .info-box { background: #4a0020; border-color: #831843; color: #f9a8d4; }
+    [data-theme="dark"] .plataforma-btn { background: #1e293b; border-color: #334155; color: #94a3b8; }
+    [data-theme="dark"] .plataforma-btn.selected { border-color: #f472b6; background: #4a0020; color: #f9a8d4; }
+    [data-theme="dark"] #screen-exito h2 { color: #f1f5f9; }
+    [data-theme="dark"] #screen-exito p { color: #94a3b8; }
+    .theme-toggle { background: none; border: 1px solid #e2e8f0; border-radius: 50%; width: 34px; height: 34px; font-size: .9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: auto; }
+    [data-theme="dark"] .theme-toggle { border-color: #334155; }
+  </style>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; }
@@ -70,6 +88,7 @@
 <header>
   <button class="back-btn" onclick="window.location.href='/dashboard.html'">←</button>
   <h2>Becas para Cursos Online</h2>
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" style="margin-left:auto">🌙</button>
 </header>
 
 <main>

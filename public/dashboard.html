@@ -4,6 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AJUCON — Dashboard</title>
+  <script src="/assets/theme.js"></script>
+  <style>
+    [data-theme="dark"] body { background: #0f172a; }
+    [data-theme="dark"] header { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] header h1 { color: #60a5fa; }
+    [data-theme="dark"] .user-info span { color: #94a3b8; }
+    [data-theme="dark"] .btn-logout { border-color: #334155; color: #64748b; }
+    [data-theme="dark"] .welcome h2 { color: #f1f5f9; }
+    [data-theme="dark"] .welcome p { color: #64748b; }
+    [data-theme="dark"] .card { background: #1e293b; }
+    [data-theme="dark"] .card h3 { color: #f1f5f9; }
+    [data-theme="dark"] .card p { color: #94a3b8; }
+  </style>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; }
@@ -34,6 +47,8 @@
       transition: all .2s;
     }
     .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
+    .theme-toggle { background: none; border: 1px solid #e2e8f0; border-radius: 50%; width: 34px; height: 34px; font-size: .95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 4px; transition: all .2s; }
+    [data-theme="dark"] .theme-toggle { border-color: #334155; }
 
     /* Main */
     main { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
@@ -98,6 +113,7 @@
     <span id="user-grado"></span>
     <div class="user-avatar" id="user-initial"></div>
     <span id="user-nombre"></span>
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()">🌙</button>
     <button class="btn-logout" onclick="logout()">Salir</button>
   </div>
 </header>
