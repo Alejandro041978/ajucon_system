@@ -94,104 +94,81 @@ export default async function handler(req, res) {
   const { mensaje, conversation_id } = req.body;
   if (!mensaje) return res.status(400).json({ error: 'Mensaje requerido.' });
 
-  // Cargar datos del usuario
-  const { data: usuario } = await supabase
-    .from('users')
-    .select('nombre, grado')
-    .eq('id', payload.id)
-    .single();
-
-  // Cargar perfil RIASEC existente
-  let { data: perfil } = await supabase
-    .from('riasec_profiles')
-    .select('*')
-    .eq('user_id', payload.id)
-    .single();
-
-  if (!perfil) {
-    const { data } = await supabase
-      .from('riasec_profiles')
-      .insert({ user_id: payload.id })
-      .select()
-      .single();
-    perfil = data;
-  }
-
-  // Obtener o crear conversación
+  // RONDA 1 — todo en paralelo: usuario, perfil RIASEC, historial o nueva conversación
   let convId = conversation_id;
-  if (!convId) {
-    const { data: conv } = await supabase
-      .from('conversations')
-      .insert({ user_id: payload.id, agente: 'psicologa' })
-      .select('id')
-      .single();
-    convId = conv.id;
+
+  const [{ data: usuario }, { data: perfilRaw }, historialResult, convResult] = await Promise.all([
+    supabase.from('users').select('nombre, grado').eq('id', payload.id).single(),
+    supabase.from('riasec_profiles').select('R,I,A,S,E,C,completitud').eq('user_id', payload.id).single(),
+    convId
+      ? supabase.from('messages').select('role, content').eq('conversation_id', convId).order('created_at', { ascending: true }).limit(14)
+      : Promise.resolve({ data: [] }),
+    convId
+      ? Promise.resolve({ data: { id: convId } })
+      : supabase.from('conversations').insert({ user_id: payload.id, agente: 'psicologa' }).select('id').single(),
+  ]);
+
+  // Resolver convId si es nueva conversación
+  if (!convId) convId = convResult?.data?.id;
+
+  // Asegurar perfil RIASEC existe (sin bloquear el flujo)
+  let perfil = perfilRaw || { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0, completitud: 0 };
+  if (!perfilRaw) {
+    supabase.from('riasec_profiles').insert({ user_id: payload.id }).then(() => {});
   }
 
-  // Guardar mensaje del usuario
-  await supabase.from('messages').insert({ conversation_id: convId, role: 'user', content: mensaje });
+  // Construir historial incluyendo el mensaje actual (sin esperar inserción en BD)
+  const historial = historialResult?.data || [];
+  const mensajesParaClaude = [
+    ...historial.map(m => ({ role: m.role, content: m.content })),
+    { role: 'user', content: mensaje },
+  ];
 
-  // Historial (últimos 20 mensajes)
-  const { data: historial } = await supabase
-    .from('messages')
-    .select('role, content')
-    .eq('conversation_id', convId)
-    .order('created_at', { ascending: true })
-    .limit(20);
-
-  // Contexto del perfil y datos del usuario para Claude
+  // Contexto del perfil
   const nombreEstudiante = usuario?.nombre?.split(' ')[0] || 'el estudiante';
   const gradoEstudiante = usuario?.grado || '';
   const perfilContext = `\n[DATOS DEL ESTUDIANTE — Nombre: ${nombreEstudiante}, Grado: ${gradoEstudiante}]\n[PERFIL RIASEC ACTUAL — R:${perfil.R} I:${perfil.I} A:${perfil.A} S:${perfil.S} E:${perfil.E} C:${perfil.C} — Completitud: ${perfil.completitud}%]\nNOTA: Ya conoces el nombre y grado del estudiante. NO los preguntes. Salúdalo por su nombre directamente y pregunta qué lo trae aquí o qué le interesa explorar.\n`;
 
+  // RONDA 2 — llamada a Anthropic (la más lenta)
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 1200,
+    max_tokens: 800,
     system: SYSTEM_PROMPT + perfilContext,
-    messages: historial.map(m => ({ role: m.role, content: m.content })),
+    messages: mensajesParaClaude,
   });
 
   const rawText = response.content[0].text;
+  const updateMatch = rawText.match(/RIASEC_UPDATE:\s*(\{[^}]+\})/);
+  const respuesta = rawText.replace(/\nRIASEC_UPDATE:[^\n]*/g, '').trim();
 
-  // Extraer bloque RIASEC_UPDATE
-  const updateMatch = rawText.match(/RIASEC_UPDATE:(\{[^}]+\})/);
-  const respuesta = rawText.replace(/\nRIASEC_UPDATE:\{[^}]+\}/, '').trim();
-
-  // Guardar respuesta en BD
-  await supabase.from('messages').insert({ conversation_id: convId, role: 'assistant', content: respuesta });
-
-  // Actualizar perfil RIASEC si hay señales nuevas
-  let nuevosPerfil = { ...perfil };
+  // Calcular nuevo perfil RIASEC
+  let nuevosPerfil = { R: perfil.R, I: perfil.I, A: perfil.A, S: perfil.S, E: perfil.E, C: perfil.C };
   if (updateMatch) {
     try {
       const delta = JSON.parse(updateMatch[1]);
-      const dims = ['R', 'I', 'A', 'S', 'E', 'C'];
-      dims.forEach(d => {
-        if (delta[d] > 0) nuevosPerfil[d] = Math.min(30, (perfil[d] || 0) + delta[d]);
+      ['R','I','A','S','E','C'].forEach(d => {
+        if (delta[d] > 0) nuevosPerfil[d] = Math.min(30, (nuevosPerfil[d] || 0) + delta[d]);
       });
-      nuevosPerfil.completitud = calcularCompletitud({
-        R: nuevosPerfil.R, I: nuevosPerfil.I, A: nuevosPerfil.A,
-        S: nuevosPerfil.S, E: nuevosPerfil.E, C: nuevosPerfil.C,
-      });
-      await supabase
-        .from('riasec_profiles')
-        .update({
-          R: nuevosPerfil.R, I: nuevosPerfil.I, A: nuevosPerfil.A,
-          S: nuevosPerfil.S, E: nuevosPerfil.E, C: nuevosPerfil.C,
-          completitud: nuevosPerfil.completitud,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('user_id', payload.id);
     } catch {}
   }
+  nuevosPerfil.completitud = calcularCompletitud(nuevosPerfil);
+
+  // RONDA 3 — guardar todo en paralelo sin bloquear la respuesta
+  Promise.all([
+    convId ? supabase.from('messages').insert([
+      { conversation_id: convId, role: 'user', content: mensaje },
+      { conversation_id: convId, role: 'assistant', content: respuesta },
+    ]) : Promise.resolve(),
+    supabase.from('riasec_profiles').upsert({
+      user_id: payload.id,
+      ...nuevosPerfil,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' }),
+  ]).catch(() => {});
 
   return res.status(200).json({
     respuesta,
     conversation_id: convId,
-    perfil: {
-      R: nuevosPerfil.R, I: nuevosPerfil.I, A: nuevosPerfil.A,
-      S: nuevosPerfil.S, E: nuevosPerfil.E, C: nuevosPerfil.C,
-      completitud: nuevosPerfil.completitud,
-    },
+    perfil: nuevosPerfil,
   });
 }
