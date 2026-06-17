@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AJUCON — Test Vocacional CHASIDE</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .back-btn { background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.2rem; padding: 4px 8px; border-radius: 8px; }
+    .back-btn:hover { background: #f1f5f9; }
+    header h2 { font-size: 1rem; color: #1e293b; }
+
+    main { max-width: 720px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Progress */
+    .progress-bar-wrap { background: #e2e8f0; border-radius: 8px; height: 8px; margin-bottom: 8px; }
+    .progress-bar { background: #2563eb; border-radius: 8px; height: 8px; transition: width .4s; }
+    .progress-label { font-size: .8rem; color: #64748b; margin-bottom: 24px; }
+
+    /* Intro */
+    #screen-intro { background: white; border-radius: 16px; padding: 36px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    #screen-intro h1 { font-size: 1.5rem; color: #1e293b; margin-bottom: 8px; }
+    #screen-intro p { color: #475569; line-height: 1.65; margin-bottom: 12px; }
+    .areas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin: 20px 0 28px; }
+    .area-pill { padding: 8px 14px; border-radius: 8px; font-size: .85rem; font-weight: 600; text-align: center; }
+
+    /* Pregunta */
+    #screen-test { display: none; }
+    .question-card { background: white; border-radius: 16px; padding: 36px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .area-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: .75rem; font-weight: 700; margin-bottom: 20px; }
+    .question-num { font-size: .85rem; color: #94a3b8; margin-bottom: 8px; }
+    .question-text { font-size: 1.1rem; color: #1e293b; font-weight: 500; line-height: 1.5; margin-bottom: 32px; }
+
+    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .option-btn {
+      padding: 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      background: white;
+      cursor: pointer;
+      font-size: .95rem;
+      font-weight: 500;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .option-btn:hover { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+    .option-btn.si { border-color: #22c55e; background: #f0fdf4; color: #16a34a; }
+    .option-btn.no { border-color: #ef4444; background: #fef2f2; color: #dc2626; }
+
+    /* Resultados */
+    #screen-resultado { display: none; }
+    .resultado-card { background: white; border-radius: 16px; padding: 36px; box-shadow: 0 2px 12px rgba(0,0,0,.06); margin-bottom: 20px; }
+    .resultado-card h2 { font-size: 1.3rem; color: #1e293b; margin-bottom: 4px; }
+    .resultado-card .subtitulo { color: #64748b; margin-bottom: 24px; font-size: .9rem; }
+
+    /* Barras de resultado */
+    .bars { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+    .bar-row { display: flex; align-items: center; gap: 12px; }
+    .bar-label { width: 220px; font-size: .9rem; color: #374151; font-weight: 500; flex-shrink: 0; }
+    .bar-label span { font-weight: 700; }
+    .bar-track { flex: 1; background: #f1f5f9; border-radius: 8px; height: 18px; overflow: hidden; }
+    .bar-fill { height: 18px; border-radius: 8px; transition: width 1s ease-out; }
+    .bar-score { width: 32px; text-align: right; font-size: .85rem; font-weight: 700; color: #475569; }
+
+    /* Perfil dominante */
+    .perfil-dominante { border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+    .perfil-dominante h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .perfil-dominante p { font-size: .9rem; line-height: 1.6; }
+
+    /* Carreras */
+    .carreras-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+    .carrera-tag { padding: 8px 14px; background: #f0f4ff; color: #2563eb; border-radius: 8px; font-size: .85rem; font-weight: 500; text-align: center; }
+
+    .btn-primary {
+      display: block; width: 100%;
+      padding: 14px;
+      background: #2563eb; color: white;
+      border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+      text-align: center; margin-top: 24px;
+    }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary {
+      display: block; width: 100%;
+      padding: 14px;
+      background: white; color: #2563eb;
+      border: 2px solid #2563eb; border-radius: 10px;
+      font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+      text-align: center; margin-top: 12px;
+    }
+    .btn-secondary:hover { background: #eff6ff; }
+  </style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" onclick="confirmarSalida()">←</button>
+  <h2>Test Vocacional CHASIDE</h2>
+</header>
+
+<main>
+
+  <!-- INTRO -->
+  <div id="screen-intro">
+    <h1>Descubre tu vocación</h1>
+    <p>El test CHASIDE mide tus intereses en 7 grandes áreas del conocimiento. No hay respuestas correctas ni incorrectas — solo marca si la actividad te gusta o no.</p>
+    <p>Son <strong>56 preguntas</strong> y toma aproximadamente <strong>10 minutos</strong>.</p>
+
+    <div class="areas-grid">
+      <div class="area-pill" style="background:#dbeafe;color:#1d4ed8">C — Ciencias Exactas</div>
+      <div class="area-pill" style="background:#fce7f3;color:#be185d">H — Humanidades</div>
+      <div class="area-pill" style="background:#fef3c7;color:#b45309">A — Arte</div>
+      <div class="area-pill" style="background:#d1fae5;color:#065f46">S — Sociales</div>
+      <div class="area-pill" style="background:#e0e7ff;color:#3730a3">I — Investigación</div>
+      <div class="area-pill" style="background:#fee2e2;color:#991b1b">D — Dirección</div>
+      <div class="area-pill" style="background:#fef9c3;color:#713f12">E — Empresa</div>
+    </div>
+
+    <button class="btn-primary" onclick="iniciarTest()">Comenzar test</button>
+  </div>
+
+  <!-- TEST -->
+  <div id="screen-test">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="progress-label" id="progress-label"></div>
+
+    <div class="question-card">
+      <div class="area-tag" id="area-tag"></div>
+      <div class="question-num" id="question-num"></div>
+      <div class="question-text" id="question-text"></div>
+      <div class="options">
+        <button class="option-btn" id="btn-si" onclick="responder(1)">👍 Sí me gusta</button>
+        <button class="option-btn" id="btn-no" onclick="responder(0)">👎 No me gusta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="screen-resultado">
+    <div class="resultado-card">
+      <h2>Tu perfil vocacional</h2>
+      <p class="subtitulo">Puntaje por área (máximo 8 puntos)</p>
+      <div class="bars" id="bars-container"></div>
+    </div>
+
+    <div class="resultado-card">
+      <div class="perfil-dominante" id="perfil-dominante"></div>
+      <h3 style="margin-bottom:14px;color:#1e293b">Carreras sugeridas</h3>
+      <div class="carreras-grid" id="carreras-grid"></div>
+    </div>
+
+    <button class="btn-primary" onclick="window.location.href='/dashboard.html'">Volver al inicio</button>
+    <button class="btn-secondary" onclick="reiniciarTest()">Repetir test</button>
+  </div>
+
+</main>
+
+<script>
+const PREGUNTAS = [
+  // C — Ciencias Exactas y Naturales
+  { area: 'C', texto: 'Resolver problemas de matemáticas o álgebra' },
+  { area: 'C', texto: 'Estudiar física, química o biología en profundidad' },
+  { area: 'C', texto: 'Trabajar con fórmulas, ecuaciones o modelos matemáticos' },
+  { area: 'C', texto: 'Programar computadoras o desarrollar software' },
+  { area: 'C', texto: 'Analizar datos estadísticos y sacar conclusiones' },
+  { area: 'C', texto: 'Estudiar astronomía, geología o ciencias de la Tierra' },
+  { area: 'C', texto: 'Trabajar en un laboratorio con experimentos científicos' },
+  { area: 'C', texto: 'Diseñar estructuras, máquinas o sistemas técnicos' },
+
+  // H — Humanidades y Letras
+  { area: 'H', texto: 'Leer libros de historia, filosofía o literatura' },
+  { area: 'H', texto: 'Escribir cuentos, ensayos o artículos' },
+  { area: 'H', texto: 'Aprender y practicar idiomas extranjeros' },
+  { area: 'H', texto: 'Analizar textos literarios o discursos' },
+  { area: 'H', texto: 'Investigar el pasado y las culturas de distintas épocas' },
+  { area: 'H', texto: 'Debatir ideas filosóficas o éticas' },
+  { area: 'H', texto: 'Estudiar geografía, política o relaciones internacionales' },
+  { area: 'H', texto: 'Traducir o interpretar textos en otros idiomas' },
+
+  // A — Arte
+  { area: 'A', texto: 'Dibujar, pintar o esculpir' },
+  { area: 'A', texto: 'Tocar un instrumento musical o cantar' },
+  { area: 'A', texto: 'Actuar en teatro, cine o televisión' },
+  { area: 'A', texto: 'Diseñar ropa, ambientes o productos' },
+  { area: 'A', texto: 'Fotografiar, filmar o editar videos' },
+  { area: 'A', texto: 'Bailar o crear coreografías' },
+  { area: 'A', texto: 'Crear animaciones o diseño gráfico digital' },
+  { area: 'A', texto: 'Decorar espacios o diseñar interiores' },
+
+  // S — Ciencias Sociales y Servicio
+  { area: 'S', texto: 'Ayudar a personas que tienen problemas personales o emocionales' },
+  { area: 'S', texto: 'Trabajar con niños, adultos mayores o personas vulnerables' },
+  { area: 'S', texto: 'Enseñar o explicar conceptos a otras personas' },
+  { area: 'S', texto: 'Participar en voluntariados o trabajo comunitario' },
+  { area: 'S', texto: 'Escuchar y aconsejar a amigos o familiares' },
+  { area: 'S', texto: 'Trabajar en salud, enfermería o cuidado de personas' },
+  { area: 'S', texto: 'Organizar actividades para grupos o comunidades' },
+  { area: 'S', texto: 'Defender los derechos de personas o grupos desfavorecidos' },
+
+  // I — Investigación e Innovación
+  { area: 'I', texto: 'Realizar experimentos para probar hipótesis' },
+  { area: 'I', texto: 'Buscar información detallada sobre temas complejos' },
+  { area: 'I', texto: 'Estudiar el comportamiento humano o animal' },
+  { area: 'I', texto: 'Investigar las causas de enfermedades o fenómenos' },
+  { area: 'I', texto: 'Explorar ideas nuevas y teorías científicas' },
+  { area: 'I', texto: 'Leer artículos científicos o de divulgación' },
+  { area: 'I', texto: 'Analizar problemas desde múltiples perspectivas' },
+  { area: 'I', texto: 'Desarrollar inventos o soluciones innovadoras' },
+
+  // D — Dirección y Administración
+  { area: 'D', texto: 'Liderar grupos o equipos de trabajo' },
+  { area: 'D', texto: 'Organizar y planificar proyectos o eventos' },
+  { area: 'D', texto: 'Tomar decisiones importantes bajo presión' },
+  { area: 'D', texto: 'Administrar recursos, tiempos y presupuestos' },
+  { area: 'D', texto: 'Coordinar personas con distintas tareas' },
+  { area: 'D', texto: 'Establecer metas y estrategias para lograrlas' },
+  { area: 'D', texto: 'Evaluar el desempeño de equipos o procesos' },
+  { area: 'D', texto: 'Representar a un grupo ante otros o en reuniones' },
+
+  // E — Empresa y Negocios
+  { area: 'E', texto: 'Vender productos o servicios' },
+  { area: 'E', texto: 'Emprender o crear tu propio negocio' },
+  { area: 'E', texto: 'Estudiar economía, finanzas o contabilidad' },
+  { area: 'E', texto: 'Negociar acuerdos o convencer personas' },
+  { area: 'E', texto: 'Trabajar en marketing, publicidad o comunicación comercial' },
+  { area: 'E', texto: 'Analizar mercados y tendencias económicas' },
+  { area: 'E', texto: 'Gestionar importaciones, exportaciones o comercio internacional' },
+  { area: 'E', texto: 'Invertir dinero o analizar oportunidades de negocio' },
+];
+
+const AREAS = {
+  C: { nombre: 'Ciencias Exactas y Naturales', color: '#2563eb', bg: '#dbeafe', perfil: 'Tienes inclinación por el pensamiento lógico-matemático, la precisión y el análisis de fenómenos naturales. Disfrutas resolver problemas con métodos rigurosos.', carreras: ['Ingeniería Civil', 'Ingeniería en Computación', 'Matemáticas', 'Física', 'Química', 'Astronomía', 'Geología', 'Arquitectura'] },
+  H: { nombre: 'Humanidades y Letras',        color: '#be185d', bg: '#fce7f3', perfil: 'Muestras interés por el lenguaje, la historia y las ideas. Tienes facilidad para la comunicación escrita, el pensamiento crítico y la comprensión de culturas y épocas.', carreras: ['Licenciatura en Historia', 'Literatura', 'Filosofía', 'Lingüística', 'Traducción e Interpretación', 'Periodismo', 'Derecho', 'Ciencias Políticas'] },
+  A: { nombre: 'Arte y Comunicación',          color: '#d97706', bg: '#fef3c7', perfil: 'Tu área fuerte es la expresión creativa. Tienes sensibilidad estética, imaginación y talento para comunicar ideas a través de distintos lenguajes artísticos.', carreras: ['Diseño Gráfico', 'Diseño de Modas', 'Artes Visuales', 'Música', 'Teatro', 'Cine y Televisión', 'Animación Digital', 'Arquitectura de Interiores'] },
+  S: { nombre: 'Ciencias Sociales y Servicio', color: '#059669', bg: '#d1fae5', perfil: 'Eres una persona empática con vocación de servicio. Te motiva ayudar, enseñar y trabajar con personas, y tienes habilidades para la comunicación interpersonal.', carreras: ['Psicología', 'Trabajo Social', 'Educación', 'Enfermería', 'Kinesiología', 'Terapia Ocupacional', 'Sociología', 'Pedagogía'] },
+  I: { nombre: 'Investigación e Innovación',   color: '#4f46e5', bg: '#e0e7ff', perfil: 'Tienes curiosidad intelectual y disfruta indagar en profundidad. Eres analítico, metódico y te atrae descubrir explicaciones a fenómenos complejos.', carreras: ['Bioquímica', 'Biología', 'Medicina', 'Farmacia', 'Ciencias de Datos', 'Investigación y Desarrollo', 'Antropología', 'Psicología Clínica'] },
+  D: { nombre: 'Dirección y Administración',   color: '#dc2626', bg: '#fee2e2', perfil: 'Tienes habilidades de liderazgo, organización y toma de decisiones. Disfrutas coordinar personas y proyectos para alcanzar metas colectivas.', carreras: ['Administración de Empresas', 'Ingeniería Comercial', 'Ingeniería Industrial', 'Gestión Pública', 'Recursos Humanos', 'Logística', 'Derecho Empresarial'] },
+  E: { nombre: 'Empresa y Negocios',           color: '#92400e', bg: '#fef9c3', perfil: 'Te motiva el mundo de los negocios, la innovación comercial y el emprendimiento. Tienes habilidades para identificar oportunidades y gestionar recursos con visión estratégica.', carreras: ['Comercio Internacional', 'Marketing', 'Economía', 'Contabilidad', 'Finanzas', 'Emprendimiento', 'Relaciones Públicas', 'Auditoría'] },
+};
+
+const token = localStorage.getItem('ajucon_token');
+if (!token) window.location.href = '/index.html';
+
+let currentIdx = 0;
+let respuestas = {};
+
+function iniciarTest() {
+  document.getElementById('screen-intro').style.display = 'none';
+  document.getElementById('screen-test').style.display = 'block';
+  mostrarPregunta();
+}
+
+function mostrarPregunta() {
+  const p = PREGUNTAS[currentIdx];
+  const area = AREAS[p.area];
+  const total = PREGUNTAS.length;
+
+  document.getElementById('progress-bar').style.width = ((currentIdx / total) * 100) + '%';
+  document.getElementById('progress-label').textContent = `Pregunta ${currentIdx + 1} de ${total}`;
+  document.getElementById('area-tag').textContent = `${p.area} — ${area.nombre}`;
+  document.getElementById('area-tag').style.background = area.bg;
+  document.getElementById('area-tag').style.color = area.color;
+  document.getElementById('question-num').textContent = `Pregunta ${currentIdx + 1}`;
+  document.getElementById('question-text').textContent = '¿Te gustaría realizar esta actividad?\n\n' + p.texto;
+
+  // Reset estilos
+  document.getElementById('btn-si').className = 'option-btn';
+  document.getElementById('btn-no').className = 'option-btn';
+}
+
+function responder(valor) {
+  const p = PREGUNTAS[currentIdx];
+  respuestas[currentIdx] = { area: p.area, valor };
+
+  // Feedback visual breve
+  if (valor === 1) document.getElementById('btn-si').className = 'option-btn si';
+  else document.getElementById('btn-no').className = 'option-btn no';
+
+  setTimeout(() => {
+    currentIdx++;
+    if (currentIdx < PREGUNTAS.length) {
+      mostrarPregunta();
+    } else {
+      mostrarResultado();
+    }
+  }, 200);
+}
+
+function mostrarResultado() {
+  document.getElementById('screen-test').style.display = 'none';
+  document.getElementById('screen-resultado').style.display = 'block';
+
+  // Calcular puntajes
+  const scores = { C: 0, H: 0, A: 0, S: 0, I: 0, D: 0, E: 0 };
+  Object.values(respuestas).forEach(r => { if (r.valor === 1) scores[r.area]++; });
+
+  // Ordenar por puntaje
+  const orden = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+  // Barras
+  const barsContainer = document.getElementById('bars-container');
+  orden.forEach(([area, score]) => {
+    const cfg = AREAS[area];
+    const pct = (score / 8) * 100;
+    barsContainer.innerHTML += `
+      <div class="bar-row">
+        <div class="bar-label"><span>${area}</span> — ${cfg.nombre}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${pct}%;background:${cfg.color}"></div>
+        </div>
+        <div class="bar-score">${score}/8</div>
+      </div>`;
+  });
+
+  // Perfil dominante (top 2)
+  const [top1, top2] = orden;
+  const cfg1 = AREAS[top1[0]];
+  const cfg2 = AREAS[top2[0]];
+  document.getElementById('perfil-dominante').innerHTML = `
+    <h3 style="color:${cfg1.color}">Área dominante: ${top1[0]} — ${cfg1.nombre}</h3>
+    <p style="margin-top:8px">${cfg1.perfil}</p>
+    ${top2[1] >= 6 ? `<p style="margin-top:12px;font-size:.85rem;color:#64748b">También muestras afinidad con el área <strong>${top2[0]} — ${cfg2.nombre}</strong>.</p>` : ''}
+  `;
+  document.getElementById('perfil-dominante').style.background = cfg1.bg;
+
+  // Carreras (top 1 + algunas del top 2 si puntaje alto)
+  const carrerasGrid = document.getElementById('carreras-grid');
+  const carreras = [...cfg1.carreras];
+  if (top2[1] >= 5) carreras.push(...cfg2.carreras.slice(0, 3));
+  carreras.forEach(c => {
+    carrerasGrid.innerHTML += `<div class="carrera-tag">${c}</div>`;
+  });
+
+  // Guardar en Supabase
+  guardarResultado(scores, top1[0], carreras);
+}
+
+async function guardarResultado(scores, resultado, carreras) {
+  try {
+    await fetch('/api/test/vocacional', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify({
+        respuestas,
+        resultado,
+        carreras,
+        scores,
+      }),
+    });
+  } catch {}
+}
+
+function confirmarSalida() {
+  if (currentIdx === 0 || currentIdx === PREGUNTAS.length) {
+    window.location.href = '/dashboard.html';
+    return;
+  }
+  if (confirm('¿Seguro que quieres salir? Perderás el progreso del test.')) {
+    window.location.href = '/dashboard.html';
+  }
+}
+
+function reiniciarTest() {
+  currentIdx = 0;
+  respuestas = {};
+  document.getElementById('bars-container').innerHTML = '';
+  document.getElementById('carreras-grid').innerHTML = '';
+  document.getElementById('screen-resultado').style.display = 'none';
+  document.getElementById('screen-intro').style.display = 'block';
+}
+</script>
+</body>
+</html>

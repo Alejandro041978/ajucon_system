@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AJUCON — Becas para Cursos Online</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; }
+    header { background: white; border-bottom: 1px solid #e2e8f0; padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
+    .back-btn { background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.2rem; padding: 4px 8px; border-radius: 8px; }
+    .back-btn:hover { background: #f1f5f9; }
+    header h2 { font-size: 1rem; color: #1e293b; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 32px 24px; }
+
+    .hero { background: linear-gradient(135deg, #db2777, #ec4899); border-radius: 16px; padding: 28px; color: white; margin-bottom: 28px; }
+    .hero h1 { font-size: 1.4rem; margin-bottom: 6px; }
+    .hero p { font-size: .9rem; opacity: .9; line-height: 1.5; }
+
+    .card { background: white; border-radius: 16px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .section-title { font-size: .8rem; font-weight: 700; color: #db2777; text-transform: uppercase; letter-spacing: .05em; margin: 24px 0 16px; }
+    .section-title:first-child { margin-top: 0; }
+
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: .85rem; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid #e2e8f0; border-radius: 10px;
+      font-size: .95rem; font-family: inherit;
+      outline: none; transition: border-color .2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #db2777; }
+    textarea { resize: vertical; min-height: 100px; }
+
+    .plataformas { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 18px; }
+    .plataforma-btn {
+      padding: 10px; border: 2px solid #e2e8f0; border-radius: 10px;
+      background: white; cursor: pointer; font-size: .85rem; font-weight: 500;
+      color: #374151; text-align: center; transition: all .15s;
+    }
+    .plataforma-btn:hover { border-color: #db2777; color: #db2777; }
+    .plataforma-btn.selected { border-color: #db2777; background: #fce7f3; color: #db2777; font-weight: 700; }
+
+    .info-box { background: #fce7f3; border: 1px solid #f9a8d4; border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; font-size: .85rem; color: #9d174d; line-height: 1.55; }
+    .info-box strong { display: block; margin-bottom: 4px; }
+
+    button[type=submit] {
+      width: 100%; padding: 14px;
+      background: #db2777; color: white;
+      border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: background .2s; margin-top: 8px;
+    }
+    button[type=submit]:hover { background: #be185d; }
+    button[type=submit]:disabled { background: #94a3b8; cursor: default; }
+
+    #screen-exito { display: none; text-align: center; padding: 48px 32px; }
+    #screen-exito .icon { font-size: 3rem; margin-bottom: 16px; }
+    #screen-exito h2 { font-size: 1.4rem; color: #1e293b; margin-bottom: 8px; }
+    #screen-exito p { color: #64748b; line-height: 1.6; margin-bottom: 24px; }
+    .btn-dashboard { display: inline-block; padding: 12px 28px; background: #2563eb; color: white; border-radius: 10px; font-weight: 600; text-decoration: none; }
+
+    .msg { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: .9rem; display: none; }
+    .msg.err { background: #fee2e2; color: #991b1b; display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" onclick="window.location.href='/dashboard.html'">←</button>
+  <h2>Becas para Cursos Online</h2>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>💻 Acceso a Becas para Cursos Online</h1>
+    <p>Postula a una beca para acceder a cursos en plataformas como Coursera, Udemy, edX y más. Aprende habilidades digitales sin costo.</p>
+  </div>
+
+  <div class="card">
+    <div id="screen-form">
+      <div class="info-box">
+        <strong>💡 ¿Cómo funciona?</strong>
+        Selecciona la plataforma y el curso que te interesa. Evaluaremos tu solicitud y si es aprobada te entregaremos acceso gratuito o un cupón de descuento.
+      </div>
+
+      <form id="form-beca" onsubmit="enviarPostulacion(event)">
+
+        <div class="section-title">Plataforma de interés</div>
+        <div class="plataformas" id="plataformas-grid">
+          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'Coursera')">🎓 Coursera</button>
+          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'Udemy')">📘 Udemy</button>
+          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'edX')">🏛️ edX</button>
+          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'LinkedIn Learning')">💼 LinkedIn Learning</button>
+          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'Platzi')">⚡ Platzi</button>
+          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'Otra')">➕ Otra</button>
+        </div>
+        <input type="hidden" id="plataforma" required />
+
+        <div class="section-title">Datos del curso</div>
+        <div class="field">
+          <label>Nombre del curso</label>
+          <input type="text" id="curso_nombre" placeholder="Ej: Python para principiantes, Diseño UX..." required />
+        </div>
+        <div class="field">
+          <label>URL del curso <span style="font-weight:400;color:#94a3b8">(opcional)</span></label>
+          <input type="url" id="curso_url" placeholder="https://..." />
+        </div>
+
+        <div class="section-title">Justificación</div>
+        <div class="field">
+          <label>¿Para qué quieres este curso y cómo te ayudará?</label>
+          <textarea id="justificacion" placeholder="Cuéntanos por qué este curso es importante para tu desarrollo y tus metas..." required></textarea>
+        </div>
+
+        <button type="submit" id="btn-enviar">Enviar solicitud</button>
+        <div class="msg" id="msg-error"></div>
+      </form>
+    </div>
+
+    <div id="screen-exito">
+      <div class="icon">✅</div>
+      <h2>¡Solicitud enviada!</h2>
+      <p>Hemos recibido tu solicitud de beca. Te contactaremos al email registrado en un plazo de <strong>3 a 5 días hábiles</strong>.</p>
+      <a href="/dashboard.html" class="btn-dashboard">Volver al inicio</a>
+    </div>
+  </div>
+</main>
+
+<script>
+  const token = localStorage.getItem('ajucon_token');
+  if (!token) window.location.href = '/index.html';
+
+  let plataformaSeleccionada = '';
+
+  function seleccionarPlataforma(btn, nombre) {
+    document.querySelectorAll('.plataforma-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    plataformaSeleccionada = nombre;
+    document.getElementById('plataforma').value = nombre;
+  }
+
+  async function enviarPostulacion(e) {
+    e.preventDefault();
+    if (!plataformaSeleccionada) {
+      const el = document.getElementById('msg-error');
+      el.textContent = 'Selecciona una plataforma.';
+      el.className = 'msg err';
+      return;
+    }
+
+    const btn = document.getElementById('btn-enviar');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const body = {
+      plataforma: plataformaSeleccionada,
+      curso_nombre: document.getElementById('curso_nombre').value,
+      curso_url: document.getElementById('curso_url').value || null,
+      justificacion: document.getElementById('justificacion').value,
+    };
+
+    const r = await fetch('/api/becas/cursos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(body),
+    });
+
+    if (r.ok) {
+      document.getElementById('screen-form').style.display = 'none';
+      document.getElementById('screen-exito').style.display = 'block';
+    } else {
+      const data = await r.json();
+      const el = document.getElementById('msg-error');
+      el.textContent = data.error || 'Error al enviar. Intenta de nuevo.';
+      el.className = 'msg err';
+      btn.disabled = false;
+      btn.textContent = 'Enviar solicitud';
+    }
+  }
+</script>
+</body>
+</html>

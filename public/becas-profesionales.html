@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AJUCON — Becas de Estudios Profesionales</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; }
+    header { background: white; border-bottom: 1px solid #e2e8f0; padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
+    .back-btn { background: none; border: none; cursor: pointer; color: #64748b; font-size: 1.2rem; padding: 4px 8px; border-radius: 8px; }
+    .back-btn:hover { background: #f1f5f9; }
+    header h2 { font-size: 1rem; color: #1e293b; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 32px 24px; }
+
+    .hero { background: linear-gradient(135deg, #d97706, #f59e0b); border-radius: 16px; padding: 28px; color: white; margin-bottom: 28px; }
+    .hero h1 { font-size: 1.4rem; margin-bottom: 6px; }
+    .hero p { font-size: .9rem; opacity: .9; line-height: 1.5; }
+
+    .card { background: white; border-radius: 16px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .section-title { font-size: .8rem; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: .05em; margin: 24px 0 16px; }
+    .section-title:first-child { margin-top: 0; }
+
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: .85rem; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    input, select, textarea {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid #e2e8f0; border-radius: 10px;
+      font-size: .95rem; font-family: inherit;
+      outline: none; transition: border-color .2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #d97706; }
+    textarea { resize: vertical; min-height: 100px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .info-box { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; font-size: .85rem; color: #92400e; line-height: 1.55; }
+    .info-box strong { display: block; margin-bottom: 4px; }
+
+    button[type=submit] {
+      width: 100%; padding: 14px;
+      background: #d97706; color: white;
+      border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: background .2s; margin-top: 8px;
+    }
+    button[type=submit]:hover { background: #b45309; }
+    button[type=submit]:disabled { background: #94a3b8; cursor: default; }
+
+    /* Éxito */
+    #screen-exito { display: none; text-align: center; padding: 48px 32px; }
+    #screen-exito .icon { font-size: 3rem; margin-bottom: 16px; }
+    #screen-exito h2 { font-size: 1.4rem; color: #1e293b; margin-bottom: 8px; }
+    #screen-exito p { color: #64748b; line-height: 1.6; margin-bottom: 24px; }
+    .btn-dashboard { display: inline-block; padding: 12px 28px; background: #2563eb; color: white; border-radius: 10px; font-weight: 600; text-decoration: none; }
+
+    .msg { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: .9rem; display: none; }
+    .msg.err { background: #fee2e2; color: #991b1b; display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <button class="back-btn" onclick="window.location.href='/dashboard.html'">←</button>
+  <h2>Postulación a Becas de Estudios Profesionales</h2>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>🎓 Becas de Estudios Profesionales</h1>
+    <p>Postula a becas para financiar tus estudios universitarios o técnico-profesionales. Revisaremos tu solicitud y te contactaremos por email.</p>
+  </div>
+
+  <div class="card">
+    <div id="screen-form">
+      <div class="info-box">
+        <strong>📋 Requisitos generales</strong>
+        Ser estudiante de 3° o 4° Medio · Promedio de notas ≥ 5.0 · Situación socioeconómica vulnerable · Residencia en Chile
+      </div>
+
+      <form id="form-beca" onsubmit="enviarPostulacion(event)">
+
+        <div class="section-title">Datos personales</div>
+        <div class="grid2">
+          <div class="field">
+            <label>RUT</label>
+            <input type="text" id="rut" placeholder="12.345.678-9" required />
+          </div>
+          <div class="field">
+            <label>Fecha de nacimiento</label>
+            <input type="date" id="fecha_nacimiento" required />
+          </div>
+        </div>
+        <div class="field">
+          <label>Dirección</label>
+          <input type="text" id="direccion" placeholder="Calle, número, ciudad" required />
+        </div>
+        <div class="field">
+          <label>Teléfono de contacto</label>
+          <input type="tel" id="telefono" placeholder="+56 9 1234 5678" required />
+        </div>
+
+        <div class="section-title">Estudios de interés</div>
+        <div class="field">
+          <label>Carrera o programa de interés</label>
+          <input type="text" id="carrera_interes" placeholder="Ej: Ingeniería Civil, Enfermería..." required />
+        </div>
+        <div class="field">
+          <label>Institución donde deseas estudiar</label>
+          <input type="text" id="institucion" placeholder="Ej: Universidad de Chile, INACAP..." required />
+        </div>
+
+        <div class="section-title">Situación académica y socioeconómica</div>
+        <div class="grid2">
+          <div class="field">
+            <label>Promedio de notas (escala 1-7)</label>
+            <input type="number" id="promedio_notas" min="1" max="7" step="0.1" placeholder="5.5" required />
+          </div>
+          <div class="field">
+            <label>Situación económica familiar</label>
+            <select id="situacion_economica" required>
+              <option value="">Selecciona</option>
+              <option>Muy vulnerable</option>
+              <option>Vulnerable</option>
+              <option>Media-baja</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-title">Carta de motivación</div>
+        <div class="field">
+          <label>¿Por qué postulas a esta beca y qué harás con ella?</label>
+          <textarea id="motivacion" placeholder="Cuéntanos sobre tus metas, tu situación y cómo esta beca cambiaría tu futuro..." required></textarea>
+        </div>
+
+        <button type="submit" id="btn-enviar">Enviar postulación</button>
+        <div class="msg" id="msg-error"></div>
+      </form>
+    </div>
+
+    <div id="screen-exito">
+      <div class="icon">✅</div>
+      <h2>¡Postulación enviada!</h2>
+      <p>Hemos recibido tu postulación. Revisaremos tu solicitud y te contactaremos al email registrado en un plazo de <strong>5 a 10 días hábiles</strong>.</p>
+      <a href="/dashboard.html" class="btn-dashboard">Volver al inicio</a>
+    </div>
+  </div>
+</main>
+
+<script>
+  const token = localStorage.getItem('ajucon_token');
+  if (!token) window.location.href = '/index.html';
+
+  async function enviarPostulacion(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn-enviar');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    const body = {
+      rut: document.getElementById('rut').value,
+      fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
+      direccion: document.getElementById('direccion').value,
+      telefono: document.getElementById('telefono').value,
+      carrera_interes: document.getElementById('carrera_interes').value,
+      institucion: document.getElementById('institucion').value,
+      promedio_notas: parseFloat(document.getElementById('promedio_notas').value),
+      situacion_economica: document.getElementById('situacion_economica').value,
+      motivacion: document.getElementById('motivacion').value,
+    };
+
+    const r = await fetch('/api/becas/profesionales', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(body),
+    });
+
+    if (r.ok) {
+      document.getElementById('screen-form').style.display = 'none';
+      document.getElementById('screen-exito').style.display = 'block';
+    } else {
+      const data = await r.json();
+      const el = document.getElementById('msg-error');
+      el.textContent = data.error || 'Error al enviar. Intenta de nuevo.';
+      el.className = 'msg err';
+      btn.disabled = false;
+      btn.textContent = 'Enviar postulación';
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AJUCON — Plataforma Escolar</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { background: white; border-radius: 16px; padding: 40px; width: 100%; max-width: 420px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+    h1 { font-size: 2rem; color: #2563eb; margin-bottom: 4px; }
+    .subtitle { color: #64748b; margin-bottom: 32px; font-size: .95rem; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .tab { flex: 1; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; background: white; cursor: pointer; font-size: .9rem; color: #475569; transition: all .2s; }
+    .tab.active { border-color: #2563eb; color: #2563eb; font-weight: 600; }
+    label { display: block; font-size: .85rem; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: .95rem; outline: none; transition: border-color .2s; margin-bottom: 16px; }
+    input:focus, select:focus { border-color: #2563eb; }
+    button[type=submit] { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .2s; }
+    button[type=submit]:hover { background: #1d4ed8; }
+    .msg { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: .9rem; display: none; }
+    .msg.ok { background: #dcfce7; color: #166534; display: block; }
+    .msg.err { background: #fee2e2; color: #991b1b; display: block; }
+    .code-group { display: none; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>AJUCON</h1>
+  <p class="subtitle">Plataforma de apoyo escolar</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('registro')">Registrarme</button>
+    <button class="tab" onclick="setTab('login')">Ingresar</button>
+  </div>
+
+  <!-- Formulario registro -->
+  <form id="form-registro" onsubmit="handleRegistro(event)">
+    <div id="campos-registro">
+      <label>Nombre completo</label>
+      <input type="text" id="nombre" placeholder="Tu nombre" required />
+      <label>Email</label>
+      <input type="email" id="email-reg" placeholder="tu@email.com" required />
+      <label>Grado escolar</label>
+      <select id="grado" required>
+        <option value="">Selecciona tu grado</option>
+        <option>7° Básico</option><option>8° Básico</option>
+        <option>1° Medio</option><option>2° Medio</option>
+        <option>3° Medio</option><option>4° Medio</option>
+      </select>
+      <button type="submit">Enviar código</button>
+    </div>
+    <div class="code-group" id="verify-reg">
+      <label>Código de 6 dígitos</label>
+      <input type="text" id="code-reg" maxlength="6" placeholder="123456" required />
+      <button type="button" onclick="handleVerify('reg')">Verificar</button>
+    </div>
+  </form>
+
+  <!-- Formulario login -->
+  <form id="form-login" style="display:none" onsubmit="handleLogin(event)">
+    <div id="campos-login">
+      <label>Email</label>
+      <input type="email" id="email-login" placeholder="tu@email.com" required />
+      <button type="submit">Enviar código</button>
+    </div>
+    <div class="code-group" id="verify-login">
+      <label>Código de 6 dígitos</label>
+      <input type="text" id="code-login" maxlength="6" placeholder="123456" required />
+      <button type="button" onclick="handleVerify('login')">Verificar</button>
+    </div>
+  </form>
+
+  <div class="msg" id="msg"></div>
+</div>
+
+<script>
+  function setTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('form-registro').style.display = tab === 'registro' ? 'block' : 'none';
+    document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+    showMsg('');
+  }
+
+  function showMsg(text, type = '') {
+    const el = document.getElementById('msg');
+    el.textContent = text;
+    el.className = 'msg' + (type ? ' ' + type : '');
+  }
+
+  async function handleRegistro(e) {
+    e.preventDefault();
+    const body = {
+      nombre: document.getElementById('nombre').value,
+      email: document.getElementById('email-reg').value,
+      grado: document.getElementById('grado').value,
+    };
+    const r = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const data = await r.json();
+    if (r.ok) {
+      document.getElementById('campos-registro').style.display = 'none';
+      document.getElementById('verify-reg').style.display = 'block';
+      showMsg('Código enviado a tu email.', 'ok');
+    } else {
+      showMsg(data.error, 'err');
+    }
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('email-login').value;
+    const r = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+    const data = await r.json();
+    if (r.ok) {
+      document.getElementById('campos-login').style.display = 'none';
+      document.getElementById('verify-login').style.display = 'block';
+      showMsg('Código enviado a tu email.', 'ok');
+    } else {
+      showMsg(data.error, 'err');
+    }
+  }
+
+  async function handleVerify(mode) {
+    const email = mode === 'reg'
+      ? document.getElementById('email-reg').value
+      : document.getElementById('email-login').value;
+    const code = document.getElementById('code-' + mode).value;
+    const r = await fetch('/api/auth/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, code }) });
+    const data = await r.json();
+    if (r.ok) {
+      localStorage.setItem('ajucon_token', data.token);
+      localStorage.setItem('ajucon_user', JSON.stringify(data.user));
+      window.location.href = '/dashboard.html';
+    } else {
+      showMsg(data.error, 'err');
+    }
+  }
+</script>
+</body>
+</html>

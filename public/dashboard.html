@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AJUCON — Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f0f4ff; min-height: 100vh; }
+
+    /* Header */
+    header {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 1.5rem; color: #2563eb; font-weight: 800; }
+    .user-info { display: flex; align-items: center; gap: 16px; }
+    .user-info span { font-size: .9rem; color: #475569; }
+    .user-avatar {
+      width: 38px; height: 38px;
+      background: #2563eb;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 1rem;
+    }
+    .btn-logout {
+      background: none; border: 1px solid #e2e8f0;
+      border-radius: 8px; padding: 6px 14px;
+      font-size: .85rem; color: #64748b; cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
+
+    /* Main */
+    main { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+    .welcome { margin-bottom: 32px; }
+    .welcome h2 { font-size: 1.6rem; color: #1e293b; }
+    .welcome p { color: #64748b; margin-top: 4px; }
+
+    /* Grid de tarjetas */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      border: 2px solid transparent;
+      text-decoration: none;
+      display: block;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.1);
+      border-color: var(--color);
+    }
+    .card-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+    }
+    .card h3 { font-size: 1rem; color: #1e293b; margin-bottom: 8px; }
+    .card p { font-size: .85rem; color: #64748b; line-height: 1.5; }
+    .card .badge {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 600;
+      background: var(--bg);
+      color: var(--color);
+    }
+
+    /* Tarjeta próximamente */
+    .card.soon { opacity: .55; cursor: default; }
+    .card.soon:hover { transform: none; box-shadow: 0 2px 12px rgba(0,0,0,.06); border-color: transparent; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>AJUCON</h1>
+  <div class="user-info">
+    <span id="user-grado"></span>
+    <div class="user-avatar" id="user-initial"></div>
+    <span id="user-nombre"></span>
+    <button class="btn-logout" onclick="logout()">Salir</button>
+  </div>
+</header>
+
+<main>
+  <div class="welcome">
+    <h2>¡Hola, <span id="welcome-nombre"></span>!</h2>
+    <p>¿En qué te podemos ayudar hoy?</p>
+  </div>
+
+  <div class="grid">
+
+    <a class="card" href="chat.html?agente=psicologa" style="--color:#7c3aed;--bg:#f5f3ff">
+      <div class="card-icon">🧠</div>
+      <h3>Psicóloga Vocacional Online</h3>
+      <p>Conversa con nuestra psicóloga IA para descubrir tu vocación y orientarte sobre tu futuro.</p>
+      <span class="badge">Agente IA</span>
+    </a>
+
+    <a class="card" href="chat.html?agente=profesor" style="--color:#0369a1;--bg:#e0f2fe">
+      <div class="card-icon">📚</div>
+      <h3>Profesor Preuniversitario Online</h3>
+      <p>Refuerza matemáticas, lenguaje, ciencias y más con un profesor IA disponible 24/7.</p>
+      <span class="badge">Agente IA</span>
+    </a>
+
+    <a class="card" href="test-vocacional.html" style="--color:#059669;--bg:#d1fae5">
+      <div class="card-icon">✏️</div>
+      <h3>Test Vocacional</h3>
+      <p>Responde un cuestionario y descubre qué carreras se alinean mejor con tu perfil e intereses.</p>
+      <span class="badge">Cuestionario</span>
+    </a>
+
+    <a class="card" href="becas-profesionales.html" style="--color:#d97706;--bg:#fef3c7">
+      <div class="card-icon">🎓</div>
+      <h3>Postulación a Becas de Estudios Profesionales</h3>
+      <p>Conoce las becas disponibles para estudios universitarios y técnicos, y postula en línea.</p>
+      <span class="badge">Formulario</span>
+    </a>
+
+    <a class="card" href="becas-cursos.html" style="--color:#db2777;--bg:#fce7f3">
+      <div class="card-icon">💻</div>
+      <h3>Acceso a Becas para Cursos Online</h3>
+      <p>Accede a becas para plataformas de cursos online como Coursera, Udemy y más.</p>
+      <span class="badge">Formulario</span>
+    </a>
+
+    <div class="card soon" style="--color:#94a3b8;--bg:#f1f5f9">
+      <div class="card-icon">🚀</div>
+      <h3>Próximamente</h3>
+      <p>Estamos preparando más servicios para apoyarte en tu camino académico.</p>
+      <span class="badge">En desarrollo</span>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // Verificar sesión
+  const token = localStorage.getItem('ajucon_token');
+  const user = JSON.parse(localStorage.getItem('ajucon_user') || 'null');
+
+  if (!token || !user) {
+    window.location.href = '/index.html';
+  } else {
+    document.getElementById('user-nombre').textContent = user.nombre;
+    document.getElementById('user-grado').textContent = user.grado;
+    document.getElementById('welcome-nombre').textContent = user.nombre.split(' ')[0];
+    document.getElementById('user-initial').textContent = user.nombre.charAt(0).toUpperCase();
+  }
+
+  function logout() {
+    localStorage.removeItem('ajucon_token');
+    localStorage.removeItem('ajucon_user');
+    window.location.href = '/index.html';
+  }
+</script>
+
+</body>
+</html>
