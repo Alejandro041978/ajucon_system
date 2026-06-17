@@ -182,8 +182,8 @@
     <h2>Usuarios registrados</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Nombre</th><th>Email</th><th>Grado</th><th>Registro</th></tr></thead>
-        <tbody id="tbody-users"><tr><td colspan="4" class="empty">Cargando...</td></tr></tbody>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Grado</th><th>Ciudad</th><th>Registro</th></tr></thead>
+        <tbody id="tbody-users"><tr><td colspan="5" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -240,6 +240,7 @@
   <div class="up-section">
     <div class="up-section-title">Datos del estudiante</div>
     <div class="up-row"><span class="up-key">Grado</span><span class="up-val" id="up-grado">—</span></div>
+    <div class="up-row"><span class="up-key">Ciudad</span><span class="up-val" id="up-ciudad">—</span></div>
     <div class="up-row"><span class="up-key">Registro</span><span class="up-val" id="up-registro">—</span></div>
     <div class="up-row"><span class="up-key">Sesiones con Valeria</span><span class="up-val" id="up-conv-psi">—</span></div>
     <div class="up-row"><span class="up-key">Sesiones con Profesor</span><span class="up-val" id="up-conv-prof">—</span></div>
@@ -332,8 +333,8 @@
     const tbody = document.getElementById('tbody-users');
     tbody.innerHTML = data.length ? data.map(u => `
       <tr onclick="abrirUsuario('${u.id}')" style="cursor:pointer">
-        <td>${u.nombre}</td><td>${u.email}</td><td>${u.grado}</td><td>${fecha(u.created_at)}</td>
-      </tr>`).join('') : '<tr><td colspan="4" class="empty">Sin usuarios aún.</td></tr>';
+        <td>${u.nombre}</td><td>${u.email}</td><td>${u.grado}</td><td>${u.ciudad || '—'}</td><td>${fecha(u.created_at)}</td>
+      </tr>`).join('') : '<tr><td colspan="5" class="empty">Sin usuarios aún.</td></tr>';
   }
 
   async function cargarBecasProfesionales() {
@@ -447,6 +448,7 @@
     document.getElementById('up-nombre').textContent = d.user.nombre;
     document.getElementById('up-email').textContent = d.user.email;
     document.getElementById('up-grado').textContent = d.user.grado;
+    document.getElementById('up-ciudad').textContent = d.user.ciudad || '—';
     document.getElementById('up-registro').textContent = fecha(d.user.created_at);
     document.getElementById('up-conv-psi').textContent = d.conversaciones.psicologa + ' sesión(es)';
     document.getElementById('up-conv-prof').textContent = d.conversaciones.profesor + ' sesión(es)';

@@ -98,6 +98,35 @@
         <option>Maestría Completa</option>
         <option>Doctorado Completo</option>
       </select>
+      <label>Ciudad de residencia</label>
+      <select id="ciudad" required>
+        <option value="">Selecciona tu región</option>
+        <option>Amazonas</option>
+        <option>Áncash</option>
+        <option>Apurímac</option>
+        <option>Arequipa</option>
+        <option>Ayacucho</option>
+        <option>Cajamarca</option>
+        <option>Callao</option>
+        <option>Cusco</option>
+        <option>Huancavelica</option>
+        <option>Huánuco</option>
+        <option>Ica</option>
+        <option>Junín</option>
+        <option>La Libertad</option>
+        <option>Lambayeque</option>
+        <option>Lima</option>
+        <option>Loreto</option>
+        <option>Madre de Dios</option>
+        <option>Moquegua</option>
+        <option>Pasco</option>
+        <option>Piura</option>
+        <option>Puno</option>
+        <option>San Martín</option>
+        <option>Tacna</option>
+        <option>Tumbes</option>
+        <option>Ucayali</option>
+      </select>
       <button type="submit">Enviar código</button>
     </div>
     <div class="code-group" id="verify-reg">
@@ -148,6 +177,7 @@
       nombre: document.getElementById('nombre').value,
       email: document.getElementById('email-reg').value,
       grado: document.getElementById('grado').value,
+      ciudad: document.getElementById('ciudad').value,
     };
     const r = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await r.json();
