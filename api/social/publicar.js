@@ -101,7 +101,7 @@ export default async function handler(req, res) {
     providers,
   };
 
-  const pubRes = await metricoolFetch('/scheduler/posts', {
+  const pubRes = await metricoolFetch('/scheduler/posts?blogId=6025050', {
     method: 'POST',
     body: JSON.stringify(publishBody),
   });
