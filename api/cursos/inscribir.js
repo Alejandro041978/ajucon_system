@@ -6,7 +6,6 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const MOODLE_URL = 'https://campus.ajucon.org.pe';
-const MOODLE_COURSE_ID = 8;
 
 async function moodlePost(wsfunction, params) {
   const url = `${MOODLE_URL}/webservice/rest/server.php?wstoken=${process.env.MOODLE_TOKEN}&wsfunction=${wsfunction}&moodlewsrestformat=json`;
@@ -35,8 +34,19 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Token inválido.' });
   }
 
-  const { curso_nombre } = req.body;
-  if (!curso_nombre) return res.status(400).json({ error: 'Debes seleccionar un curso.' });
+  const { curso_id } = req.body;
+  if (!curso_id) return res.status(400).json({ error: 'Debes seleccionar un curso.' });
+
+  // Obtener datos del curso desde BD
+  const { data: curso } = await supabase
+    .from('cursos')
+    .select('nombre, moodle_curso_id, activo')
+    .eq('id', curso_id)
+    .single();
+
+  if (!curso || !curso.activo) return res.status(400).json({ error: 'Curso no disponible.' });
+  const curso_nombre = curso.nombre;
+  const MOODLE_COURSE_ID = curso.moodle_curso_id;
 
   // Verificar si tiene inscripción activa
   const { data: activa } = await supabase
@@ -94,15 +104,17 @@ export default async function handler(req, res) {
   }
 
   // Enrolar en el curso
-  const enrol = await moodlePost('enrol_manual_enrol_users', {
-    'enrolments[0][roleid]': '5',
-    'enrolments[0][userid]': String(moodleUserId),
-    'enrolments[0][courseid]': String(MOODLE_COURSE_ID),
-  });
-
-  if (enrol?.exception) {
-    console.error('Moodle enrol error:', enrol);
-    return res.status(500).json({ error: 'Error al inscribir en el campus virtual.' });
+  // Solo enrolar en Moodle si hay curso_id configurado
+  if (MOODLE_COURSE_ID) {
+    const enrol = await moodlePost('enrol_manual_enrol_users', {
+      'enrolments[0][roleid]': '5',
+      'enrolments[0][userid]': String(moodleUserId),
+      'enrolments[0][courseid]': String(MOODLE_COURSE_ID),
+    });
+    if (enrol?.exception) {
+      console.error('Moodle enrol error:', enrol);
+      return res.status(500).json({ error: 'Error al inscribir en el campus virtual.' });
+    }
   }
 
   // Guardar en Supabase

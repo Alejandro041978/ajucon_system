@@ -156,6 +156,7 @@
   <div class="nav-item" onclick="setSeccion('users', this)">👤 Usuarios</div>
   <div class="nav-item" onclick="setSeccion('becas_profesionales', this)">🎓 Becas Profesionales</div>
   <div class="nav-item" onclick="setSeccion('becas_cursos', this)">💻 Becas Cursos</div>
+  <div class="nav-item" onclick="setSeccion('gestion_cursos', this)">⚙️ Gestión de Cursos</div>
   <div class="nav-item" onclick="setSeccion('test_results', this)">✏️ Test CHASIDE</div>
   <div class="nav-item" onclick="setSeccion('riasec', this)">🧠 Perfiles RIASEC</div>
   <div class="nav-item" onclick="setSeccion('valeria_review', this)">🔍 Revisor Valeria</div>
@@ -216,6 +217,13 @@
     <h2>Perfiles Vocacionales — Modelo RIASEC</h2>
     <div id="riasec-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-top:8px"></div>
     <div id="riasec-empty" style="display:none;text-align:center;color:var(--text-faint);padding:40px">Sin perfiles aún.</div>
+  </div>
+
+  <!-- Gestión de Cursos -->
+  <div class="section" id="sec-gestion_cursos">
+    <h2>Gestión de Cursos Online</h2>
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:20px">Edita el nombre, activa/desactiva cursos y asigna el ID de Moodle para la integración automática.</p>
+    <div id="cursos-tabla"></div>
   </div>
 
   <!-- Revisor Valeria -->
@@ -429,6 +437,74 @@
     }).join('');
   }
 
+  async function cargarGestionCursos() {
+    const wrap = document.getElementById('cursos-tabla');
+    wrap.innerHTML = '<p style="color:var(--text-faint);font-size:.85rem">Cargando...</p>';
+
+    const r = await fetch('/api/admin/cursos', { headers: { 'Authorization': 'Bearer ' + token } });
+    const cursos = await r.json();
+
+    wrap.innerHTML = `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="background:var(--surface2);font-size:.75rem;color:var(--text-muted);text-transform:uppercase">
+            <th style="padding:10px 14px;text-align:left;font-weight:600;width:40px">#</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:600">Nombre del curso</th>
+            <th style="padding:10px 14px;text-align:left;font-weight:600;width:130px">ID Moodle</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:600;width:90px">Activo</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:600;width:80px">Guardar</th>
+          </tr></thead>
+          <tbody>
+            ${cursos.map((c, i) => `
+              <tr style="border-top:1px solid var(--border)" id="fila-${c.id}">
+                <td style="padding:10px 14px;font-size:.8rem;color:var(--text-faint)">${i + 1}</td>
+                <td style="padding:8px 14px">
+                  <input type="text" value="${c.nombre}" id="nombre-${c.id}"
+                    style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:.88rem;font-family:inherit;outline:none"
+                    onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor=''" />
+                </td>
+                <td style="padding:8px 14px">
+                  <input type="number" value="${c.moodle_curso_id || ''}" id="moodle-${c.id}" placeholder="—"
+                    style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:.88rem;font-family:inherit;outline:none"
+                    onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor=''" />
+                </td>
+                <td style="padding:8px 14px;text-align:center">
+                  <input type="checkbox" id="activo-${c.id}" ${c.activo ? 'checked' : ''}
+                    style="width:17px;height:17px;accent-color:#6366f1;cursor:pointer" />
+                </td>
+                <td style="padding:8px 14px;text-align:center">
+                  <button onclick="guardarCurso(${c.id})"
+                    style="padding:6px 14px;background:#6366f1;color:white;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer">
+                    Guardar
+                  </button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  async function guardarCurso(id) {
+    const nombre = document.getElementById('nombre-' + id).value.trim();
+    const moodleVal = document.getElementById('moodle-' + id).value.trim();
+    const activo = document.getElementById('activo-' + id).checked;
+    if (!nombre) return alert('El nombre no puede estar vacío.');
+
+    const r = await fetch('/api/admin/cursos', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ id, nombre, moodle_curso_id: moodleVal ? parseInt(moodleVal) : null, activo }),
+    });
+    const fila = document.getElementById('fila-' + id);
+    if (r.ok) {
+      fila.style.background = '#d1fae5';
+      setTimeout(() => fila.style.background = '', 1200);
+    } else {
+      fila.style.background = '#fee2e2';
+      setTimeout(() => fila.style.background = '', 1200);
+    }
+  }
+
   async function cargarValeriaReview() {
     const list = document.getElementById('review-list');
     const empty = document.getElementById('review-empty');
@@ -460,7 +536,7 @@
     }).join('');
   }
 
-  const loaders = { stats:cargarStats, users:cargarUsers, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview };
+  const loaders = { stats:cargarStats, users:cargarUsers, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos };
   const loaded = new Set();
 
   function setSeccion(sec, el) {

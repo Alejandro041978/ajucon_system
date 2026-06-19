@@ -108,28 +108,7 @@
     window.location.href = '/index.html';
   }
 
-  const CURSOS = [
-    'Liderazgo',
-    'Desarrollo Emocional',
-    'Valores, ética y bienestar',
-    'Desarrollo Humano a lo Largo de la Vida',
-    'Finanzas Personales',
-    'Redes Sociales',
-    'Pensamiento Creativo',
-    'Introducción a la Inteligencia Artificial',
-    'Lógica de la Argumentación y Pensamiento Crítico',
-    'Creatividad Digital',
-    'Inteligencia Emocional',
-    'Habilidades de Comunicación',
-    'Gestión de Emociones',
-    'Gestión del Tiempo y Productividad',
-    'Cómo Hacer Amigos y tener Relaciones Exitosas',
-    'Herramientas para la Autogestión de Emociones',
-    'Liderazgo en tiempos Digitales',
-    'Cómo entender lo que leo',
-    'Cómo Ser más Empático',
-    'Comunicación Asertiva',
-  ];
+  let CURSOS = []; // se carga desde la API
 
   let cursoSeleccionado = null;
 
@@ -180,8 +159,8 @@
   }
 
   function renderCatalogo() {
-    const opciones = CURSOS.map((nombre, i) =>
-      `<option value="${i}">${i + 1}. ${nombre}</option>`).join('');
+    const opciones = CURSOS.map((c, i) =>
+      `<option value="${c.id}">${i + 1}. ${c.nombre}</option>`).join('');
 
     return `
       <div class="catalogo-title">Elige tu próximo curso</div>
@@ -197,9 +176,8 @@
   }
 
   function seleccionarCurso(sel) {
-    if (!sel.value) { cursoSeleccionado = null; document.getElementById('btn-inscribir').disabled = true; return; }
-    cursoSeleccionado = CURSOS[parseInt(sel.value)];
-    document.getElementById('btn-inscribir').disabled = false;
+    cursoSeleccionado = sel.value || null;
+    document.getElementById('btn-inscribir').disabled = !cursoSeleccionado;
   }
 
   async function inscribirse() {
@@ -213,7 +191,7 @@
     const r = await fetch('/api/cursos/inscribir', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ curso_nombre: cursoSeleccionado }),
+      body: JSON.stringify({ curso_id: cursoSeleccionado }),
     });
     const data = await r.json();
 
@@ -233,9 +211,11 @@
     const contenido = document.getElementById('contenido');
     const loading = document.getElementById('loading');
 
-    const r = await fetch('/api/cursos/mi-curso', {
-      headers: { 'Authorization': 'Bearer ' + token },
-    });
+    const [rCursos, r] = await Promise.all([
+      fetch('/api/cursos/catalogo', { headers: { 'Authorization': 'Bearer ' + token } }),
+      fetch('/api/cursos/mi-curso', { headers: { 'Authorization': 'Bearer ' + token } }),
+    ]);
+    CURSOS = rCursos.ok ? await rCursos.json() : [];
     const data = await r.json();
     loading.style.display = 'none';
     contenido.style.display = 'block';
