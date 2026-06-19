@@ -1,19 +1,9 @@
-import jwt from 'jsonwebtoken';
-
-function verifyAdmin(req) {
-  const auth = req.headers.authorization?.replace('Bearer ', '');
-  if (!auth) return null;
-  try {
-    const p = jwt.verify(auth, process.env.JWT_SECRET);
-    return p.role === 'admin' ? p : null;
-  } catch { return null; }
-}
-
 export default async function handler(req, res) {
-  if (!verifyAdmin(req)) return res.status(401).json({ error: 'No autorizado.' });
-
   const TOKEN = process.env.METRICOOL_TOKEN;
   const BASE = 'https://app.metricool.com/api/v2';
+
+  const b64 = Buffer.from(`:${TOKEN}`).toString('base64');
+  const b64v2 = Buffer.from(`${TOKEN}:`).toString('base64');
 
   const intentos = [
     { nombre: 'token query param', url: `${BASE}/user?token=${TOKEN}` },
@@ -22,6 +12,10 @@ export default async function handler(req, res) {
     { nombre: 'Bearer header', url: `${BASE}/user`, headers: { 'Authorization': `Bearer ${TOKEN}` } },
     { nombre: 'Token header', url: `${BASE}/user`, headers: { 'Authorization': `Token ${TOKEN}` } },
     { nombre: 'X-Mc-Auth header', url: `${BASE}/user`, headers: { 'X-Mc-Auth': TOKEN } },
+    { nombre: 'Basic :token', url: `${BASE}/user`, headers: { 'Authorization': `Basic ${b64}` } },
+    { nombre: 'Basic token:', url: `${BASE}/user`, headers: { 'Authorization': `Basic ${b64v2}` } },
+    { nombre: 'token header lowercase', url: `${BASE}/user`, headers: { 'token': TOKEN } },
+    { nombre: '/brands endpoint token param', url: `${BASE}/brands?token=${TOKEN}` },
   ];
 
   const resultados = [];
