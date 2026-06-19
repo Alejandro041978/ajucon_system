@@ -100,7 +100,8 @@ export default async function handler(req, res) {
   }
 
   const publishBody = {
-    publicationDate: scheduledAt,
+    text: post.captions?.facebook || post.captions?.instagram || post.tema || '',
+    publicationDate: { dateTime: scheduledAt },
     providers,
   };
 
