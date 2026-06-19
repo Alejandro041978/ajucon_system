@@ -240,6 +240,7 @@
   <span class="logo">AJUCON</span>
   <div class="acciones">
     <a href="/dashboard.html" class="btn-back">← Volver</a>
+    <button class="btn-nuevo" id="btn-nuevo" onclick="confirmarNuevoReporte()" style="padding:8px 18px;border:1px solid #334155;border-radius:8px;color:#94a3b8;background:none;font-family:system-ui,sans-serif;font-size:.85rem;cursor:pointer">↺ Nuevo reporte</button>
     <button class="btn-pdf" onclick="window.print()">⬇ Descargar PDF</button>
   </div>
 </div>
@@ -378,9 +379,19 @@
     return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
-  async function cargarReporte() {
+  function confirmarNuevoReporte() {
+    if (confirm('¿Generar un nuevo reporte? Esto reemplazará el reporte actual y puede tomar unos segundos.')) {
+      document.getElementById('reporte').style.display = 'none';
+      document.getElementById('loader').style.display = 'flex';
+      document.querySelector('.loader-txt').textContent = 'Generando nuevo reporte vocacional...';
+      cargarReporte(true);
+    }
+  }
+
+  async function cargarReporte(forzar = false) {
     try {
-      const r = await fetch('/api/reportes/generar', {
+      const url = '/api/reportes/generar' + (forzar ? '?nuevo=1' : '');
+      const r = await fetch(url, {
         headers: { 'Authorization': 'Bearer ' + token },
       });
       const data = await r.json();
@@ -411,6 +422,10 @@
     document.getElementById('ficha-ciudad').textContent = usuario.ciudad || 'Tacna';
     document.getElementById('ficha-fecha').textContent = fechaCorta(generado_en);
     document.getElementById('pie-fecha').textContent = `Generado el ${fechaCorta(generado_en)}`;
+    if (d._desde_cache) {
+      document.getElementById('btn-nuevo').style.color = '#818cf8';
+      document.getElementById('btn-nuevo').title = 'Este reporte fue generado el ' + fechaCorta(generado_en);
+    }
 
     // RIASEC
     if (riasec) {

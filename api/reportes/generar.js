@@ -46,6 +46,23 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Token inválido.' });
   }
 
+  const forzarNuevo = req.query.nuevo === '1';
+
+  // Si no se fuerza regeneración, devolver reporte guardado si existe
+  if (!forzarNuevo) {
+    const { data: reporteGuardado } = await supabase
+      .from('reportes_vocacionales')
+      .select('contenido, created_at')
+      .eq('user_id', payload.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (reporteGuardado) {
+      return res.status(200).json({ ...reporteGuardado.contenido, _desde_cache: true, generado_en: reporteGuardado.created_at });
+    }
+  }
+
   // Obtener todos los datos del estudiante en paralelo
   const [
     { data: usuario },
@@ -140,7 +157,7 @@ Reglas:
     return res.status(500).json({ error: 'Error al generar el reporte con IA. Intenta nuevamente.' });
   }
 
-  return res.status(200).json({
+  const respuesta = {
     usuario: {
       nombre: `${usuario.nombre} ${usuario.apellido || ''}`.trim(),
       email: usuario.email,
@@ -152,5 +169,11 @@ Reglas:
     chaside: tieneChaside ? { resultado: chaside.resultado, area: AREAS_CHASIDE[chaside.resultado] || chaside.resultado, carreras: chaside.carreras } : null,
     narrativa,
     generado_en: new Date().toISOString(),
-  });
+  };
+
+  // Guardar reporte en BD (upsert: borrar el anterior y guardar el nuevo)
+  await supabase.from('reportes_vocacionales').delete().eq('user_id', payload.id);
+  await supabase.from('reportes_vocacionales').insert({ user_id: payload.id, contenido: respuesta });
+
+  return res.status(200).json(respuesta);
 }
