@@ -61,29 +61,29 @@ export default async function handler(req, res) {
     ? new Date(fecha).toISOString()
     : new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 min desde ahora si no se especifica
 
-  const networksBody = {};
+  const providers = {};
   const redes = post.redes || [];
 
   if (redes.includes('facebook')) {
-    networksBody.facebook = {
+    providers.facebook = {
       text: post.captions?.facebook || '',
       ...(mediaUrl ? { mediaUrls: [mediaUrl] } : {}),
     };
   }
   if (redes.includes('instagram')) {
-    networksBody.instagram = {
+    providers.instagram = {
       text: post.captions?.instagram || '',
       ...(mediaUrl ? { mediaUrls: [mediaUrl] } : {}),
     };
   }
   if (redes.includes('tiktok')) {
-    networksBody.tiktok = {
+    providers.tiktok = {
       text: post.captions?.tiktok || '',
       ...(post.video_url ? { mediaUrls: [post.video_url] } : {}),
     };
   }
   if (redes.includes('youtube')) {
-    networksBody.youtube = {
+    providers.youtube = {
       title: post.captions?.youtube_titulo || post.tema,
       text: post.captions?.youtube_descripcion || '',
       ...(post.video_url ? { mediaUrls: [post.video_url] } : {}),
@@ -91,8 +91,8 @@ export default async function handler(req, res) {
   }
 
   const publishBody = {
-    scheduledDate: scheduledAt,
-    networks: networksBody,
+    publicationDate: scheduledAt,
+    providers,
   };
 
   const pubRes = await metricoolFetch('/scheduler/posts', {
