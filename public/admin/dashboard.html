@@ -185,7 +185,7 @@
     <h2>Usuarios registrados</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Nombre</th><th>Email</th><th>Grado</th><th>Colegio</th><th>Ciudad</th><th>Registro</th></tr></thead>
+        <thead><tr><th>Nombre</th><th>Apellido</th><th>Email</th><th>Grado</th><th>Colegio</th><th>Ciudad</th><th>Registro</th><th></th></tr></thead>
         <tbody id="tbody-users"><tr><td colspan="6" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
@@ -675,7 +675,7 @@
     const conBorrar = puedoBorrar('users');
     tbody.innerHTML = data.length ? data.map(u => `
       <tr>
-        <td>${u.nombre} ${u.apellido||''}</td><td>${u.email}</td><td>${u.grado}</td><td>${u.colegio || '—'}</td><td>${u.ciudad || '—'}</td><td>${fecha(u.created_at)}</td>
+        <td>${u.nombre||'—'}</td><td>${u.apellido||'—'}</td><td>${u.email}</td><td>${u.grado}</td><td>${u.colegio || '—'}</td><td>${u.ciudad || '—'}</td><td>${fecha(u.created_at)}</td>
         <td style="white-space:nowrap">
           ${conEditar ? `<button onclick='abrirModalUsuario(${JSON.stringify(u)})' style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#6366f1';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Editar</button>` : ''}
           ${conBorrar ? `<button onclick="borrarUsuario('${u.id}')" style="margin-left:4px;padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Borrar</button>` : ''}
