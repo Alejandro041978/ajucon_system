@@ -66,28 +66,28 @@ export default async function handler(req, res) {
 
   if (redes.includes('facebook')) {
     providers.push({
-      name: 'FACEBOOK',
+      network: 'FACEBOOK',
       text: post.captions?.facebook || '',
       ...(mediaUrl ? { mediaUrls: [mediaUrl] } : {}),
     });
   }
   if (redes.includes('instagram')) {
     providers.push({
-      name: 'INSTAGRAM',
+      network: 'INSTAGRAM',
       text: post.captions?.instagram || '',
       ...(mediaUrl ? { mediaUrls: [mediaUrl] } : {}),
     });
   }
   if (redes.includes('tiktok')) {
     providers.push({
-      name: 'TIKTOK',
+      network: 'TIKTOK',
       text: post.captions?.tiktok || '',
       ...(post.video_url ? { mediaUrls: [post.video_url] } : {}),
     });
   }
   if (redes.includes('youtube')) {
     providers.push({
-      name: 'YOUTUBE',
+      network: 'YOUTUBE',
       title: post.captions?.youtube_titulo || post.tema,
       text: post.captions?.youtube_descripcion || '',
       ...(post.video_url ? { mediaUrls: [post.video_url] } : {}),
