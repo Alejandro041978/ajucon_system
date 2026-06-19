@@ -15,44 +15,110 @@
     input:focus { border-color: #6366f1; }
     button { width: 100%; padding: 13px; background: #6366f1; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .2s; }
     button:hover { background: #4f46e5; }
+    button:disabled { background: #334155; cursor: default; }
     .err { background: #450a0a; color: #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: .85rem; margin-top: 14px; display: none; }
+    .ok { background: #052e16; color: #86efac; border-radius: 8px; padding: 10px 14px; font-size: .85rem; margin-top: 14px; display: none; }
+    .back { background: none; border: none; color: #64748b; font-size: .82rem; cursor: pointer; margin-top: 12px; text-decoration: underline; width: auto; padding: 0; }
+    .back:hover { color: #94a3b8; background: none; }
   </style>
 </head>
 <body>
 <div class="card">
   <h1>AJUCON Admin</h1>
   <p class="sub">Panel de administración</p>
-  <form onsubmit="login(event)">
-    <label>Email</label>
-    <input type="email" id="email" required />
-    <label>Contraseña</label>
-    <input type="password" id="password" required />
-    <button type="submit" id="btn">Ingresar</button>
-    <div class="err" id="err"></div>
-  </form>
+
+  <!-- Paso 1: email -->
+  <div id="paso1">
+    <form onsubmit="pedirCodigo(event)">
+      <label>Email de administrador</label>
+      <input type="email" id="email" placeholder="admin@ajucon.org.pe" required />
+      <button type="submit" id="btn1">Enviar código</button>
+    </form>
+  </div>
+
+  <!-- Paso 2: código -->
+  <div id="paso2" style="display:none">
+    <p style="color:#94a3b8;font-size:.88rem;margin-bottom:20px">Ingresa el código de 6 dígitos enviado a <strong id="email-show" style="color:#f1f5f9"></strong></p>
+    <form onsubmit="verificarCodigo(event)">
+      <label>Código de acceso</label>
+      <input type="text" id="code" maxlength="6" placeholder="123456" required autocomplete="one-time-code" />
+      <button type="submit" id="btn2">Ingresar</button>
+    </form>
+    <button class="back" onclick="volverPaso1()">← Volver</button>
+  </div>
+
+  <div class="ok" id="ok"></div>
+  <div class="err" id="err"></div>
 </div>
 <script>
   if (localStorage.getItem('ajucon_admin_token')) window.location.href = '/admin/dashboard.html';
 
-  async function login(e) {
-    e.preventDefault();
-    const btn = document.getElementById('btn');
-    btn.textContent = 'Ingresando...'; btn.disabled = true;
+  function mostrarErr(msg) {
+    const el = document.getElementById('err');
+    el.textContent = msg; el.style.display = 'block';
+    document.getElementById('ok').style.display = 'none';
+  }
+  function mostrarOk(msg) {
+    const el = document.getElementById('ok');
+    el.textContent = msg; el.style.display = 'block';
+    document.getElementById('err').style.display = 'none';
+  }
 
+  async function pedirCodigo(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn1');
+    btn.textContent = 'Enviando...'; btn.disabled = true;
+    document.getElementById('err').style.display = 'none';
+
+    const email = document.getElementById('email').value;
     const r = await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value }),
+      body: JSON.stringify({ email }),
     });
     const data = await r.json();
+
+    if (r.ok) {
+      document.getElementById('email-show').textContent = email;
+      document.getElementById('paso1').style.display = 'none';
+      document.getElementById('paso2').style.display = 'block';
+      mostrarOk(data.mensaje);
+      setTimeout(() => document.getElementById('code').focus(), 100);
+    } else {
+      mostrarErr(data.error);
+    }
+    btn.textContent = 'Enviar código'; btn.disabled = false;
+  }
+
+  async function verificarCodigo(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btn2');
+    btn.textContent = 'Verificando...'; btn.disabled = true;
+
+    const email = document.getElementById('email').value;
+    const code = document.getElementById('code').value;
+    const r = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code }),
+    });
+    const data = await r.json();
+
     if (r.ok) {
       localStorage.setItem('ajucon_admin_token', data.token);
       window.location.href = '/admin/dashboard.html';
     } else {
-      const el = document.getElementById('err');
-      el.textContent = data.error; el.style.display = 'block';
+      mostrarErr(data.error);
       btn.textContent = 'Ingresar'; btn.disabled = false;
     }
+  }
+
+  function volverPaso1() {
+    document.getElementById('paso2').style.display = 'none';
+    document.getElementById('paso1').style.display = 'block';
+    document.getElementById('err').style.display = 'none';
+    document.getElementById('ok').style.display = 'none';
+    document.getElementById('code').value = '';
   }
 </script>
 </body>

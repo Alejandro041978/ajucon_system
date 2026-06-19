@@ -262,10 +262,6 @@
       <label style="font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Email</label>
       <input id="admin-email" type="email" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#2d3748'" />
     </div>
-    <div style="margin-bottom:14px">
-      <label style="font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Contraseña <span id="admin-pass-hint" style="font-weight:400;text-transform:none">(dejar vacío para no cambiar)</span></label>
-      <input id="admin-password" type="password" placeholder="••••••••" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#2d3748'" />
-    </div>
     <div id="admin-activo-wrap" style="margin-bottom:20px;display:flex;align-items:center;gap:10px">
       <input id="admin-activo" type="checkbox" checked style="width:18px;height:18px;accent-color:#6366f1;cursor:pointer" />
       <label for="admin-activo" style="font-size:.9rem;color:#e2e8f0;cursor:pointer">Cuenta activa</label>
@@ -746,9 +742,7 @@
     document.getElementById('admin-nombre').value = admin?.nombre || '';
     document.getElementById('admin-apellido').value = admin?.apellido || '';
     document.getElementById('admin-email').value = admin?.email || '';
-    document.getElementById('admin-password').value = '';
     document.getElementById('admin-activo').checked = admin ? !!admin.activo : true;
-    document.getElementById('admin-pass-hint').style.display = admin ? 'inline' : 'none';
     document.getElementById('admin-modal-msg').style.display = 'none';
     document.getElementById('admin-guardar-btn').disabled = false;
     document.getElementById('admin-guardar-btn').textContent = 'Guardar';
@@ -772,14 +766,13 @@
     const password = document.getElementById('admin-password').value;
     const activo = document.getElementById('admin-activo').checked;
     if (!nombre || !apellido || !email) { mostrarAdminMsg('Nombre, apellido y email son requeridos.'); return; }
-    if (!_adminEditandoId && !password) { mostrarAdminMsg('La contraseña es requerida para nuevos administradores.'); return; }
 
     const btn = document.getElementById('admin-guardar-btn');
     btn.disabled = true; btn.textContent = 'Guardando...';
 
     const body = _adminEditandoId
-      ? { id: _adminEditandoId, nombre, apellido, email, activo, ...(password ? { password } : {}) }
-      : { nombre, apellido, email, password, activo };
+      ? { id: _adminEditandoId, nombre, apellido, email, activo }
+      : { nombre, apellido, email, activo };
 
     const r = await fetch('/api/admin/admins', {
       method: _adminEditandoId ? 'PATCH' : 'POST',
