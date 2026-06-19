@@ -270,17 +270,67 @@
       </select>
     </div>
     <div id="admin-permisos-wrap" style="margin-bottom:20px">
-      <label style="font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Secciones con acceso</label>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="perm-stats" style="accent-color:#6366f1;width:16px;height:16px" /> Resumen</label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="perm-users" style="accent-color:#6366f1;width:16px;height:16px" /> Usuarios</label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="perm-becas_profesionales" style="accent-color:#6366f1;width:16px;height:16px" /> Becas Profesionales</label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="perm-becas_cursos" style="accent-color:#6366f1;width:16px;height:16px" /> Becas Cursos</label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="perm-gestion_cursos" style="accent-color:#6366f1;width:16px;height:16px" /> Gestión de Cursos</label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="perm-test_results" style="accent-color:#6366f1;width:16px;height:16px" /> Test CHASIDE</label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="perm-riasec" style="accent-color:#6366f1;width:16px;height:16px" /> Perfiles RIASEC</label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="perm-valeria_review" style="accent-color:#6366f1;width:16px;height:16px" /> Revisor Valeria</label>
-      </div>
+      <label style="font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:10px">Permisos por sección</label>
+      <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+        <thead>
+          <tr>
+            <th style="text-align:left;color:#64748b;padding:6px 8px;border-bottom:1px solid #2d3748;font-weight:600">Sección</th>
+            <th style="text-align:center;color:#64748b;padding:6px 8px;border-bottom:1px solid #2d3748;font-weight:600">Ver</th>
+            <th style="text-align:center;color:#64748b;padding:6px 8px;border-bottom:1px solid #2d3748;font-weight:600">Editar</th>
+            <th style="text-align:center;color:#64748b;padding:6px 8px;border-bottom:1px solid #2d3748;font-weight:600">Borrar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Resumen</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-stats-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+          </tr>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Usuarios</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-users-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-users-editar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-users-borrar" style="accent-color:#ef4444;width:15px;height:15px" /></td>
+          </tr>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Becas Profesionales</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-becas_profesionales-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-becas_profesionales-editar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+          </tr>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Becas Cursos</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-becas_cursos-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-becas_cursos-editar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+          </tr>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Gestión de Cursos</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-gestion_cursos-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-gestion_cursos-editar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+          </tr>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Test CHASIDE</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-test_results-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+          </tr>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Perfiles RIASEC</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-riasec-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+          </tr>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Revisor Valeria</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-valeria_review-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div id="admin-activo-wrap" style="margin-bottom:20px;display:flex;align-items:center;gap:10px">
       <input id="admin-activo" type="checkbox" checked style="width:18px;height:18px;accent-color:#6366f1;cursor:pointer" />
@@ -400,14 +450,19 @@
   // Decodificar rol y permisos del JWT (sin verificar firma — solo para UI)
   const _jwtPayload = JSON.parse(atob(token.split('.')[1]));
   const esSuperAdmin = _jwtPayload.rol === 'super_admin';
-  const _permisos = esSuperAdmin ? null : (_jwtPayload.permisos || []);
+  // permisos: null = super_admin (todo), objeto = {sec: [acciones]}
+  const _permisos = esSuperAdmin ? null : (_jwtPayload.permisos || {});
+
+  function puedoVer(sec) { return esSuperAdmin || (_permisos[sec] && _permisos[sec].includes('ver')); }
+  function puedoEditar(sec) { return esSuperAdmin || (_permisos[sec] && _permisos[sec].includes('editar')); }
+  function puedoBorrar(sec) { return esSuperAdmin || (_permisos[sec] && _permisos[sec].includes('borrar')); }
 
   if (esSuperAdmin) {
     document.getElementById('nav-admins').style.display = 'block';
   } else {
-    // Ocultar secciones sin permiso
+    // Ocultar secciones sin permiso de ver
     ['users','becas_profesionales','becas_cursos','gestion_cursos','test_results','riasec','valeria_review'].forEach(sec => {
-      if (!_permisos.includes(sec)) {
+      if (!puedoVer(sec)) {
         const el = document.querySelector(`[onclick="setSeccion('${sec}', this)"]`);
         if (el) el.style.display = 'none';
       }
@@ -469,21 +524,28 @@
   async function cargarUsers() {
     const data = await api('users'); if (!data) return;
     const tbody = document.getElementById('tbody-users');
+    const conEditar = puedoEditar('users');
+    const conBorrar = puedoBorrar('users');
     tbody.innerHTML = data.length ? data.map(u => `
-      <tr onclick="abrirUsuario('${u.id}')" style="cursor:pointer">
-        <td>${u.nombre}</td><td>${u.email}</td><td>${u.grado}</td><td>${u.colegio || '—'}</td><td>${u.ciudad || '—'}</td><td>${fecha(u.created_at)}</td>
-      </tr>`).join('') : '<tr><td colspan="5" class="empty">Sin usuarios aún.</td></tr>';
+      <tr>
+        <td>${u.nombre} ${u.apellido||''}</td><td>${u.email}</td><td>${u.grado}</td><td>${u.colegio || '—'}</td><td>${u.ciudad || '—'}</td><td>${fecha(u.created_at)}</td>
+        <td style="white-space:nowrap">
+          ${conEditar ? `<button onclick="abrirUsuario('${u.id}')" style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#6366f1';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Editar</button>` : ''}
+          ${conBorrar ? `<button onclick="borrarUsuario('${u.id}')" style="margin-left:4px;padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Borrar</button>` : ''}
+        </td>
+      </tr>`).join('') : '<tr><td colspan="7" class="empty">Sin usuarios aún.</td></tr>';
   }
 
   async function cargarBecasProfesionales() {
     const data = await api('becas_profesionales'); if (!data) return;
     const tbody = document.getElementById('tbody-becas_profesionales');
+    const conEditar = puedoEditar('becas_profesionales');
     tbody.innerHTML = data.length ? data.map(b => `
       <tr>
         <td>${b.users?.nombre||'—'}</td><td>${b.users?.email||'—'}</td>
         <td>${b.carrera_interes||'—'}</td>
         <td>${b.promedio_notas||'—'}</td>
-        <td>${badgeEstado(b.estado,'becas_profesionales',b.id)}</td>
+        <td>${conEditar ? badgeEstado(b.estado,'becas_profesionales',b.id) : `<span class="badge">${b.estado||'—'}</span>`}</td>
         <td><button onclick='verBeca(${JSON.stringify(b).replace(/'/g,"&#39;")})' style="padding:4px 12px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#818cf8';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Ver</button></td>
       </tr>`).join('') : '<tr><td colspan="6" class="empty">Sin postulaciones aún.</td></tr>';
   }
@@ -535,13 +597,14 @@
   async function cargarBecasCursos() {
     const data = await api('becas_cursos'); if (!data) return;
     const tbody = document.getElementById('tbody-becas_cursos');
+    const conEditar = puedoEditar('becas_cursos');
     tbody.innerHTML = data.length ? data.map(b => {
       const nombre = [b.users?.nombre, b.users?.apellido].filter(Boolean).join(' ') || '—';
       return `<tr>
         <td>${nombre}</td><td>${b.users?.email||'—'}</td>
         <td>${b.curso_nombre||'—'}</td>
         <td>${b.nota !== null && b.nota !== undefined ? b.nota + '%' : '—'}</td>
-        <td>${badgeEstado(b.estado,'inscripciones_cursos',b.id)}</td>
+        <td>${conEditar ? badgeEstado(b.estado,'inscripciones_cursos',b.id) : `<span class="badge">${b.estado||'—'}</span>`}</td>
       </tr>`;
     }).join('') : '<tr><td colspan="5" class="empty">Sin inscripciones aún.</td></tr>';
   }
@@ -624,6 +687,7 @@
       return;
     }
 
+    const conEditarCurso = puedoEditar('gestion_cursos');
     wrap.innerHTML = `
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
         <table style="width:100%;border-collapse:collapse">
@@ -632,7 +696,7 @@
             <th style="padding:10px 14px;text-align:left;font-weight:600">Nombre del curso</th>
             <th style="padding:10px 14px;text-align:left;font-weight:600;width:130px">ID Moodle</th>
             <th style="padding:10px 14px;text-align:center;font-weight:600;width:90px">Estado</th>
-            <th style="padding:10px 14px;text-align:center;font-weight:600;width:70px">Editar</th>
+            ${conEditarCurso ? '<th style="padding:10px 14px;text-align:center;font-weight:600;width:70px">Editar</th>' : ''}
           </tr></thead>
           <tbody>
             ${cursos.map((c, i) => `
@@ -645,7 +709,7 @@
                     ${c.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
-                <td style="padding:10px 14px;text-align:center">
+                ${conEditarCurso ? `<td style="padding:10px 14px;text-align:center">
                   <button onclick='abrirModalCurso(${JSON.stringify(c)})'
                     title="Editar curso"
                     style="background:none;border:1px solid var(--border);border-radius:7px;color:var(--text-muted);font-size:1rem;width:34px;height:34px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center"
@@ -653,7 +717,7 @@
                     onmouseout="this.style.borderColor='';this.style.color=''">
                     ✏️
                   </button>
-                </td>
+                </td>` : ''}
               </tr>`).join('')}
           </tbody>
         </table>
@@ -783,14 +847,33 @@
     document.getElementById('admin-rol').value = admin?.rol || 'admin';
     document.getElementById('admin-activo').checked = admin ? !!admin.activo : true;
 
-    // Permisos — marcar checkboxes
-    const todasSecs = ['stats','users','becas_profesionales','becas_cursos','gestion_cursos','test_results','riasec','valeria_review'];
-    const permsActivos = admin?.permisos || todasSecs;
-    todasSecs.forEach(s => {
-      const cb = document.getElementById('perm-' + s);
-      if (cb) cb.checked = permsActivos.includes(s);
+    // Permisos — marcar checkboxes según nuevo formato {seccion: [acciones]}
+    const permMap = {
+      stats: ['ver'], users: ['ver','editar','borrar'],
+      becas_profesionales: ['ver','editar'], becas_cursos: ['ver','editar'],
+      gestion_cursos: ['ver','editar'], test_results: ['ver'],
+      riasec: ['ver'], valeria_review: ['ver']
+    };
+    // Normalizar formato antiguo (array plano) al nuevo
+    let permsObj = {};
+    if (admin?.permisos) {
+      if (Array.isArray(admin.permisos)) {
+        // Formato antiguo: array de secciones → dar solo "ver" en cada una
+        admin.permisos.forEach(s => { permsObj[s] = ['ver']; });
+      } else {
+        permsObj = admin.permisos;
+      }
+    } else {
+      // Nuevo admin: todo marcado
+      Object.keys(permMap).forEach(s => { permsObj[s] = permMap[s]; });
+    }
+    Object.entries(permMap).forEach(([sec, acciones]) => {
+      acciones.forEach(accion => {
+        const cb = document.getElementById(`perm-${sec}-${accion}`);
+        if (cb) cb.checked = !!(permsObj[sec] && permsObj[sec].includes(accion));
+      });
     });
-    // Si es super_admin, ocultar sección permisos (tiene acceso a todo)
+    // Si es super_admin, ocultar tabla permisos (tiene acceso total)
     document.getElementById('admin-permisos-wrap').style.display =
       (admin?.rol === 'super_admin') ? 'none' : 'block';
     document.getElementById('admin-modal-msg').style.display = 'none';
@@ -824,9 +907,20 @@
     btn.disabled = true; btn.textContent = 'Guardando...';
 
     const rol = document.getElementById('admin-rol').value;
-    const todasSecs = ['stats','users','becas_profesionales','becas_cursos','gestion_cursos','test_results','riasec','valeria_review'];
-    const permisos = rol === 'super_admin' ? todasSecs :
-      todasSecs.filter(s => document.getElementById('perm-' + s)?.checked);
+    const permMap = {
+      stats: ['ver'], users: ['ver','editar','borrar'],
+      becas_profesionales: ['ver','editar'], becas_cursos: ['ver','editar'],
+      gestion_cursos: ['ver','editar'], test_results: ['ver'],
+      riasec: ['ver'], valeria_review: ['ver']
+    };
+    const permisos = {};
+    Object.entries(permMap).forEach(([sec, acciones]) => {
+      const accsActivas = acciones.filter(a => {
+        const cb = document.getElementById(`perm-${sec}-${a}`);
+        return cb ? cb.checked : true;
+      });
+      if (accsActivas.length > 0) permisos[sec] = accsActivas;
+    });
     const body = _adminEditandoId
       ? { id: _adminEditandoId, nombre, apellido, email, rol, permisos, activo }
       : { nombre, apellido, email, rol, permisos, activo };

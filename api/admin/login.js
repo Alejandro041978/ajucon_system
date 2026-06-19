@@ -72,10 +72,15 @@ export default async function handler(req, res) {
 
   await supabase.from('verification_codes').update({ used: true }).eq('id', rows[0].id);
 
-  const todasSecciones = ['stats','users','becas_profesionales','becas_cursos','gestion_cursos','test_results','riasec','valeria_review'];
+  const permisosDefault = {
+    stats: ['ver'], users: ['ver','editar','borrar'],
+    becas_profesionales: ['ver','editar'], becas_cursos: ['ver','editar'],
+    gestion_cursos: ['ver','editar'], test_results: ['ver'],
+    riasec: ['ver'], valeria_review: ['ver']
+  };
   const payload = admin
-    ? { role: 'admin', id: admin.id, email: admin.email, rol: admin.rol || 'admin', permisos: admin.permisos || todasSecciones }
-    : { role: 'admin', email, rol: 'super_admin', permisos: todasSecciones };
+    ? { role: 'admin', id: admin.id, email: admin.email, rol: admin.rol || 'admin', permisos: admin.permisos || permisosDefault }
+    : { role: 'admin', email, rol: 'super_admin', permisos: permisosDefault };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '8h' });
   const nombre = admin ? `${admin.nombre} ${admin.apellido}` : 'Administrador';
