@@ -57,9 +57,14 @@ export default async function handler(req, res) {
 
   // Construir el body del post para Metricool
   // Metricool API v2: POST /posts con scheduled_at y redes configuradas
-  const scheduledAt = fecha
-    ? new Date(fecha).toISOString()
-    : new Date(Date.now() + 5 * 60 * 1000).toISOString(); // 5 min desde ahora si no se especifica
+  const dt = fecha ? new Date(fecha) : new Date(Date.now() + 5 * 60 * 1000);
+  const scheduledAt = {
+    year: dt.getUTCFullYear(),
+    month: dt.getUTCMonth() + 1,
+    day: dt.getUTCDate(),
+    hour: dt.getUTCHours(),
+    minute: dt.getUTCMinutes(),
+  };
 
   const providers = {};
   const redes = post.redes || [];
