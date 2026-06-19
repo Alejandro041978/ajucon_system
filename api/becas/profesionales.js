@@ -16,20 +16,24 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Token inválido.' });
   }
 
-  const { rut, fecha_nacimiento, direccion, telefono, carrera_interes, institucion, promedio_notas, situacion_economica, motivacion } = req.body;
+  const { rut, fecha_nacimiento, direccion, telefono, tipo_institucion, carrera_interes, modalidad, region, promedio_notas, situacion_economica, motivacion } = req.body;
 
-  if (!rut || !fecha_nacimiento || !direccion || !telefono || !carrera_interes || !institucion || !promedio_notas || !situacion_economica || !motivacion) {
+  if (!rut || !fecha_nacimiento || !direccion || !telefono || !tipo_institucion || !carrera_interes || !modalidad || !promedio_notas || !situacion_economica || !motivacion) {
     return res.status(400).json({ error: 'Todos los campos son requeridos.' });
   }
 
-  if (promedio_notas < 1 || promedio_notas > 7) {
-    return res.status(400).json({ error: 'El promedio debe estar entre 1 y 7.' });
+  if (modalidad === 'Presencial' && !region) {
+    return res.status(400).json({ error: 'Debes seleccionar la región donde estudiarías.' });
+  }
+
+  if (promedio_notas < 0 || promedio_notas > 20) {
+    return res.status(400).json({ error: 'El promedio debe estar entre 0 y 20.' });
   }
 
   const { error } = await supabase.from('becas_profesionales').insert({
     user_id: payload.id,
     rut, fecha_nacimiento, direccion, telefono,
-    carrera_interes, institucion,
+    tipo_institucion, carrera_interes, modalidad, region: region || null,
     promedio_notas, situacion_economica, motivacion,
   });
 
