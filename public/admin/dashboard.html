@@ -195,7 +195,7 @@
     <h2>Postulaciones — Becas Profesionales</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Nombre</th><th>Email</th><th>Carrera</th><th>Institución</th><th>Promedio</th><th>Estado</th></tr></thead>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Carrera</th><th>Promedio</th><th>Estado</th><th></th></tr></thead>
         <tbody id="tbody-becas_profesionales"><tr><td colspan="6" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
@@ -224,6 +224,16 @@
     <h2>Gestión de Cursos Online</h2>
     <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:20px">Edita el nombre, activa/desactiva cursos y asigna el ID de Moodle para la integración automática.</p>
     <div id="cursos-tabla"></div>
+  </div>
+
+  <!-- Modal detalle beca profesional -->
+  <div class="overlay" id="beca-overlay" onclick="cerrarBeca()"></div>
+  <div id="beca-modal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);width:500px;max-width:95vw;max-height:85vh;overflow-y:auto;background:#1e2535;border:1px solid #2d3748;border-radius:16px;padding:28px;z-index:200;opacity:0;pointer-events:none;transition:all .2s ease">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="color:#f1f5f9;font-size:1rem;margin:0">Detalle de postulación</h3>
+      <button onclick="cerrarBeca()" style="background:none;border:none;color:#64748b;font-size:1.3rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div id="beca-modal-body"></div>
   </div>
 
   <!-- Modal edición de curso -->
@@ -387,9 +397,55 @@
     tbody.innerHTML = data.length ? data.map(b => `
       <tr>
         <td>${b.users?.nombre||'—'}</td><td>${b.users?.email||'—'}</td>
-        <td>${b.carrera_interes}</td><td>${b.institucion}</td>
-        <td>${b.promedio_notas}</td><td>${badgeEstado(b.estado,'becas_profesionales',b.id)}</td>
+        <td>${b.carrera_interes||'—'}</td>
+        <td>${b.promedio_notas||'—'}</td>
+        <td>${badgeEstado(b.estado,'becas_profesionales',b.id)}</td>
+        <td><button onclick='verBeca(${JSON.stringify(b).replace(/'/g,"&#39;")})' style="padding:4px 12px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#818cf8';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Ver</button></td>
       </tr>`).join('') : '<tr><td colspan="6" class="empty">Sin postulaciones aún.</td></tr>';
+  }
+
+  function verBeca(b) {
+    const u = b.users || {};
+    const filas = [
+      ['Nombre', u.nombre || '—'],
+      ['Email', u.email || '—'],
+      ['DNI', b.rut || '—'],
+      ['Fecha de nacimiento', b.fecha_nacimiento || '—'],
+      ['Dirección', b.direccion || '—'],
+      ['Ciudad / Región', b.region || '—'],
+      ['Teléfono', b.telefono || '—'],
+      ['Modalidad', b.modalidad || '—'],
+      ['Tipo de institución', b.tipo_institucion || '—'],
+      ['Carrera', b.carrera_interes || '—'],
+      ['Promedio', b.promedio_notas || '—'],
+      ['Situación económica', b.situacion_economica || '—'],
+      ['Postulación', b.created_at ? new Date(b.created_at).toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—'],
+    ].map(([k,v]) => `
+      <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1e293b;font-size:.85rem">
+        <span style="color:#64748b">${k}</span>
+        <span style="color:#e2e8f0;font-weight:500;text-align:right;max-width:60%">${v}</span>
+      </div>`).join('');
+
+    document.getElementById('beca-modal-body').innerHTML = `
+      ${filas}
+      <div style="margin-top:16px">
+        <div style="font-size:.72rem;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Carta de motivación</div>
+        <div style="font-size:.85rem;color:#cbd5e1;line-height:1.6;background:#0d1117;padding:14px;border-radius:8px">${b.motivacion || '—'}</div>
+      </div>`;
+
+    document.getElementById('beca-overlay').classList.add('open');
+    const modal = document.getElementById('beca-modal');
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
+    modal.style.transform = 'translate(-50%,-50%) scale(1)';
+  }
+
+  function cerrarBeca() {
+    document.getElementById('beca-overlay').classList.remove('open');
+    const modal = document.getElementById('beca-modal');
+    modal.style.opacity = '0';
+    modal.style.pointerEvents = 'none';
+    modal.style.transform = 'translate(-50%,-50%) scale(.96)';
   }
 
   async function cargarBecasCursos() {
