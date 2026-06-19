@@ -105,33 +105,6 @@
           <input type="tel" id="telefono" placeholder="+51 9 1234 5678" required />
         </div>
 
-        <div class="section-title">Estudios de interés</div>
-        <div class="field">
-          <label>Carrera o programa de interés</label>
-          <input type="text" id="carrera_interes" placeholder="Ej: Ingeniería Civil, Enfermería..." required />
-        </div>
-        <div class="field">
-          <label>Institución donde deseas estudiar</label>
-          <input type="text" id="institucion" placeholder="Ej: Universidad de Chile, INACAP..." required />
-        </div>
-
-        <div class="section-title">Situación académica y socioeconómica</div>
-        <div class="grid2">
-          <div class="field">
-            <label>Promedio de notas (escala 0-20)</label>
-            <input type="number" id="promedio_notas" min="0" max="20" step="0.1" placeholder="15.5" required />
-          </div>
-          <div class="field">
-            <label>Situación económica familiar</label>
-            <select id="situacion_economica" required>
-              <option value="">Selecciona</option>
-              <option>Muy vulnerable</option>
-              <option>Vulnerable</option>
-              <option>Media-baja</option>
-            </select>
-          </div>
-        </div>
-
         <div class="section-title">Modalidad de estudio</div>
         <div class="grid2">
           <div class="field">
@@ -171,6 +144,45 @@
               <option>Tacna</option>
               <option>Tumbes</option>
               <option>Ucayali</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-title">Estudios de interés</div>
+        <div class="field">
+          <label>Tipo de institución</label>
+          <select id="tipo_institucion" required>
+            <option value="">Selecciona</option>
+            <option>Instituto Superior Licenciado</option>
+            <option>Universidad Licenciada</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Carrera o programa de interés</label>
+          <select id="carrera_interes" required>
+            <option value="">Selecciona</option>
+            <option>Administración</option>
+            <option>Contabilidad</option>
+            <option>Enfermería</option>
+            <option>Farmacia</option>
+            <option>Marketing</option>
+            <option>Computación</option>
+          </select>
+        </div>
+
+        <div class="section-title">Situación académica y socioeconómica</div>
+        <div class="grid2">
+          <div class="field">
+            <label>Promedio de notas (escala 0-20)</label>
+            <input type="number" id="promedio_notas" min="0" max="20" step="0.1" placeholder="15.5" required />
+          </div>
+          <div class="field">
+            <label>Situación económica familiar</label>
+            <select id="situacion_economica" required>
+              <option value="">Selecciona</option>
+              <option>Muy vulnerable</option>
+              <option>Vulnerable</option>
+              <option>Media-baja</option>
             </select>
           </div>
         </div>
@@ -236,8 +248,8 @@
       fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
       direccion: document.getElementById('direccion').value,
       telefono: document.getElementById('telefono').value,
+      tipo_institucion: document.getElementById('tipo_institucion').value,
       carrera_interes: document.getElementById('carrera_interes').value,
-      institucion: document.getElementById('institucion').value,
       promedio_notas: parseFloat(document.getElementById('promedio_notas').value),
       situacion_economica: document.getElementById('situacion_economica').value,
       modalidad: document.getElementById('modalidad').value,
