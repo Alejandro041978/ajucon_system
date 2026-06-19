@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   if (seccion === 'users') {
     const { data } = await supabase
       .from('users')
-      .select('id, nombre, email, grado, ciudad, colegio, created_at')
+      .select('id, nombre, apellido, email, grado, ciudad, colegio, created_at')
       .order('created_at', { ascending: false });
     return res.status(200).json(data);
   }

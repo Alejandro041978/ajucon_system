@@ -322,6 +322,49 @@
     <div id="cursos-tabla"></div>
   </div>
 
+  <!-- Modal editar usuario -->
+  <div class="overlay" id="user-edit-overlay" onclick="cerrarModalUsuario()"></div>
+  <div id="user-edit-modal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);width:460px;max-width:95vw;background:#1e2535;border:1px solid #2d3748;border-radius:16px;padding:28px;z-index:200;opacity:0;pointer-events:none;transition:all .2s ease">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="margin:0;color:#f1f5f9;font-size:1rem">Editar usuario</h3>
+      <button onclick="cerrarModalUsuario()" style="background:none;border:none;color:#64748b;font-size:1.3rem;cursor:pointer">×</button>
+    </div>
+    <input type="hidden" id="uedit-id" />
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div>
+        <label style="font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Nombres</label>
+        <input id="uedit-nombre" type="text" style="width:100%;padding:9px 12px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.88rem;outline:none" />
+      </div>
+      <div>
+        <label style="font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Apellidos</label>
+        <input id="uedit-apellido" type="text" style="width:100%;padding:9px 12px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.88rem;outline:none" />
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Email</label>
+      <input id="uedit-email" type="email" style="width:100%;padding:9px 12px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.88rem;outline:none" />
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div>
+        <label style="font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Grado</label>
+        <input id="uedit-grado" type="text" style="width:100%;padding:9px 12px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.88rem;outline:none" />
+      </div>
+      <div>
+        <label style="font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Ciudad</label>
+        <input id="uedit-ciudad" type="text" style="width:100%;padding:9px 12px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.88rem;outline:none" />
+      </div>
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px">Colegio / Institución</label>
+      <input id="uedit-colegio" type="text" style="width:100%;padding:9px 12px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.88rem;outline:none" />
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="cerrarModalUsuario()" style="padding:9px 20px;background:none;border:1px solid #2d3748;border-radius:8px;color:#64748b;font-size:.88rem;cursor:pointer">Cancelar</button>
+      <button id="uedit-guardar-btn" onclick="guardarUsuario()" style="padding:9px 24px;background:#6366f1;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">Guardar</button>
+    </div>
+    <div id="uedit-msg" style="margin-top:10px;font-size:.83rem;display:none"></div>
+  </div>
+
   <!-- Modal admin -->
   <div class="overlay" id="admin-overlay" onclick="cerrarModalAdmin()"></div>
   <div id="admin-modal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);width:440px;max-width:95vw;background:#1e2535;border:1px solid #2d3748;border-radius:16px;padding:28px;z-index:200;opacity:0;pointer-events:none;transition:all .2s ease">
@@ -611,7 +654,7 @@
       <tr>
         <td>${u.nombre} ${u.apellido||''}</td><td>${u.email}</td><td>${u.grado}</td><td>${u.colegio || '—'}</td><td>${u.ciudad || '—'}</td><td>${fecha(u.created_at)}</td>
         <td style="white-space:nowrap">
-          ${conEditar ? `<button onclick="abrirUsuario('${u.id}')" style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#6366f1';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Editar</button>` : ''}
+          ${conEditar ? `<button onclick='abrirModalUsuario(${JSON.stringify(u)})' style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#6366f1';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Editar</button>` : ''}
           ${conBorrar ? `<button onclick="borrarUsuario('${u.id}')" style="margin-left:4px;padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Borrar</button>` : ''}
         </td>
       </tr>`).join('') : '<tr><td colspan="7" class="empty">Sin usuarios aún.</td></tr>';
@@ -1026,6 +1069,68 @@
     const el = document.getElementById('admin-modal-msg');
     el.textContent = texto; el.style.color = '#fca5a5'; el.style.display = 'block';
   }
+
+  // ===== Editar usuario =====
+  function abrirModalUsuario(u) {
+    document.getElementById('uedit-id').value = u.id;
+    document.getElementById('uedit-nombre').value = u.nombre || '';
+    document.getElementById('uedit-apellido').value = u.apellido || '';
+    document.getElementById('uedit-email').value = u.email || '';
+    document.getElementById('uedit-grado').value = u.grado || '';
+    document.getElementById('uedit-ciudad').value = u.ciudad || '';
+    document.getElementById('uedit-colegio').value = u.colegio || '';
+    document.getElementById('uedit-msg').style.display = 'none';
+    document.getElementById('user-edit-overlay').classList.add('open');
+    const modal = document.getElementById('user-edit-modal');
+    modal.style.opacity = '1'; modal.style.pointerEvents = 'auto'; modal.style.transform = 'translate(-50%,-50%) scale(1)';
+  }
+
+  function cerrarModalUsuario() {
+    document.getElementById('user-edit-overlay').classList.remove('open');
+    const modal = document.getElementById('user-edit-modal');
+    modal.style.opacity = '0'; modal.style.pointerEvents = 'none'; modal.style.transform = 'translate(-50%,-50%) scale(.96)';
+  }
+
+  async function guardarUsuario() {
+    const btn = document.getElementById('uedit-guardar-btn');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const body = {
+      id: document.getElementById('uedit-id').value,
+      nombre: document.getElementById('uedit-nombre').value.trim(),
+      apellido: document.getElementById('uedit-apellido').value.trim(),
+      email: document.getElementById('uedit-email').value.trim(),
+      grado: document.getElementById('uedit-grado').value.trim(),
+      ciudad: document.getElementById('uedit-ciudad').value.trim(),
+      colegio: document.getElementById('uedit-colegio').value.trim(),
+    };
+    const r = await fetch('/api/admin/usuario', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(body),
+    });
+    btn.disabled = false; btn.textContent = 'Guardar';
+    if (r.ok) {
+      cerrarModalUsuario();
+      loaded.delete('users');
+      cargarUsers();
+    } else {
+      const d = await r.json().catch(() => ({}));
+      const msg = document.getElementById('uedit-msg');
+      msg.textContent = d.error || 'Error al guardar.';
+      msg.style.color = '#fca5a5'; msg.style.display = 'block';
+    }
+  }
+
+  async function borrarUsuario(id) {
+    if (!confirm('¿Eliminar este usuario? Esta acción no se puede deshacer.')) return;
+    const r = await fetch('/api/admin/usuario?id=' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+    if (r.ok) { loaded.delete('users'); cargarUsers(); }
+    else alert('Error al eliminar el usuario.');
+  }
+  // ===== Fin editar usuario =====
 
   // ===== Importar CSV =====
   let _csvFilas = [];

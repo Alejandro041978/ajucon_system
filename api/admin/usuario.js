@@ -13,8 +13,32 @@ function verifyAdmin(req) {
 }
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).end();
   if (!verifyAdmin(req)) return res.status(401).json({ error: 'No autorizado.' });
+
+  if (req.method === 'PATCH') {
+    const { id, nombre, apellido, email, grado, ciudad, colegio } = req.body;
+    if (!id) return res.status(400).json({ error: 'ID requerido.' });
+    const update = {};
+    if (nombre !== undefined) update.nombre = nombre;
+    if (apellido !== undefined) update.apellido = apellido;
+    if (email !== undefined) update.email = email;
+    if (grado !== undefined) update.grado = grado;
+    if (ciudad !== undefined) update.ciudad = ciudad;
+    if (colegio !== undefined) update.colegio = colegio;
+    const { error } = await supabase.from('users').update(update).eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
+  }
+
+  if (req.method === 'DELETE') {
+    const { id } = req.query;
+    if (!id) return res.status(400).json({ error: 'ID requerido.' });
+    const { error } = await supabase.from('users').delete().eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
+  }
+
+  if (req.method !== 'GET') return res.status(405).end();
 
   const { id } = req.query;
   if (!id) return res.status(400).json({ error: 'ID requerido.' });
