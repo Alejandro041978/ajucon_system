@@ -85,19 +85,18 @@ export default async function handler(req, res) {
       mediaUrls: [post.video_url || post.imagen_url],
     });
   }
-  const ytTitle = post.captions?.youtube_titulo || post.tema || '';
-  if (redes.includes('youtube')) {
+  if (redes.includes('youtube') && post.video_url) {
     providers.push({
       network: 'YOUTUBE',
+      ytTitle: post.captions?.youtube_titulo || post.tema || '',
       text: post.captions?.youtube_descripcion || '',
-      ...(post.video_url ? { mediaUrls: [post.video_url] } : {}),
+      mediaUrls: [post.video_url],
     });
   }
 
   const publishBody = {
     blogId: 6025050,
     text: post.captions?.facebook || post.captions?.instagram || post.tema || '',
-    ytTitle,
     publicationDate: { dateTime: scheduledAt },
     providers,
   };
