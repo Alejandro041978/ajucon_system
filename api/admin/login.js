@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   // Buscar en admin_users
   const { data: admin } = await supabase
     .from('admin_users')
-    .select('id, nombre, apellido, email, activo, rol')
+    .select('id, nombre, apellido, email, activo, rol, permisos')
     .eq('email', email)
     .single();
 
@@ -72,9 +72,10 @@ export default async function handler(req, res) {
 
   await supabase.from('verification_codes').update({ used: true }).eq('id', rows[0].id);
 
+  const todasSecciones = ['stats','users','becas_profesionales','becas_cursos','gestion_cursos','test_results','riasec','valeria_review'];
   const payload = admin
-    ? { role: 'admin', id: admin.id, email: admin.email, rol: admin.rol || 'admin' }
-    : { role: 'admin', email, rol: 'super_admin' };
+    ? { role: 'admin', id: admin.id, email: admin.email, rol: admin.rol || 'admin', permisos: admin.permisos || todasSecciones }
+    : { role: 'admin', email, rol: 'super_admin', permisos: todasSecciones };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '8h' });
   const nombre = admin ? `${admin.nombre} ${admin.apellido}` : 'Administrador';

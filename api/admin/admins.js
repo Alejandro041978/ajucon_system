@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     const { data } = await supabase
       .from('admin_users')
-      .select('id, nombre, apellido, email, rol, activo, created_at')
+      .select('id, nombre, apellido, email, rol, permisos, activo, created_at')
       .order('created_at', { ascending: false });
     return res.status(200).json(data || []);
   }
@@ -36,13 +36,14 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PATCH') {
-    const { id, nombre, apellido, email, rol, activo } = req.body;
+    const { id, nombre, apellido, email, rol, permisos, activo } = req.body;
     if (!id) return res.status(400).json({ error: 'ID requerido.' });
     const update = {};
     if (nombre !== undefined) update.nombre = nombre;
     if (apellido !== undefined) update.apellido = apellido;
     if (email !== undefined) update.email = email;
     if (rol !== undefined) update.rol = rol;
+    if (permisos !== undefined) update.permisos = permisos;
     if (activo !== undefined) update.activo = activo;
     const { error } = await supabase.from('admin_users').update(update).eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
