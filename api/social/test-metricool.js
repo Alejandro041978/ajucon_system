@@ -5,16 +5,16 @@ export default async function handler(req, res) {
   const H = { 'X-Mc-Auth': TOKEN };
 
   const intentos = [
-    { nombre: '/brands', url: `${BASE}/brands`, headers: H },
-    { nombre: '/accounts', url: `${BASE}/accounts`, headers: H },
-    { nombre: '/profile', url: `${BASE}/profile`, headers: H },
-    { nombre: '/me', url: `${BASE}/me`, headers: H },
-    { nombre: '/blogs', url: `${BASE}/blogs`, headers: H },
-    { nombre: '/social/posts', url: `${BASE}/social/posts`, headers: H },
-    { nombre: '/scheduler', url: `${BASE}/scheduler`, headers: H },
-    { nombre: '/scheduler/posts', url: `${BASE}/scheduler/posts`, headers: H },
-    { nombre: '/posts', url: `${BASE}/posts`, headers: H },
-    { nombre: '/networks', url: `${BASE}/networks`, headers: H },
+    { nombre: '/scheduler/posts (GET)', url: `${BASE}/scheduler/posts`, headers: H },
+    { nombre: '/blogs/list', url: `${BASE}/blogs/list`, headers: H },
+    { nombre: '/blogs/all', url: `${BASE}/blogs/all`, headers: H },
+    { nombre: '/blog', url: `${BASE}/blog`, headers: H },
+    { nombre: '/blog/list', url: `${BASE}/blog/list`, headers: H },
+    { nombre: '/analytics/blogs', url: `${BASE}/analytics/blogs`, headers: H },
+    { nombre: '/analytics/accounts', url: `${BASE}/analytics/accounts`, headers: H },
+    { nombre: '/accounts/list', url: `${BASE}/accounts/list`, headers: H },
+    { nombre: '/user/blogs', url: `${BASE}/user/blogs`, headers: H },
+    { nombre: '/scheduler/posts con blogId=1', url: `${BASE}/scheduler/posts?blogId=1`, headers: H },
   ];
 
   const resultados = [];
