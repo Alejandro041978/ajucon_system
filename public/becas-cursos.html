@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AJUCON — Becas para Cursos Online</title>
+  <title>AJUCON — Cursos Online</title>
   <link rel="stylesheet" href="/assets/theme.css" />
   <script src="/assets/theme.js"></script>
   <style>
@@ -12,64 +12,69 @@
     .back-btn:hover { background: var(--surface2); }
     header h2 { font-size: 1rem; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    main { max-width: 680px; margin: 0 auto; padding: 32px 24px; }
+    main { max-width: 780px; margin: 0 auto; padding: 32px 24px; }
 
     .hero { background: linear-gradient(135deg, #db2777, #ec4899); border-radius: var(--radius); padding: 28px; color: white; margin-bottom: 28px; }
     .hero h1 { font-size: 1.4rem; margin-bottom: 6px; }
     .hero p { font-size: .9rem; opacity: .9; line-height: 1.5; }
 
-    .card { background: var(--surface); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: var(--transition); }
-    .section-title { font-size: .8rem; font-weight: 700; color: #db2777; text-transform: uppercase; letter-spacing: .05em; margin: 24px 0 16px; }
-    .section-title:first-child { margin-top: 0; }
-
-    .field { margin-bottom: 18px; }
-    label { display: block; font-size: .85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-    input, select, textarea {
-      width: 100%; padding: 11px 14px;
-      border: 2px solid var(--border); border-radius: 10px;
-      font-size: .95rem; font-family: inherit; outline: none;
-      background: var(--surface2); color: var(--text);
-      transition: var(--transition);
+    /* Estado actual del curso */
+    .curso-activo {
+      background: var(--surface); border: 2px solid #db2777; border-radius: var(--radius);
+      padding: 24px; margin-bottom: 28px; box-shadow: var(--shadow);
     }
-    input::placeholder, textarea::placeholder { color: var(--text-faint); }
-    input:focus, select:focus, textarea:focus { border-color: #db2777; }
-    textarea { resize: vertical; min-height: 100px; }
+    .curso-activo-label { font-size: .75rem; font-weight: 700; color: #db2777; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; }
+    .curso-activo-nombre { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+    .curso-meta { display: flex; gap: 20px; flex-wrap: wrap; font-size: .85rem; color: var(--text-muted); margin-bottom: 16px; }
+    .nota-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); color: var(--accent); padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: .9rem; }
+    .estado-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: .85rem; }
+    .estado-inscrito { background: #fef3c7; color: #b45309; }
+    .estado-aprobado { background: #d1fae5; color: #065f46; }
+    .estado-rechazado { background: #fee2e2; color: #991b1b; }
+    [data-theme="dark"] .estado-inscrito { background: #451a03; color: #fcd34d; }
+    [data-theme="dark"] .estado-aprobado { background: #064e3b; color: #6ee7b7; }
+    [data-theme="dark"] .estado-rechazado { background: #450a0a; color: #fca5a5; }
+    .btn-campus { display: inline-block; margin-top: 8px; padding: 10px 20px; background: #db2777; color: white; border-radius: var(--radius-sm); font-weight: 600; font-size: .9rem; text-decoration: none; }
 
-    .plataformas { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 18px; }
-    .plataforma-btn {
-      padding: 10px; border: 2px solid var(--border); border-radius: 10px;
-      background: var(--surface2); cursor: pointer; font-size: .85rem; font-weight: 500;
-      color: var(--text-muted); text-align: center; transition: var(--transition);
+    /* Historial */
+    .historial-title { font-size: .8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin: 24px 0 12px; }
+
+    /* Catálogo de cursos */
+    .catalogo-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .catalogo-sub { font-size: .85rem; color: var(--text-muted); margin-bottom: 20px; }
+    .cursos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .curso-card {
+      background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius);
+      padding: 18px 16px; cursor: pointer; transition: border-color .2s, box-shadow .2s;
+      display: flex; flex-direction: column; gap: 8px;
     }
-    .plataforma-btn:hover { border-color: #db2777; color: #db2777; }
-    .plataforma-btn.selected { border-color: #db2777; background: #fce7f3; color: #db2777; font-weight: 700; }
-    [data-theme="dark"] .plataforma-btn.selected { background: #4a0020; color: #f9a8d4; border-color: #f472b6; }
+    .curso-card:hover { border-color: #db2777; box-shadow: var(--shadow); }
+    .curso-card.selected { border-color: #db2777; background: #fdf2f8; }
+    [data-theme="dark"] .curso-card.selected { background: #2d0a1e; }
+    .curso-num { font-size: .72rem; font-weight: 700; color: #db2777; }
+    .curso-nombre-card { font-size: .9rem; font-weight: 600; color: var(--text); line-height: 1.3; }
 
-    .info-box { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; font-size: .85rem; color: var(--text-muted); line-height: 1.55; }
-    [data-theme="dark"] .info-box { background: #4a0020; border-color: #831843; color: #f9a8d4; }
-    .info-box strong { display: block; margin-bottom: 4px; color: var(--text); }
-    [data-theme="dark"] .info-box strong { color: #f9a8d4; }
+    .inscribir-bar { margin-top: 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .btn-inscribir { padding: 12px 28px; background: #db2777; color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background .2s; }
+    .btn-inscribir:hover { background: #be185d; }
+    .btn-inscribir:disabled { background: var(--text-faint); cursor: default; }
+    .sel-label { font-size: .88rem; color: var(--text-muted); }
+    .sel-nombre { font-weight: 700; color: var(--text); }
 
-    button[type=submit] { width: 100%; padding: 14px; background: #db2777; color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background .2s; margin-top: 8px; }
-    button[type=submit]:hover { background: #be185d; }
-    button[type=submit]:disabled { background: var(--text-faint); cursor: default; }
-
-    #screen-exito { display: none; text-align: center; padding: 48px 32px; }
-    #screen-exito .icon { font-size: 3rem; margin-bottom: 16px; }
-    #screen-exito h2 { font-size: 1.4rem; color: var(--text); margin-bottom: 8px; }
-    #screen-exito p { color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
-    .btn-dashboard { display: inline-block; padding: 12px 28px; background: var(--accent); color: white; border-radius: 10px; font-weight: 600; text-decoration: none; }
-
-    .msg { margin-top: 16px; padding: 12px; border-radius: var(--radius-sm); font-size: .9rem; display: none; }
+    .msg { padding: 12px 16px; border-radius: var(--radius-sm); font-size: .9rem; margin-top: 16px; display: none; }
+    .msg.ok { background: #d1fae5; color: #065f46; display: block; }
     .msg.err { background: #fee2e2; color: #991b1b; display: block; }
+    [data-theme="dark"] .msg.ok { background: #064e3b; color: #6ee7b7; }
     [data-theme="dark"] .msg.err { background: #450a0a; color: #fca5a5; }
+
+    #loading { text-align: center; padding: 48px; color: var(--text-faint); }
   </style>
 </head>
 <body>
 
 <header>
   <button class="back-btn" onclick="window.location.href='/dashboard.html'">←</button>
-  <h2>Becas para Cursos Online</h2>
+  <h2>Cursos Online — Campus Virtual AJUCON</h2>
   <div class="user-chip">
     <span class="chip-grado" id="h-grado"></span>
     <div class="chip-avatar" id="h-avatar"></div>
@@ -81,58 +86,12 @@
 
 <main>
   <div class="hero">
-    <h1>💻 Acceso a Becas para Cursos Online</h1>
-    <p>Postula a una beca para acceder a cursos en plataformas como Coursera, Udemy, edX y más. Aprende habilidades digitales sin costo.</p>
+    <h1>💻 Cursos Online AJUCON</h1>
+    <p>Accede a cursos gratuitos para desarrollar habilidades personales, digitales y profesionales. Puedes llevar un curso a la vez.</p>
   </div>
 
-  <div class="card">
-    <div id="screen-form">
-      <div class="info-box">
-        <strong>💡 ¿Cómo funciona?</strong>
-        Selecciona la plataforma y el curso que te interesa. Evaluaremos tu solicitud y si es aprobada te entregaremos acceso gratuito o un cupón de descuento.
-      </div>
-
-      <form id="form-beca" onsubmit="enviarPostulacion(event)">
-
-        <div class="section-title">Plataforma de interés</div>
-        <div class="plataformas" id="plataformas-grid">
-          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'Coursera')">🎓 Coursera</button>
-          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'Udemy')">📘 Udemy</button>
-          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'edX')">🏛️ edX</button>
-          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'LinkedIn Learning')">💼 LinkedIn Learning</button>
-          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'Platzi')">⚡ Platzi</button>
-          <button type="button" class="plataforma-btn" onclick="seleccionarPlataforma(this, 'Otra')">➕ Otra</button>
-        </div>
-        <input type="hidden" id="plataforma" required />
-
-        <div class="section-title">Datos del curso</div>
-        <div class="field">
-          <label>Nombre del curso</label>
-          <input type="text" id="curso_nombre" placeholder="Ej: Python para principiantes, Diseño UX..." required />
-        </div>
-        <div class="field">
-          <label>URL del curso <span style="font-weight:400;color:#94a3b8">(opcional)</span></label>
-          <input type="url" id="curso_url" placeholder="https://..." />
-        </div>
-
-        <div class="section-title">Justificación</div>
-        <div class="field">
-          <label>¿Para qué quieres este curso y cómo te ayudará?</label>
-          <textarea id="justificacion" placeholder="Cuéntanos por qué este curso es importante para tu desarrollo y tus metas..." required></textarea>
-        </div>
-
-        <button type="submit" id="btn-enviar">Enviar solicitud</button>
-        <div class="msg" id="msg-error"></div>
-      </form>
-    </div>
-
-    <div id="screen-exito">
-      <div class="icon">✅</div>
-      <h2>¡Solicitud enviada!</h2>
-      <p>Hemos recibido tu solicitud de beca. Te contactaremos al email registrado en un plazo de <strong>3 a 5 días hábiles</strong>.</p>
-      <a href="/dashboard.html" class="btn-dashboard">Volver al inicio</a>
-    </div>
-  </div>
+  <div id="loading">Cargando tu información...</div>
+  <div id="contenido" style="display:none"></div>
 </main>
 
 <script>
@@ -152,53 +111,158 @@
     window.location.href = '/index.html';
   }
 
-  let plataformaSeleccionada = '';
+  const CURSOS = [
+    'Liderazgo',
+    'Desarrollo Emocional',
+    'Valores, ética y bienestar',
+    'Desarrollo Humano a lo Largo de la Vida',
+    'Finanzas Personales',
+    'Redes Sociales',
+    'Pensamiento Creativo',
+    'Introducción a la Inteligencia Artificial',
+    'Lógica de la Argumentación y Pensamiento Crítico',
+    'Creatividad Digital',
+    'Inteligencia Emocional',
+    'Habilidades de Comunicación',
+    'Gestión de Emociones',
+    'Gestión del Tiempo y Productividad',
+    'Cómo Hacer Amigos y tener Relaciones Exitosas',
+    'Herramientas para la Autogestión de Emociones',
+    'Liderazgo en tiempos Digitales',
+    'Cómo entender lo que leo',
+    'Cómo Ser más Empático',
+    'Comunicación Asertiva',
+  ];
 
-  function seleccionarPlataforma(btn, nombre) {
-    document.querySelectorAll('.plataforma-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    plataformaSeleccionada = nombre;
-    document.getElementById('plataforma').value = nombre;
+  let cursoSeleccionado = null;
+
+  function badgeEstado(estado) {
+    const map = { inscrito: '📚 En curso', aprobado: '✅ Aprobado', rechazado: '❌ No aprobado' };
+    return `<span class="estado-badge estado-${estado}">${map[estado] || estado}</span>`;
   }
 
-  async function enviarPostulacion(e) {
-    e.preventDefault();
-    if (!plataformaSeleccionada) {
-      const el = document.getElementById('msg-error');
-      el.textContent = 'Selecciona una plataforma.';
-      el.className = 'msg err';
-      return;
-    }
+  function renderCursoActivo(c) {
+    const fechaInsc = new Date(c.created_at).toLocaleDateString('es-PE', { day:'2-digit', month:'long', year:'numeric' });
+    return `
+      <div class="curso-activo">
+        <div class="curso-activo-label">Tu curso actual</div>
+        <div class="curso-activo-nombre">${c.curso_nombre}</div>
+        <div class="curso-meta">
+          <span>📅 Inscrito el ${fechaInsc}</span>
+          ${c.nota !== null && c.nota !== undefined ? `<span>${badgeEstado(c.estado)}</span>` : `<span>${badgeEstado(c.estado)}</span>`}
+          ${c.nota !== null && c.nota !== undefined ? `<span class="nota-badge">🎯 ${c.nota.toFixed(0)}%</span>` : ''}
+        </div>
+        <a href="https://campus.ajucon.org.pe" target="_blank" class="btn-campus">Ir al Campus Virtual →</a>
+      </div>`;
+  }
 
-    const btn = document.getElementById('btn-enviar');
+  function renderHistorial(anteriores) {
+    if (!anteriores.length) return '';
+    const filas = anteriores.map(c => {
+      const fecha = new Date(c.created_at).toLocaleDateString('es-PE', { day:'2-digit', month:'2-digit', year:'numeric' });
+      return `<tr>
+        <td style="padding:10px 12px;font-size:.88rem;color:var(--text)">${c.curso_nombre}</td>
+        <td style="padding:10px 12px;font-size:.85rem;color:var(--text-muted)">${fecha}</td>
+        <td style="padding:10px 12px">${badgeEstado(c.estado)}</td>
+        <td style="padding:10px 12px;font-size:.88rem;color:var(--text-muted)">${c.nota !== null && c.nota !== undefined ? c.nota.toFixed(0) + '%' : '—'}</td>
+      </tr>`;
+    }).join('');
+    return `
+      <div class="historial-title">Cursos anteriores</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:28px">
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="background:var(--surface2);font-size:.75rem;color:var(--text-muted);text-transform:uppercase">
+            <th style="padding:10px 12px;text-align:left;font-weight:600">Curso</th>
+            <th style="padding:10px 12px;text-align:left;font-weight:600">Fecha</th>
+            <th style="padding:10px 12px;text-align:left;font-weight:600">Estado</th>
+            <th style="padding:10px 12px;text-align:left;font-weight:600">Nota</th>
+          </tr></thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderCatalogo() {
+    const cards = CURSOS.map((nombre, i) => `
+      <div class="curso-card" onclick="seleccionarCurso(${i}, this)">
+        <div class="curso-num">Curso ${i + 1}</div>
+        <div class="curso-nombre-card">${nombre}</div>
+      </div>`).join('');
+
+    return `
+      <div class="catalogo-title">Elige tu próximo curso</div>
+      <div class="catalogo-sub">Selecciona un curso y haz clic en "Inscribirme". Recibirás los datos de acceso al campus por email.</div>
+      <div class="cursos-grid">${cards}</div>
+      <div class="inscribir-bar">
+        <button class="btn-inscribir" id="btn-inscribir" onclick="inscribirse()" disabled>Inscribirme</button>
+        <span class="sel-label" id="sel-label">Ningún curso seleccionado</span>
+      </div>
+      <div class="msg" id="msg"></div>`;
+  }
+
+  function seleccionarCurso(idx, el) {
+    document.querySelectorAll('.curso-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    cursoSeleccionado = CURSOS[idx];
+    document.getElementById('btn-inscribir').disabled = false;
+    document.getElementById('sel-label').innerHTML = `Seleccionado: <span class="sel-nombre">${cursoSeleccionado}</span>`;
+  }
+
+  async function inscribirse() {
+    if (!cursoSeleccionado) return;
+    const btn = document.getElementById('btn-inscribir');
+    const msg = document.getElementById('msg');
     btn.disabled = true;
-    btn.textContent = 'Enviando...';
+    btn.textContent = 'Inscribiendo...';
+    msg.className = 'msg';
 
-    const body = {
-      plataforma: plataformaSeleccionada,
-      curso_nombre: document.getElementById('curso_nombre').value,
-      curso_url: document.getElementById('curso_url').value || null,
-      justificacion: document.getElementById('justificacion').value,
-    };
-
-    const r = await fetch('/api/becas/cursos', {
+    const r = await fetch('/api/cursos/inscribir', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ curso_nombre: cursoSeleccionado }),
     });
+    const data = await r.json();
 
     if (r.ok) {
-      document.getElementById('screen-form').style.display = 'none';
-      document.getElementById('screen-exito').style.display = 'block';
+      msg.className = 'msg ok';
+      msg.textContent = data.mensaje;
+      setTimeout(() => cargar(), 2000);
     } else {
-      const data = await r.json();
-      const el = document.getElementById('msg-error');
-      el.textContent = data.error || 'Error al enviar. Intenta de nuevo.';
-      el.className = 'msg err';
+      msg.className = 'msg err';
+      msg.textContent = data.error || 'Error al inscribirse.';
       btn.disabled = false;
-      btn.textContent = 'Enviar solicitud';
+      btn.textContent = 'Inscribirme';
     }
   }
+
+  async function cargar() {
+    const contenido = document.getElementById('contenido');
+    const loading = document.getElementById('loading');
+
+    const r = await fetch('/api/cursos/mi-curso', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+    const data = await r.json();
+    loading.style.display = 'none';
+    contenido.style.display = 'block';
+
+    const cursos = data.cursos || [];
+    const activo = cursos.find(c => c.estado === 'inscrito');
+    const anteriores = cursos.filter(c => c.estado !== 'inscrito');
+
+    let html = '';
+    if (activo) {
+      html += renderCursoActivo(activo);
+    }
+    html += renderHistorial(anteriores);
+    if (!activo) {
+      html += renderCatalogo();
+    }
+
+    contenido.innerHTML = html;
+  }
+
+  cargar();
 </script>
 </body>
 </html>
