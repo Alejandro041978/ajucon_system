@@ -21,8 +21,9 @@ export default async function handler(req, res) {
   const { data: inscripciones } = await supabase
     .from('inscripciones_cursos')
     .select('id, moodle_user_id, moodle_curso_id')
-    .eq('estado', 'inscrito')
-    .not('moodle_user_id', 'is', null);
+    .eq('estado', 'aprobado')
+    .not('moodle_user_id', 'is', null)
+    .not('moodle_curso_id', 'is', null);
 
   if (!inscripciones || inscripciones.length === 0) {
     return res.status(200).json({ ok: true, actualizados: 0 });
