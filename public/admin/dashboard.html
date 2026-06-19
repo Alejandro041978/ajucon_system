@@ -442,7 +442,16 @@
     wrap.innerHTML = '<p style="color:var(--text-faint);font-size:.85rem">Cargando...</p>';
 
     const r = await fetch('/api/admin/cursos', { headers: { 'Authorization': 'Bearer ' + token } });
+    if (r.status === 401) { logout(); return; }
     const cursos = await r.json();
+    if (!Array.isArray(cursos)) {
+      wrap.innerHTML = `<p style="color:#ef4444;font-size:.85rem">Error al cargar cursos: ${JSON.stringify(cursos)}</p>`;
+      return;
+    }
+    if (cursos.length === 0) {
+      wrap.innerHTML = '<p style="color:var(--text-faint);font-size:.85rem">No hay cursos registrados. Ejecuta el SQL supabase_cursos.sql en Supabase.</p>';
+      return;
+    }
 
     wrap.innerHTML = `
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
