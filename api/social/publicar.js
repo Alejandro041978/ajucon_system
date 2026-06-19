@@ -95,6 +95,7 @@ export default async function handler(req, res) {
   }
 
   const publishBody = {
+    blogId: 6025050,
     text: post.captions?.facebook || post.captions?.instagram || post.tema || '',
     publicationDate: { dateTime: scheduledAt },
     providers,
