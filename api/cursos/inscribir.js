@@ -71,7 +71,7 @@ export default async function handler(req, res) {
 
   const partes = usuario.nombre.trim().split(' ');
   const firstname = partes[0];
-  const lastname = partes.slice(1).join(' ') || partes[0];
+  const lastname = partes.slice(1).join(' ') || '-';
   const username = usernameDeEmail(usuario.email);
   const password = generarPassword();
 
