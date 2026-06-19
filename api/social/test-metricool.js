@@ -2,20 +2,19 @@ export default async function handler(req, res) {
   const TOKEN = process.env.METRICOOL_TOKEN;
   const BASE = 'https://app.metricool.com/api/v2';
 
-  const b64 = Buffer.from(`:${TOKEN}`).toString('base64');
-  const b64v2 = Buffer.from(`${TOKEN}:`).toString('base64');
+  const H = { 'X-Mc-Auth': TOKEN };
 
   const intentos = [
-    { nombre: 'token query param', url: `${BASE}/user?token=${TOKEN}` },
-    { nombre: 'smToken query param', url: `${BASE}/user?smToken=${TOKEN}` },
-    { nombre: 'access_token query param', url: `${BASE}/user?access_token=${TOKEN}` },
-    { nombre: 'Bearer header', url: `${BASE}/user`, headers: { 'Authorization': `Bearer ${TOKEN}` } },
-    { nombre: 'Token header', url: `${BASE}/user`, headers: { 'Authorization': `Token ${TOKEN}` } },
-    { nombre: 'X-Mc-Auth header', url: `${BASE}/user`, headers: { 'X-Mc-Auth': TOKEN } },
-    { nombre: 'Basic :token', url: `${BASE}/user`, headers: { 'Authorization': `Basic ${b64}` } },
-    { nombre: 'Basic token:', url: `${BASE}/user`, headers: { 'Authorization': `Basic ${b64v2}` } },
-    { nombre: 'token header lowercase', url: `${BASE}/user`, headers: { 'token': TOKEN } },
-    { nombre: '/brands endpoint token param', url: `${BASE}/brands?token=${TOKEN}` },
+    { nombre: '/brands', url: `${BASE}/brands`, headers: H },
+    { nombre: '/accounts', url: `${BASE}/accounts`, headers: H },
+    { nombre: '/profile', url: `${BASE}/profile`, headers: H },
+    { nombre: '/me', url: `${BASE}/me`, headers: H },
+    { nombre: '/blogs', url: `${BASE}/blogs`, headers: H },
+    { nombre: '/social/posts', url: `${BASE}/social/posts`, headers: H },
+    { nombre: '/scheduler', url: `${BASE}/scheduler`, headers: H },
+    { nombre: '/scheduler/posts', url: `${BASE}/scheduler/posts`, headers: H },
+    { nombre: '/posts', url: `${BASE}/posts`, headers: H },
+    { nombre: '/networks', url: `${BASE}/networks`, headers: H },
   ];
 
   const resultados = [];
