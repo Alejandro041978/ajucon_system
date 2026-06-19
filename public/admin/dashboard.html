@@ -161,6 +161,7 @@
   <div class="nav-item" onclick="setSeccion('test_results', this)">✏️ Test CHASIDE</div>
   <div class="nav-item" onclick="setSeccion('riasec', this)">🧠 Perfiles RIASEC</div>
   <div class="nav-item" onclick="setSeccion('valeria_review', this)">🔍 Revisor Valeria</div>
+  <div class="nav-item" onclick="setSeccion('redes_sociales', this)">📱 Redes Sociales</div>
   <div class="sidebar-footer">
     <button class="btn-theme" id="theme-btn" onclick="toggleAdminTheme()">☀️ Modo claro</button>
     <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
@@ -524,6 +525,62 @@
       <button id="modal-guardar-btn" onclick="guardarDesdeModal()" style="padding:10px 24px;background:#6366f1;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">Guardar cambios</button>
     </div>
     <div id="modal-msg" style="margin-top:12px;font-size:.85rem;display:none"></div>
+  </div>
+
+  <!-- Redes Sociales -->
+  <div class="section" id="sec-redes_sociales">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <h2 style="margin:0">Redes Sociales — Agentes IA</h2>
+      <button onclick="abrirModalSocial()" style="padding:9px 20px;background:#7c3aed;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">✦ Generar contenido</button>
+    </div>
+    <div id="social-posts-list"></div>
+    <div id="social-empty" style="display:none;text-align:center;color:var(--text-faint);padding:60px">Sin contenido generado aún. Haz clic en "Generar contenido" para empezar.</div>
+  </div>
+
+  <!-- Modal generar contenido social -->
+  <div id="social-overlay" onclick="cerrarModalSocial()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200"></div>
+  <div id="social-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:201;background:#1e293b;border:1px solid #2d3748;border-radius:16px;padding:28px;width:500px;max-width:95vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="margin:0;color:#f1f5f9;font-size:1.05rem">Nuevo contenido para redes</h3>
+      <button onclick="cerrarModalSocial()" style="background:none;border:none;color:#64748b;font-size:1.3rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Tema o idea del contenido</label>
+      <textarea id="social-tema" rows="3" placeholder="Ej: Orientación vocacional para alumnos de 5to de secundaria, beneficios del Instituto Neumann..." style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box;resize:vertical" onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#2d3748'"></textarea>
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px">Redes objetivo</label>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:6px;font-size:.88rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="soc-fb" checked style="accent-color:#7c3aed"> Facebook</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:.88rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="soc-ig" checked style="accent-color:#7c3aed"> Instagram</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:.88rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="soc-tt" checked style="accent-color:#7c3aed"> TikTok</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:.88rem;color:#e2e8f0;cursor:pointer"><input type="checkbox" id="soc-yt" checked style="accent-color:#7c3aed"> YouTube</label>
+      </div>
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Fecha de publicación (opcional)</label>
+      <input type="datetime-local" id="social-fecha" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.88rem;font-family:inherit;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#2d3748'" />
+    </div>
+    <div id="social-modal-msg" style="display:none;margin-bottom:12px;font-size:.84rem;padding:10px 14px;border-radius:8px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="cerrarModalSocial()" style="padding:10px 20px;background:none;border:1px solid #2d3748;border-radius:8px;color:#64748b;font-size:.88rem;cursor:pointer">Cancelar</button>
+      <button id="social-generar-btn" onclick="generarContenidoSocial()" style="padding:10px 24px;background:#7c3aed;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">✦ Generar con IA</button>
+    </div>
+  </div>
+
+  <!-- Modal publicar post social -->
+  <div id="social-pub-overlay" onclick="cerrarModalPublicar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200"></div>
+  <div id="social-pub-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:201;background:#1e293b;border:1px solid #2d3748;border-radius:16px;padding:28px;width:500px;max-width:95vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="margin:0;color:#f1f5f9;font-size:1.05rem">Publicar en Metricool</h3>
+      <button onclick="cerrarModalPublicar()" style="background:none;border:none;color:#64748b;font-size:1.3rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div id="social-pub-body"></div>
+    <div id="social-pub-msg" style="display:none;margin-top:12px;font-size:.84rem;padding:10px 14px;border-radius:8px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">
+      <button onclick="cerrarModalPublicar()" style="padding:10px 20px;background:none;border:1px solid #2d3748;border-radius:8px;color:#64748b;font-size:.88rem;cursor:pointer">Cancelar</button>
+      <button id="social-pub-btn" onclick="confirmarPublicar()" style="padding:10px 24px;background:#059669;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">Publicar ahora</button>
+    </div>
   </div>
 
   <!-- Revisor Valeria -->
@@ -1294,7 +1351,251 @@
   }
   // ===== Fin Importar CSV =====
 
-  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos };
+  // ===== Redes Sociales =====
+  let _socialPubPostId = null;
+  let _socialPollInterval = null;
+
+  const SOCIAL_ESTADO_LABELS = {
+    pendiente: { txt: 'Pendiente', bg: '#1e293b', color: '#64748b' },
+    generando_imagen: { txt: '⏳ Generando imagen...', bg: '#1e3a5f', color: '#93c5fd' },
+    generando_video: { txt: '⏳ Generando video...', bg: '#1e3a5f', color: '#93c5fd' },
+    listo: { txt: '✓ Listo', bg: '#14532d', color: '#86efac' },
+    revision_requerida: { txt: '⚠ Revisión', bg: '#3b2f00', color: '#fcd34d' },
+    publicado: { txt: '🚀 Publicado', bg: '#1e1b4b', color: '#a5b4fc' },
+    error: { txt: '✗ Error', bg: '#450a0a', color: '#fca5a5' },
+  };
+
+  function socialEstadoBadge(estado) {
+    const s = SOCIAL_ESTADO_LABELS[estado] || { txt: estado, bg: '#1e293b', color: '#64748b' };
+    return `<span style="padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;background:${s.bg};color:${s.color}">${s.txt}</span>`;
+  }
+
+  function socialRedIcon(red) {
+    const icons = { facebook: '📘', instagram: '📸', tiktok: '🎵', youtube: '▶️' };
+    return icons[red] || red;
+  }
+
+  async function cargarRedesSociales() {
+    const list = document.getElementById('social-posts-list');
+    const empty = document.getElementById('social-empty');
+    list.innerHTML = '<p style="color:var(--text-faint);font-size:.85rem;padding:20px 0">Cargando...</p>';
+
+    const r = await fetch('/api/social/posts', { headers: { 'Authorization': 'Bearer ' + token } });
+    if (r.status === 401) { logout(); return; }
+    const posts = await r.json();
+
+    if (!Array.isArray(posts) || posts.length === 0) {
+      list.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    list.innerHTML = posts.map(p => {
+      const enProgreso = p.estado === 'generando_imagen' || p.estado === 'generando_video';
+      const esListo = p.estado === 'listo' || p.estado === 'revision_requerida';
+      const mediaHtml = p.video_url
+        ? `<video src="${p.video_url}" controls style="width:100%;border-radius:8px;max-height:200px;margin-top:12px" muted></video>`
+        : p.imagen_url
+          ? `<img src="${p.imagen_url}" style="width:100%;border-radius:8px;max-height:200px;object-fit:cover;margin-top:12px" />`
+          : enProgreso
+            ? `<div style="margin-top:12px;padding:20px;background:#0d1117;border-radius:8px;text-align:center;color:#475569;font-size:.82rem">Generando con Higgsfield IA...</div>`
+            : '';
+
+      const captionsHtml = p.captions ? `
+        <div style="margin-top:12px;display:grid;gap:8px">
+          ${p.captions.facebook ? `<div style="background:#0d1117;border-radius:8px;padding:10px 12px"><div style="font-size:.68rem;font-weight:700;color:#3b82f6;margin-bottom:4px">📘 FACEBOOK</div><div style="font-size:.82rem;color:#94a3b8;line-height:1.5">${p.captions.facebook}</div></div>` : ''}
+          ${p.captions.instagram ? `<div style="background:#0d1117;border-radius:8px;padding:10px 12px"><div style="font-size:.68rem;font-weight:700;color:#ec4899;margin-bottom:4px">📸 INSTAGRAM</div><div style="font-size:.82rem;color:#94a3b8;line-height:1.5">${p.captions.instagram}</div></div>` : ''}
+          ${p.captions.tiktok ? `<div style="background:#0d1117;border-radius:8px;padding:10px 12px"><div style="font-size:.68rem;font-weight:700;color:#f472b6;margin-bottom:4px">🎵 TIKTOK</div><div style="font-size:.82rem;color:#94a3b8;line-height:1.5">${p.captions.tiktok}</div></div>` : ''}
+          ${p.captions.youtube_titulo ? `<div style="background:#0d1117;border-radius:8px;padding:10px 12px"><div style="font-size:.68rem;font-weight:700;color:#ef4444;margin-bottom:4px">▶️ YOUTUBE</div><div style="font-size:.82rem;color:#94a3b8;line-height:1.5"><strong>${p.captions.youtube_titulo}</strong><br/>${p.captions.youtube_descripcion || ''}</div></div>` : ''}
+        </div>` : '';
+
+      const notas = p.notas_calidad ? `<div style="margin-top:8px;font-size:.78rem;color:#64748b;font-style:italic">Quality Guardian: ${p.notas_calidad}</div>` : '';
+
+      return `
+        <div id="social-card-${p.id}" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div>
+              <div style="font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:4px">${p.tema}</div>
+              <div style="font-size:.75rem;color:var(--text-muted)">${(p.redes||[]).map(socialRedIcon).join(' ')} · ${fecha(p.created_at)} · ${p.creado_por || ''}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              ${socialEstadoBadge(p.estado)}
+              ${esListo ? `<button onclick="abrirModalPublicar('${p.id}')" style="padding:5px 14px;background:#059669;color:white;border:none;border-radius:7px;font-size:.78rem;font-weight:700;cursor:pointer">Publicar</button>` : ''}
+              <button onclick="borrarPostSocial('${p.id}')" style="padding:5px 10px;background:none;border:1px solid #334155;border-radius:7px;color:#64748b;font-size:.78rem;cursor:pointer" title="Eliminar" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#334155';this.style.color='#64748b'">✕</button>
+            </div>
+          </div>
+          ${mediaHtml}
+          ${captionsHtml}
+          ${notas}
+        </div>`;
+    }).join('');
+
+    // Iniciar polling para posts en progreso
+    const enProgreso = posts.filter(p => p.estado === 'generando_imagen' || p.estado === 'generando_video');
+    if (enProgreso.length > 0) iniciarPollingSocial(enProgreso.map(p => p.id));
+  }
+
+  function iniciarPollingSocial(ids) {
+    if (_socialPollInterval) clearInterval(_socialPollInterval);
+    _socialPollInterval = setInterval(async () => {
+      let algoPendiente = false;
+      for (const id of ids) {
+        const r = await fetch(`/api/social/estado?id=${id}`, { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!r.ok) continue;
+        const post = await r.json();
+        actualizarCardSocial(post);
+        if (post.estado === 'generando_imagen' || post.estado === 'generando_video') {
+          algoPendiente = true;
+        }
+      }
+      if (!algoPendiente) {
+        clearInterval(_socialPollInterval);
+        _socialPollInterval = null;
+      }
+    }, 6000);
+  }
+
+  function actualizarCardSocial(post) {
+    const card = document.getElementById(`social-card-${post.id}`);
+    if (!card) return;
+    const badgeEl = card.querySelector('[data-badge]');
+    // Refrescar lista completa cuando termina
+    if (post.estado === 'listo' || post.estado === 'error' || post.estado === 'revision_requerida') {
+      loaded.delete('redes_sociales');
+      cargarRedesSociales();
+    }
+  }
+
+  function abrirModalSocial() {
+    document.getElementById('social-tema').value = '';
+    document.getElementById('social-fecha').value = '';
+    document.getElementById('social-modal-msg').style.display = 'none';
+    document.getElementById('social-generar-btn').disabled = false;
+    document.getElementById('social-generar-btn').textContent = '✦ Generar con IA';
+    document.getElementById('social-overlay').style.display = 'block';
+    document.getElementById('social-modal').style.display = 'block';
+    setTimeout(() => document.getElementById('social-tema').focus(), 50);
+  }
+
+  function cerrarModalSocial() {
+    document.getElementById('social-overlay').style.display = 'none';
+    document.getElementById('social-modal').style.display = 'none';
+  }
+
+  async function generarContenidoSocial() {
+    const tema = document.getElementById('social-tema').value.trim();
+    if (!tema) { mostrarSocialMsg('Escribe el tema del contenido.', false); return; }
+
+    const redes = [];
+    if (document.getElementById('soc-fb').checked) redes.push('facebook');
+    if (document.getElementById('soc-ig').checked) redes.push('instagram');
+    if (document.getElementById('soc-tt').checked) redes.push('tiktok');
+    if (document.getElementById('soc-yt').checked) redes.push('youtube');
+    if (redes.length === 0) { mostrarSocialMsg('Selecciona al menos una red.', false); return; }
+
+    const fecha_publicacion = document.getElementById('social-fecha').value || null;
+
+    const btn = document.getElementById('social-generar-btn');
+    btn.disabled = true;
+    btn.textContent = 'Generando agentes IA...';
+    mostrarSocialMsg('Los agentes están redactando el contenido y generando la imagen. Esto puede tomar 30-60 segundos...', true);
+
+    const r = await fetch('/api/social/generar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ tema, redes, fecha_publicacion }),
+    });
+    const data = await r.json();
+
+    btn.disabled = false;
+    btn.textContent = '✦ Generar con IA';
+
+    if (!r.ok) {
+      mostrarSocialMsg(data.error || 'Error al generar contenido.', false);
+      return;
+    }
+
+    cerrarModalSocial();
+    loaded.delete('redes_sociales');
+    cargarRedesSociales();
+  }
+
+  function mostrarSocialMsg(txt, ok) {
+    const el = document.getElementById('social-modal-msg');
+    el.textContent = txt;
+    el.style.background = ok ? '#14532d' : '#450a0a';
+    el.style.color = ok ? '#86efac' : '#fca5a5';
+    el.style.display = 'block';
+  }
+
+  async function borrarPostSocial(id) {
+    if (!confirm('¿Eliminar este post? Esta acción no se puede deshacer.')) return;
+    await fetch(`/api/social/posts?id=${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+    loaded.delete('redes_sociales');
+    cargarRedesSociales();
+  }
+
+  function abrirModalPublicar(postId) {
+    _socialPubPostId = postId;
+    document.getElementById('social-pub-msg').style.display = 'none';
+    document.getElementById('social-pub-btn').disabled = false;
+    document.getElementById('social-pub-btn').textContent = 'Publicar ahora';
+    document.getElementById('social-pub-body').innerHTML = `
+      <div style="margin-bottom:16px">
+        <label style="font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Fecha y hora de publicación (opcional)</label>
+        <input type="datetime-local" id="pub-fecha" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.88rem;font-family:inherit;outline:none;box-sizing:border-box" />
+        <div style="font-size:.75rem;color:#475569;margin-top:5px">Si no se especifica, se publicará en 5 minutos.</div>
+      </div>`;
+    document.getElementById('social-pub-overlay').style.display = 'block';
+    document.getElementById('social-pub-modal').style.display = 'block';
+  }
+
+  function cerrarModalPublicar() {
+    document.getElementById('social-pub-overlay').style.display = 'none';
+    document.getElementById('social-pub-modal').style.display = 'none';
+    _socialPubPostId = null;
+  }
+
+  async function confirmarPublicar() {
+    if (!_socialPubPostId) return;
+    const fecha = document.getElementById('pub-fecha')?.value || null;
+    const btn = document.getElementById('social-pub-btn');
+    btn.disabled = true;
+    btn.textContent = 'Publicando...';
+
+    const r = await fetch('/api/social/publicar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ post_id: _socialPubPostId, fecha }),
+    });
+    const data = await r.json();
+
+    btn.disabled = false;
+    btn.textContent = 'Publicar ahora';
+
+    const msgEl = document.getElementById('social-pub-msg');
+    if (r.ok) {
+      msgEl.textContent = '¡Publicado exitosamente en Metricool!';
+      msgEl.style.background = '#14532d';
+      msgEl.style.color = '#86efac';
+      msgEl.style.display = 'block';
+      setTimeout(() => {
+        cerrarModalPublicar();
+        loaded.delete('redes_sociales');
+        cargarRedesSociales();
+      }, 1500);
+    } else {
+      msgEl.textContent = data.error || 'Error al publicar.';
+      msgEl.style.background = '#450a0a';
+      msgEl.style.color = '#fca5a5';
+      msgEl.style.display = 'block';
+      console.error('Metricool error:', data);
+    }
+  }
+  // ===== Fin Redes Sociales =====
+
+  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos, redes_sociales:cargarRedesSociales };
   const loaded = new Set();
 
   function setSeccion(sec, el) {
