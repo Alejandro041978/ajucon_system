@@ -15,11 +15,11 @@ function verifyAdmin(req) {
 }
 
 async function metricoolFetch(path, options = {}) {
-  const sep = path.includes('?') ? '&' : '?';
-  const url = `${METRICOOL_BASE}${path}${sep}token=${process.env.METRICOOL_TOKEN}`;
+  const url = `${METRICOOL_BASE}${path}`;
   const res = await fetch(url, {
     ...options,
     headers: {
+      'X-Mc-Auth': process.env.METRICOOL_TOKEN,
       'Content-Type': 'application/json',
       ...(options.headers || {}),
     },
@@ -46,10 +46,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'El post aún no está listo para publicar.' });
   }
 
-  // Obtener información de la cuenta Metricool
-  const userRes = await metricoolFetch('/user');
-  if (!userRes.ok) {
-    return res.status(502).json({ error: 'Error conectando con Metricool.', detalle: userRes.data });
+  // Verificar conexión con Metricool
+  const pingRes = await metricoolFetch('/scheduler/posts');
+  if (!pingRes.ok) {
+    return res.status(502).json({ error: 'Error conectando con Metricool.', detalle: pingRes.data });
   }
 
   // Determinar la URL de media a usar (video preferido sobre imagen)
