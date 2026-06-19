@@ -66,33 +66,37 @@ export default async function handler(req, res) {
     minute: dt.getUTCMinutes(),
   };
 
-  const providers = {};
+  const providers = [];
   const redes = post.redes || [];
 
   if (redes.includes('facebook')) {
-    providers.facebook = {
+    providers.push({
+      name: 'FACEBOOK',
       text: post.captions?.facebook || '',
       ...(mediaUrl ? { mediaUrls: [mediaUrl] } : {}),
-    };
+    });
   }
   if (redes.includes('instagram')) {
-    providers.instagram = {
+    providers.push({
+      name: 'INSTAGRAM',
       text: post.captions?.instagram || '',
       ...(mediaUrl ? { mediaUrls: [mediaUrl] } : {}),
-    };
+    });
   }
   if (redes.includes('tiktok')) {
-    providers.tiktok = {
+    providers.push({
+      name: 'TIKTOK',
       text: post.captions?.tiktok || '',
       ...(post.video_url ? { mediaUrls: [post.video_url] } : {}),
-    };
+    });
   }
   if (redes.includes('youtube')) {
-    providers.youtube = {
+    providers.push({
+      name: 'YOUTUBE',
       title: post.captions?.youtube_titulo || post.tema,
       text: post.captions?.youtube_descripcion || '',
       ...(post.video_url ? { mediaUrls: [post.video_url] } : {}),
-    };
+    });
   }
 
   const publishBody = {
