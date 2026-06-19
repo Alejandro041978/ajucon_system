@@ -415,9 +415,10 @@
     const { usuario, riasec, chaside, narrativa, generado_en } = d;
 
     // Membrete y ficha
+    const nombreCompleto = usuario.nombre || '—';
     document.getElementById('membrete-estudiante').textContent =
-      `${usuario.nombre} · ${usuario.grado} · ${fechaCorta(generado_en)}`;
-    document.getElementById('ficha-nombre').textContent = usuario.nombre;
+      `${nombreCompleto} · ${usuario.grado} · ${fechaCorta(generado_en)}`;
+    document.getElementById('ficha-nombre').textContent = nombreCompleto;
     document.getElementById('ficha-grado').textContent = usuario.grado || '—';
     document.getElementById('ficha-ciudad').textContent = usuario.ciudad || 'Tacna';
     document.getElementById('ficha-fecha').textContent = fechaCorta(generado_en);
