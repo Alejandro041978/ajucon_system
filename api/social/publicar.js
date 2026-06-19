@@ -78,17 +78,17 @@ export default async function handler(req, res) {
       ...(mediaUrl ? { mediaUrls: [mediaUrl] } : {}),
     });
   }
-  if (redes.includes('tiktok')) {
+  if (redes.includes('tiktok') && (post.video_url || post.imagen_url)) {
     providers.push({
       network: 'TIKTOK',
       text: post.captions?.tiktok || '',
-      ...(post.video_url ? { mediaUrls: [post.video_url] } : {}),
+      mediaUrls: [post.video_url || post.imagen_url],
     });
   }
   if (redes.includes('youtube')) {
     providers.push({
       network: 'YOUTUBE',
-      title: post.captions?.youtube_titulo || post.tema,
+      ytTitle: post.captions?.youtube_titulo || post.tema,
       text: post.captions?.youtube_descripcion || '',
       ...(post.video_url ? { mediaUrls: [post.video_url] } : {}),
     });
