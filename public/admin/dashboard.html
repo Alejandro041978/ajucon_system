@@ -154,6 +154,7 @@
   <div class="logo">AJUCON <span>Panel Admin</span></div>
   <div class="nav-item active" onclick="setSeccion('stats', this)">📊 Resumen</div>
   <div class="nav-item" onclick="setSeccion('users', this)">👤 Usuarios</div>
+  <div class="nav-item" onclick="setSeccion('admins', this)">🔐 Administradores</div>
   <div class="nav-item" onclick="setSeccion('becas_profesionales', this)">🎓 Becas Profesionales</div>
   <div class="nav-item" onclick="setSeccion('becas_cursos', this)">💻 Becas Cursos</div>
   <div class="nav-item" onclick="setSeccion('gestion_cursos', this)">⚙️ Gestión de Cursos</div>
@@ -212,6 +213,20 @@
     </div>
   </div>
 
+  <!-- Administradores -->
+  <div class="section" id="sec-admins">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <h2 style="margin:0">Administradores</h2>
+      <button onclick="abrirModalAdmin(null)" style="padding:9px 20px;background:#6366f1;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">+ Nuevo administrador</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Estado</th><th>Registro</th><th></th></tr></thead>
+        <tbody id="tbody-admins"><tr><td colspan="5" class="empty">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Perfiles RIASEC -->
   <div class="section" id="sec-riasec">
     <h2>Perfiles Vocacionales — Modelo RIASEC</h2>
@@ -224,6 +239,42 @@
     <h2>Gestión de Cursos Online</h2>
     <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:20px">Edita el nombre, activa/desactiva cursos y asigna el ID de Moodle para la integración automática.</p>
     <div id="cursos-tabla"></div>
+  </div>
+
+  <!-- Modal admin -->
+  <div class="overlay" id="admin-overlay" onclick="cerrarModalAdmin()"></div>
+  <div id="admin-modal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);width:440px;max-width:95vw;background:#1e2535;border:1px solid #2d3748;border-radius:16px;padding:28px;z-index:200;opacity:0;pointer-events:none;transition:all .2s ease">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 id="admin-modal-title" style="color:#f1f5f9;font-size:1rem;margin:0">Nuevo administrador</h3>
+      <button onclick="cerrarModalAdmin()" style="background:none;border:none;color:#64748b;font-size:1.3rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div>
+        <label style="font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Nombres</label>
+        <input id="admin-nombre" type="text" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#2d3748'" />
+      </div>
+      <div>
+        <label style="font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Apellidos</label>
+        <input id="admin-apellido" type="text" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#2d3748'" />
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Email</label>
+      <input id="admin-email" type="email" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#2d3748'" />
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Contraseña <span id="admin-pass-hint" style="font-weight:400;text-transform:none">(dejar vacío para no cambiar)</span></label>
+      <input id="admin-password" type="password" placeholder="••••••••" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#2d3748'" />
+    </div>
+    <div id="admin-activo-wrap" style="margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <input id="admin-activo" type="checkbox" checked style="width:18px;height:18px;accent-color:#6366f1;cursor:pointer" />
+      <label for="admin-activo" style="font-size:.9rem;color:#e2e8f0;cursor:pointer">Cuenta activa</label>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="cerrarModalAdmin()" style="padding:10px 20px;background:none;border:1px solid #2d3748;border-radius:8px;color:#64748b;font-size:.88rem;cursor:pointer">Cancelar</button>
+      <button id="admin-guardar-btn" onclick="guardarAdmin()" style="padding:10px 24px;background:#6366f1;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">Guardar</button>
+    </div>
+    <div id="admin-modal-msg" style="margin-top:12px;font-size:.85rem;display:none"></div>
   </div>
 
   <!-- Modal detalle beca profesional -->
@@ -669,7 +720,89 @@
     }).join('');
   }
 
-  const loaders = { stats:cargarStats, users:cargarUsers, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos };
+  let _adminEditandoId = null;
+
+  async function cargarAdmins() {
+    const tbody = document.getElementById('tbody-admins');
+    const r = await fetch('/api/admin/admins', { headers: { 'Authorization': 'Bearer ' + token } });
+    if (r.status === 401) { logout(); return; }
+    const data = await r.json();
+    tbody.innerHTML = data.length ? data.map(a => `
+      <tr>
+        <td>${a.nombre} ${a.apellido}</td>
+        <td>${a.email}</td>
+        <td><span style="padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${a.activo ? 'background:#14532d;color:#86efac' : 'background:#1e293b;color:#64748b'}">${a.activo ? 'Activo' : 'Inactivo'}</span></td>
+        <td>${fecha(a.created_at)}</td>
+        <td><button onclick='abrirModalAdmin(${JSON.stringify(a)})'
+          style="padding:4px 12px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer"
+          onmouseover="this.style.borderColor='#6366f1';this.style.color='#818cf8'"
+          onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">✏️ Editar</button></td>
+      </tr>`).join('') : '<tr><td colspan="5" class="empty">Sin administradores aún.</td></tr>';
+  }
+
+  function abrirModalAdmin(admin) {
+    _adminEditandoId = admin ? admin.id : null;
+    document.getElementById('admin-modal-title').textContent = admin ? 'Editar administrador' : 'Nuevo administrador';
+    document.getElementById('admin-nombre').value = admin?.nombre || '';
+    document.getElementById('admin-apellido').value = admin?.apellido || '';
+    document.getElementById('admin-email').value = admin?.email || '';
+    document.getElementById('admin-password').value = '';
+    document.getElementById('admin-activo').checked = admin ? !!admin.activo : true;
+    document.getElementById('admin-pass-hint').style.display = admin ? 'inline' : 'none';
+    document.getElementById('admin-modal-msg').style.display = 'none';
+    document.getElementById('admin-guardar-btn').disabled = false;
+    document.getElementById('admin-guardar-btn').textContent = 'Guardar';
+    document.getElementById('admin-overlay').classList.add('open');
+    const modal = document.getElementById('admin-modal');
+    modal.style.opacity = '1'; modal.style.pointerEvents = 'auto'; modal.style.transform = 'translate(-50%,-50%) scale(1)';
+    setTimeout(() => document.getElementById('admin-nombre').focus(), 50);
+  }
+
+  function cerrarModalAdmin() {
+    document.getElementById('admin-overlay').classList.remove('open');
+    const modal = document.getElementById('admin-modal');
+    modal.style.opacity = '0'; modal.style.pointerEvents = 'none'; modal.style.transform = 'translate(-50%,-50%) scale(.96)';
+    _adminEditandoId = null;
+  }
+
+  async function guardarAdmin() {
+    const nombre = document.getElementById('admin-nombre').value.trim();
+    const apellido = document.getElementById('admin-apellido').value.trim();
+    const email = document.getElementById('admin-email').value.trim();
+    const password = document.getElementById('admin-password').value;
+    const activo = document.getElementById('admin-activo').checked;
+    if (!nombre || !apellido || !email) { mostrarAdminMsg('Nombre, apellido y email son requeridos.'); return; }
+    if (!_adminEditandoId && !password) { mostrarAdminMsg('La contraseña es requerida para nuevos administradores.'); return; }
+
+    const btn = document.getElementById('admin-guardar-btn');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+
+    const body = _adminEditandoId
+      ? { id: _adminEditandoId, nombre, apellido, email, activo, ...(password ? { password } : {}) }
+      : { nombre, apellido, email, password, activo };
+
+    const r = await fetch('/api/admin/admins', {
+      method: _adminEditandoId ? 'PATCH' : 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(body),
+    });
+    if (r.ok) {
+      cerrarModalAdmin();
+      loaded.delete('admins');
+      cargarAdmins();
+    } else {
+      const d = await r.json().catch(() => ({}));
+      mostrarAdminMsg(d.error || 'Error al guardar.');
+      btn.disabled = false; btn.textContent = 'Guardar';
+    }
+  }
+
+  function mostrarAdminMsg(texto) {
+    const el = document.getElementById('admin-modal-msg');
+    el.textContent = texto; el.style.color = '#fca5a5'; el.style.display = 'block';
+  }
+
+  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos };
   const loaded = new Set();
 
   function setSeccion(sec, el) {
