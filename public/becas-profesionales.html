@@ -98,54 +98,52 @@
         </div>
         <div class="field">
           <label>Dirección</label>
-          <input type="text" id="direccion" placeholder="Calle, número, ciudad" required />
+          <input type="text" id="direccion" placeholder="Calle, número" required />
+        </div>
+        <div class="field">
+          <label>Ciudad / Región</label>
+          <select id="region" required>
+            <option value="">Selecciona tu ciudad</option>
+            <option>Amazonas</option>
+            <option>Áncash</option>
+            <option>Apurímac</option>
+            <option>Arequipa</option>
+            <option>Ayacucho</option>
+            <option>Cajamarca</option>
+            <option>Callao</option>
+            <option>Cusco</option>
+            <option>Huancavelica</option>
+            <option>Huánuco</option>
+            <option>Ica</option>
+            <option>Junín</option>
+            <option>La Libertad</option>
+            <option>Lambayeque</option>
+            <option>Lima</option>
+            <option>Loreto</option>
+            <option>Madre de Dios</option>
+            <option>Moquegua</option>
+            <option>Pasco</option>
+            <option>Piura</option>
+            <option>Puno</option>
+            <option>San Martín</option>
+            <option>Tacna</option>
+            <option>Tumbes</option>
+            <option>Ucayali</option>
+          </select>
         </div>
         <div class="field">
           <label>Teléfono de contacto</label>
-          <input type="tel" id="telefono" placeholder="+51 9 1234 5678" required />
+          <input type="tel" id="telefono" placeholder="9XXXXXXXX" maxlength="9" required />
         </div>
 
         <div class="section-title">Modalidad de estudio</div>
-        <div class="grid2">
-          <div class="field">
-            <label>Modalidad de interés</label>
-            <select id="modalidad" required onchange="toggleRegion(this.value)">
-              <option value="">Selecciona</option>
-              <option value="Online">Online</option>
-              <option value="Presencial">Presencial</option>
-            </select>
-          </div>
-          <div class="field" id="campo-region" style="display:none">
-            <label>Región donde estudiarías</label>
-            <select id="region">
-              <option value="">Selecciona región</option>
-              <option>Amazonas</option>
-              <option>Áncash</option>
-              <option>Apurímac</option>
-              <option>Arequipa</option>
-              <option>Ayacucho</option>
-              <option>Cajamarca</option>
-              <option>Callao</option>
-              <option>Cusco</option>
-              <option>Huancavelica</option>
-              <option>Huánuco</option>
-              <option>Ica</option>
-              <option>Junín</option>
-              <option>La Libertad</option>
-              <option>Lambayeque</option>
-              <option>Lima</option>
-              <option>Loreto</option>
-              <option>Madre de Dios</option>
-              <option>Moquegua</option>
-              <option>Pasco</option>
-              <option>Piura</option>
-              <option>Puno</option>
-              <option>San Martín</option>
-              <option>Tacna</option>
-              <option>Tumbes</option>
-              <option>Ucayali</option>
-            </select>
-          </div>
+        <div class="field" style="max-width:50%">
+          <label>Modalidad de interés</label>
+          <select id="modalidad" required>
+            <option value="">Selecciona</option>
+            <option value="Online">Online</option>
+            <option value="Presencial">Presencial</option>
+          </select>
         </div>
 
         <div class="section-title">Estudios de interés</div>
@@ -222,19 +220,6 @@
     localStorage.removeItem('ajucon_token');
     localStorage.removeItem('ajucon_user');
     window.location.href = '/index.html';
-  }
-
-  function toggleRegion(val) {
-    const campo = document.getElementById('campo-region');
-    const select = document.getElementById('region');
-    if (val === 'Presencial') {
-      campo.style.display = 'block';
-      select.required = true;
-    } else {
-      campo.style.display = 'none';
-      select.required = false;
-      select.value = '';
-    }
   }
 
   async function enviarPostulacion(e) {

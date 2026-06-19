@@ -24,8 +24,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Todos los campos son requeridos.' });
   }
 
-  if (modalidad === 'Presencial' && !region) {
-    return res.status(400).json({ error: 'Debes seleccionar la región donde estudiarías.' });
+  if (!region) {
+    return res.status(400).json({ error: 'Debes seleccionar tu ciudad / región.' });
   }
 
   if (promedio_notas < 0 || promedio_notas > 20) {
