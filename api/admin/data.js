@@ -73,7 +73,7 @@ export default async function handler(req, res) {
     const [u, bp, bc, tr] = await Promise.all([
       supabase.from('users').select('id', { count: 'exact', head: true }),
       supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }),
-      supabase.from('becas_cursos').select('id', { count: 'exact', head: true }),
+      supabase.from('inscripciones_cursos').select('id', { count: 'exact', head: true }),
       supabase.from('test_results').select('id', { count: 'exact', head: true }),
     ]);
     return res.status(200).json({
