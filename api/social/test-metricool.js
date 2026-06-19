@@ -2,20 +2,23 @@ export default async function handler(req, res) {
   const TOKEN = process.env.METRICOOL_TOKEN;
   const BASE = 'https://app.metricool.com/api/v2';
 
-  const H = { 'X-Mc-Auth': TOKEN };
+  const H = { 'X-Mc-Auth': TOKEN, 'Content-Type': 'application/json' };
+  const minBody = JSON.stringify({ text: 'test', publicationDate: { dateTime: '2026-06-25T10:00:00' }, providers: [{ name: 'FACEBOOK', text: 'test' }] });
 
-  const intentos = [
-    { nombre: '/scheduler/posts (GET)', url: `${BASE}/scheduler/posts`, headers: H },
-    { nombre: '/blogs/list', url: `${BASE}/blogs/list`, headers: H },
-    { nombre: '/blogs/all', url: `${BASE}/blogs/all`, headers: H },
-    { nombre: '/blog', url: `${BASE}/blog`, headers: H },
-    { nombre: '/blog/list', url: `${BASE}/blog/list`, headers: H },
-    { nombre: '/analytics/blogs', url: `${BASE}/analytics/blogs`, headers: H },
-    { nombre: '/analytics/accounts', url: `${BASE}/analytics/accounts`, headers: H },
-    { nombre: '/accounts/list', url: `${BASE}/accounts/list`, headers: H },
-    { nombre: '/user/blogs', url: `${BASE}/user/blogs`, headers: H },
-    { nombre: '/scheduler/posts con blogId=1', url: `${BASE}/scheduler/posts?blogId=1`, headers: H },
-  ];
+  // Probar con blogId en el body
+  const intentos = [];
+  for (const id of [1, 2, 3, 100, 1000, 10000]) {
+    intentos.push({
+      nombre: `POST blogId=${id} en body`,
+      url: `${BASE}/scheduler/posts`,
+      method: 'POST',
+      body: JSON.stringify({ blogId: id, text: 'test', publicationDate: { dateTime: '2026-06-25T10:00:00' }, providers: [{ name: 'FACEBOOK', text: 'test' }] }),
+      headers: H,
+    });
+  }
+  // Probar con blogId como query param
+  intentos.push({ nombre: 'GET /scheduler/posts detalle', url: `${BASE}/scheduler/posts`, headers: { 'X-Mc-Auth': TOKEN } });
+  intentos.push({ nombre: 'GET /analytics/stats', url: `${BASE}/analytics/stats`, headers: { 'X-Mc-Auth': TOKEN } });
 
   const resultados = [];
   for (const intento of intentos) {
