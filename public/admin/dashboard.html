@@ -226,6 +226,32 @@
     <div id="cursos-tabla"></div>
   </div>
 
+  <!-- Modal edición de curso -->
+  <div class="overlay" id="curso-overlay" onclick="cerrarModalCurso()"></div>
+  <div id="curso-modal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);width:440px;max-width:95vw;background:#1e2535;border:1px solid #2d3748;border-radius:16px;padding:28px;z-index:200;opacity:0;pointer-events:none;transition:all .2s ease">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="color:#f1f5f9;font-size:1rem;margin:0">Editar curso</h3>
+      <button onclick="cerrarModalCurso()" style="background:none;border:none;color:#64748b;font-size:1.3rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">Nombre del curso</label>
+      <input id="modal-nombre" type="text" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#2d3748'" />
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px">ID de Moodle</label>
+      <input id="modal-moodle" type="number" placeholder="Sin asignar" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.9rem;font-family:inherit;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#2d3748'" />
+    </div>
+    <div style="margin-bottom:24px;display:flex;align-items:center;gap:10px">
+      <input id="modal-activo" type="checkbox" style="width:18px;height:18px;accent-color:#6366f1;cursor:pointer" />
+      <label for="modal-activo" style="font-size:.9rem;color:#e2e8f0;cursor:pointer">Curso activo (visible para estudiantes)</label>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="cerrarModalCurso()" style="padding:10px 20px;background:none;border:1px solid #2d3748;border-radius:8px;color:#64748b;font-size:.88rem;cursor:pointer">Cancelar</button>
+      <button id="modal-guardar-btn" onclick="guardarDesdeModal()" style="padding:10px 24px;background:#6366f1;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">Guardar cambios</button>
+    </div>
+    <div id="modal-msg" style="margin-top:12px;font-size:.85rem;display:none"></div>
+  </div>
+
   <!-- Revisor Valeria -->
   <div class="section" id="sec-valeria_review">
     <h2>Revisor de Conversaciones — Valeria</h2>
@@ -437,6 +463,8 @@
     }).join('');
   }
 
+  let _cursoEditandoId = null;
+
   async function cargarGestionCursos() {
     const wrap = document.getElementById('cursos-tabla');
     wrap.innerHTML = '<p style="color:var(--text-faint);font-size:.85rem">Cargando...</p>';
@@ -460,31 +488,27 @@
             <th style="padding:10px 14px;text-align:left;font-weight:600;width:40px">#</th>
             <th style="padding:10px 14px;text-align:left;font-weight:600">Nombre del curso</th>
             <th style="padding:10px 14px;text-align:left;font-weight:600;width:130px">ID Moodle</th>
-            <th style="padding:10px 14px;text-align:center;font-weight:600;width:90px">Activo</th>
-            <th style="padding:10px 14px;text-align:center;font-weight:600;width:80px">Guardar</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:600;width:90px">Estado</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:600;width:70px">Editar</th>
           </tr></thead>
           <tbody>
             ${cursos.map((c, i) => `
               <tr style="border-top:1px solid var(--border)" id="fila-${c.id}">
                 <td style="padding:10px 14px;font-size:.8rem;color:var(--text-faint)">${i + 1}</td>
-                <td style="padding:8px 14px">
-                  <input type="text" value="${c.nombre}" id="nombre-${c.id}"
-                    style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:.88rem;font-family:inherit;outline:none"
-                    onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor=''" />
+                <td style="padding:10px 14px;font-size:.88rem;color:var(--text)">${c.nombre}</td>
+                <td style="padding:10px 14px;font-size:.85rem;color:var(--text-muted)">${c.moodle_curso_id || '—'}</td>
+                <td style="padding:10px 14px;text-align:center">
+                  <span style="padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;${c.activo ? 'background:#14532d;color:#86efac' : 'background:#1e293b;color:#64748b'}">
+                    ${c.activo ? 'Activo' : 'Inactivo'}
+                  </span>
                 </td>
-                <td style="padding:8px 14px">
-                  <input type="number" value="${c.moodle_curso_id || ''}" id="moodle-${c.id}" placeholder="—"
-                    style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-size:.88rem;font-family:inherit;outline:none"
-                    onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor=''" />
-                </td>
-                <td style="padding:8px 14px;text-align:center">
-                  <input type="checkbox" id="activo-${c.id}" ${c.activo ? 'checked' : ''}
-                    style="width:17px;height:17px;accent-color:#6366f1;cursor:pointer" />
-                </td>
-                <td style="padding:8px 14px;text-align:center">
-                  <button onclick="guardarCurso(${c.id})"
-                    style="padding:6px 14px;background:#6366f1;color:white;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer">
-                    Guardar
+                <td style="padding:10px 14px;text-align:center">
+                  <button onclick='abrirModalCurso(${JSON.stringify(c)})'
+                    title="Editar curso"
+                    style="background:none;border:1px solid var(--border);border-radius:7px;color:var(--text-muted);font-size:1rem;width:34px;height:34px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center"
+                    onmouseover="this.style.borderColor='#6366f1';this.style.color='#818cf8'"
+                    onmouseout="this.style.borderColor='';this.style.color=''">
+                    ✏️
                   </button>
                 </td>
               </tr>`).join('')}
@@ -493,25 +517,66 @@
       </div>`;
   }
 
-  async function guardarCurso(id) {
-    const nombre = document.getElementById('nombre-' + id).value.trim();
-    const moodleVal = document.getElementById('moodle-' + id).value.trim();
-    const activo = document.getElementById('activo-' + id).checked;
-    if (!nombre) return alert('El nombre no puede estar vacío.');
+  function abrirModalCurso(curso) {
+    _cursoEditandoId = curso.id;
+    document.getElementById('modal-nombre').value = curso.nombre;
+    document.getElementById('modal-moodle').value = curso.moodle_curso_id || '';
+    document.getElementById('modal-activo').checked = !!curso.activo;
+    document.getElementById('modal-msg').style.display = 'none';
+    document.getElementById('modal-guardar-btn').disabled = false;
+    document.getElementById('modal-guardar-btn').textContent = 'Guardar cambios';
+
+    document.getElementById('curso-overlay').classList.add('open');
+    const modal = document.getElementById('curso-modal');
+    modal.style.opacity = '1';
+    modal.style.pointerEvents = 'auto';
+    modal.style.transform = 'translate(-50%,-50%) scale(1)';
+    setTimeout(() => document.getElementById('modal-nombre').focus(), 50);
+  }
+
+  function cerrarModalCurso() {
+    document.getElementById('curso-overlay').classList.remove('open');
+    const modal = document.getElementById('curso-modal');
+    modal.style.opacity = '0';
+    modal.style.pointerEvents = 'none';
+    modal.style.transform = 'translate(-50%,-50%) scale(.96)';
+    _cursoEditandoId = null;
+  }
+
+  async function guardarDesdeModal() {
+    if (!_cursoEditandoId) return;
+    const nombre = document.getElementById('modal-nombre').value.trim();
+    if (!nombre) { mostrarModalMsg('El nombre no puede estar vacío.', false); return; }
+    const moodleVal = document.getElementById('modal-moodle').value.trim();
+    const activo = document.getElementById('modal-activo').checked;
+
+    const btn = document.getElementById('modal-guardar-btn');
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
 
     const r = await fetch('/api/admin/cursos', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ id, nombre, moodle_curso_id: moodleVal ? parseInt(moodleVal) : null, activo }),
+      body: JSON.stringify({ id: _cursoEditandoId, nombre, moodle_curso_id: moodleVal ? parseInt(moodleVal) : null, activo }),
     });
-    const fila = document.getElementById('fila-' + id);
+
     if (r.ok) {
-      fila.style.background = '#d1fae5';
-      setTimeout(() => fila.style.background = '', 1200);
+      cerrarModalCurso();
+      loaded.delete('gestion_cursos');
+      cargarGestionCursos();
     } else {
-      fila.style.background = '#fee2e2';
-      setTimeout(() => fila.style.background = '', 1200);
+      const d = await r.json().catch(() => ({}));
+      mostrarModalMsg(d.error || 'Error al guardar.', false);
+      btn.disabled = false;
+      btn.textContent = 'Guardar cambios';
     }
+  }
+
+  function mostrarModalMsg(texto, ok) {
+    const el = document.getElementById('modal-msg');
+    el.textContent = texto;
+    el.style.color = ok ? '#86efac' : '#fca5a5';
+    el.style.display = 'block';
   }
 
   async function cargarValeriaReview() {
