@@ -206,7 +206,7 @@
     <h2>Postulaciones — Becas Cursos Online</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Nombre</th><th>Email</th><th>Plataforma</th><th>Curso</th><th>Estado</th></tr></thead>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Curso</th><th>Nota</th><th>Estado</th></tr></thead>
         <tbody id="tbody-becas_cursos"><tr><td colspan="5" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
@@ -451,12 +451,15 @@
   async function cargarBecasCursos() {
     const data = await api('becas_cursos'); if (!data) return;
     const tbody = document.getElementById('tbody-becas_cursos');
-    tbody.innerHTML = data.length ? data.map(b => `
-      <tr>
-        <td>${b.users?.nombre||'—'}</td><td>${b.users?.email||'—'}</td>
-        <td>${b.plataforma}</td><td>${b.curso_nombre}</td>
-        <td>${badgeEstado(b.estado,'becas_cursos',b.id)}</td>
-      </tr>`).join('') : '<tr><td colspan="5" class="empty">Sin solicitudes aún.</td></tr>';
+    tbody.innerHTML = data.length ? data.map(b => {
+      const nombre = [b.users?.nombre, b.users?.apellido].filter(Boolean).join(' ') || '—';
+      return `<tr>
+        <td>${nombre}</td><td>${b.users?.email||'—'}</td>
+        <td>${b.curso_nombre||'—'}</td>
+        <td>${b.nota !== null && b.nota !== undefined ? b.nota + '%' : '—'}</td>
+        <td>${badgeEstado(b.estado,'inscripciones_cursos',b.id)}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5" class="empty">Sin inscripciones aún.</td></tr>';
   }
 
   async function cargarTestResults() {
