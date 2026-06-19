@@ -80,8 +80,10 @@
   <!-- Formulario registro -->
   <form id="form-registro" onsubmit="handleRegistro(event)">
     <div id="campos-registro">
-      <label>Nombre completo</label>
-      <input type="text" id="nombre" placeholder="Tu nombre" required />
+      <label>Nombres</label>
+      <input type="text" id="nombres" placeholder="Tus nombres" required />
+      <label>Apellidos</label>
+      <input type="text" id="apellidos" placeholder="Tus apellidos" required />
       <label>Email</label>
       <input type="email" id="email-reg" placeholder="tu@email.com" required />
       <label>Grado escolar</label>
@@ -188,7 +190,8 @@
     e.preventDefault();
     const grado = document.getElementById('grado').value;
     const body = {
-      nombre: document.getElementById('nombre').value,
+      nombre: document.getElementById('nombres').value.trim(),
+      apellido: document.getElementById('apellidos').value.trim(),
       email: document.getElementById('email-reg').value,
       grado,
       ciudad: document.getElementById('ciudad').value,

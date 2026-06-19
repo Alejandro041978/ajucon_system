@@ -65,13 +65,12 @@ export default async function handler(req, res) {
   // Obtener datos del usuario
   const { data: usuario } = await supabase
     .from('users')
-    .select('nombre, email')
+    .select('nombre, apellido, email')
     .eq('id', payload.id)
     .single();
 
-  const partes = usuario.nombre.trim().split(' ');
-  const firstname = partes[0];
-  const lastname = partes.slice(1).join(' ') || '-';
+  const firstname = usuario.nombre || '-';
+  const lastname = usuario.apellido || '-';
   const username = usernameDeEmail(usuario.email);
   const password = generarPassword();
 
