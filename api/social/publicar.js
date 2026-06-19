@@ -15,11 +15,11 @@ function verifyAdmin(req) {
 }
 
 async function metricoolFetch(path, options = {}) {
-  const url = `${METRICOOL_BASE}${path}`;
+  const sep = path.includes('?') ? '&' : '?';
+  const url = `${METRICOOL_BASE}${path}${sep}token=${process.env.METRICOOL_TOKEN}`;
   const res = await fetch(url, {
     ...options,
     headers: {
-      'Authorization': `Bearer ${process.env.METRICOOL_TOKEN}`,
       'Content-Type': 'application/json',
       ...(options.headers || {}),
     },
