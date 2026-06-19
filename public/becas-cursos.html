@@ -42,19 +42,14 @@
     /* Catálogo de cursos */
     .catalogo-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
     .catalogo-sub { font-size: .85rem; color: var(--text-muted); margin-bottom: 16px; }
-    .cursos-lista { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-    .curso-item {
-      display: flex; align-items: center; gap: 14px;
-      padding: 13px 18px; cursor: pointer;
-      border-bottom: 1px solid var(--border); transition: background .15s;
+    .curso-select {
+      width: 100%; padding: 12px 16px;
+      border: 2px solid var(--border); border-radius: 10px;
+      font-size: .95rem; font-family: inherit;
+      background: var(--surface2); color: var(--text);
+      cursor: pointer; outline: none; transition: var(--transition);
     }
-    .curso-item:last-child { border-bottom: none; }
-    .curso-item:hover { background: var(--surface2); }
-    .curso-item.selected { background: #fdf2f8; }
-    [data-theme="dark"] .curso-item.selected { background: #2d0a1e; }
-    .curso-item input[type=radio] { accent-color: #db2777; width: 17px; height: 17px; flex-shrink: 0; cursor: pointer; }
-    .curso-item-num { font-size: .75rem; font-weight: 700; color: #db2777; width: 22px; flex-shrink: 0; }
-    .curso-item-nombre { font-size: .92rem; color: var(--text); }
+    .curso-select:focus { border-color: #db2777; }
 
     .inscribir-bar { margin-top: 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
     .btn-inscribir { padding: 12px 28px; background: #db2777; color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background .2s; }
@@ -185,30 +180,26 @@
   }
 
   function renderCatalogo() {
-    const items = CURSOS.map((nombre, i) => `
-      <label class="curso-item" id="item-${i}">
-        <input type="radio" name="curso" value="${i}" onchange="seleccionarCurso(${i})">
-        <span class="curso-item-num">${i + 1}.</span>
-        <span class="curso-item-nombre">${nombre}</span>
-      </label>`).join('');
+    const opciones = CURSOS.map((nombre, i) =>
+      `<option value="${i}">${i + 1}. ${nombre}</option>`).join('');
 
     return `
       <div class="catalogo-title">Elige tu próximo curso</div>
       <div class="catalogo-sub">Selecciona un curso y haz clic en "Inscribirme". Recibirás los datos de acceso al campus por email.</div>
-      <div class="cursos-lista">${items}</div>
+      <select class="curso-select" id="curso-select" onchange="seleccionarCurso(this)">
+        <option value="">— Selecciona un curso —</option>
+        ${opciones}
+      </select>
       <div class="inscribir-bar">
         <button class="btn-inscribir" id="btn-inscribir" onclick="inscribirse()" disabled>Inscribirme</button>
-        <span class="sel-label" id="sel-label">Ningún curso seleccionado</span>
       </div>
       <div class="msg" id="msg"></div>`;
   }
 
-  function seleccionarCurso(idx) {
-    document.querySelectorAll('.curso-item').forEach(c => c.classList.remove('selected'));
-    document.getElementById('item-' + idx).classList.add('selected');
-    cursoSeleccionado = CURSOS[idx];
+  function seleccionarCurso(sel) {
+    if (!sel.value) { cursoSeleccionado = null; document.getElementById('btn-inscribir').disabled = true; return; }
+    cursoSeleccionado = CURSOS[parseInt(sel.value)];
     document.getElementById('btn-inscribir').disabled = false;
-    document.getElementById('sel-label').innerHTML = `Seleccionado: <span class="sel-nombre">${cursoSeleccionado}</span>`;
   }
 
   async function inscribirse() {
