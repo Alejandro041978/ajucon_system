@@ -145,16 +145,19 @@ Reglas:
   try {
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
+      max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }],
     });
 
     const texto = response.content[0].text.trim();
-    const jsonStr = texto.startsWith('{') ? texto : texto.slice(texto.indexOf('{'), texto.lastIndexOf('}') + 1);
+    const inicio = texto.indexOf('{');
+    const fin = texto.lastIndexOf('}');
+    if (inicio === -1 || fin === -1) throw new Error('Claude no devolvió JSON válido: ' + texto.slice(0, 200));
+    const jsonStr = texto.slice(inicio, fin + 1);
     narrativa = JSON.parse(jsonStr);
   } catch (e) {
-    console.error('Error Claude:', e);
-    return res.status(500).json({ error: 'Error al generar el reporte con IA. Intenta nuevamente.' });
+    console.error('Error generando reporte:', e.message);
+    return res.status(500).json({ error: 'Error al generar el reporte con IA: ' + e.message });
   }
 
   const respuesta = {
