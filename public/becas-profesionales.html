@@ -132,6 +132,49 @@
           </div>
         </div>
 
+        <div class="section-title">Modalidad de estudio</div>
+        <div class="grid2">
+          <div class="field">
+            <label>Modalidad de interés</label>
+            <select id="modalidad" required onchange="toggleRegion(this.value)">
+              <option value="">Selecciona</option>
+              <option value="Online">Online</option>
+              <option value="Presencial">Presencial</option>
+            </select>
+          </div>
+          <div class="field" id="campo-region" style="display:none">
+            <label>Región donde estudiarías</label>
+            <select id="region">
+              <option value="">Selecciona región</option>
+              <option>Amazonas</option>
+              <option>Áncash</option>
+              <option>Apurímac</option>
+              <option>Arequipa</option>
+              <option>Ayacucho</option>
+              <option>Cajamarca</option>
+              <option>Callao</option>
+              <option>Cusco</option>
+              <option>Huancavelica</option>
+              <option>Huánuco</option>
+              <option>Ica</option>
+              <option>Junín</option>
+              <option>La Libertad</option>
+              <option>Lambayeque</option>
+              <option>Lima</option>
+              <option>Loreto</option>
+              <option>Madre de Dios</option>
+              <option>Moquegua</option>
+              <option>Pasco</option>
+              <option>Piura</option>
+              <option>Puno</option>
+              <option>San Martín</option>
+              <option>Tacna</option>
+              <option>Tumbes</option>
+              <option>Ucayali</option>
+            </select>
+          </div>
+        </div>
+
         <div class="section-title">Carta de motivación</div>
         <div class="field">
           <label>¿Por qué postulas a esta beca y qué harás con ella?</label>
@@ -169,6 +212,19 @@
     window.location.href = '/index.html';
   }
 
+  function toggleRegion(val) {
+    const campo = document.getElementById('campo-region');
+    const select = document.getElementById('region');
+    if (val === 'Presencial') {
+      campo.style.display = 'block';
+      select.required = true;
+    } else {
+      campo.style.display = 'none';
+      select.required = false;
+      select.value = '';
+    }
+  }
+
   async function enviarPostulacion(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-enviar');
@@ -184,6 +240,8 @@
       institucion: document.getElementById('institucion').value,
       promedio_notas: parseFloat(document.getElementById('promedio_notas').value),
       situacion_economica: document.getElementById('situacion_economica').value,
+      modalidad: document.getElementById('modalidad').value,
+      region: document.getElementById('region').value || null,
       motivacion: document.getElementById('motivacion').value,
     };
 
