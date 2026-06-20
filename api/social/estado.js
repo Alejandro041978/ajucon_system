@@ -101,31 +101,37 @@ export default async function handler(req, res) {
       const rawImagenUrl = extractImageUrl(hfData);
       const imagenUrl = rawImagenUrl ? await uploadToSupabase(rawImagenUrl, 'imagenes', 'png') : null;
       if (imagenUrl) {
-        // Arrancar DoP Turbo (image → video)
+        const soloImagen = !post.redes?.includes('tiktok') && !post.redes?.includes('youtube');
+
         let videoRequestId = null;
-        try {
-          const videoRes = await fetch(`${HF_BASE}/higgsfield-ai/dop/turbo`, {
-            method: 'POST',
-            headers: hfHeaders(),
-            body: JSON.stringify({
-              image_url: imagenUrl,
-              prompt: post.brief?.hook || post.tema || '',
-              enhance_prompt: true,
-            }),
-          });
-          const videoData = await videoRes.json();
-          videoRequestId = videoData.request_id || null;
-          if (!videoRequestId) {
-            console.error('DoP Turbo sin request_id:', JSON.stringify(videoData).slice(0, 300));
+        if (!soloImagen) {
+          // Arrancar DoP Turbo (image → video)
+          try {
+            const videoRes = await fetch(`${HF_BASE}/higgsfield-ai/dop/turbo`, {
+              method: 'POST',
+              headers: hfHeaders(),
+              body: JSON.stringify({
+                image_url: imagenUrl,
+                prompt: post.brief?.hook || post.tema || '',
+                enhance_prompt: true,
+              }),
+            });
+            const videoData = await videoRes.json();
+            videoRequestId = videoData.request_id || null;
+            if (!videoRequestId) {
+              console.error('DoP Turbo sin request_id:', JSON.stringify(videoData).slice(0, 300));
+            }
+          } catch (e) {
+            console.error('DoP Turbo error:', e.message);
           }
-        } catch (e) {
-          console.error('DoP Turbo error:', e.message);
         }
 
         await supabase.from('social_posts').update({
           imagen_url: imagenUrl,
           video_request_id: videoRequestId,
           estado: videoRequestId ? 'generando_video' : 'listo',
+          aprobado: soloImagen ? true : undefined,
+          notas_calidad: soloImagen ? 'Imagen aprobada para publicación.' : null,
           updated_at: new Date().toISOString(),
         }).eq('id', id);
       }

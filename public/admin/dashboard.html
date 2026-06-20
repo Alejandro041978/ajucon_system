@@ -562,9 +562,10 @@
       <input type="datetime-local" id="social-fecha" style="width:100%;padding:10px 14px;border:1px solid #2d3748;border-radius:8px;background:#0d1117;color:#f1f5f9;font-size:.88rem;font-family:inherit;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='#2d3748'" />
     </div>
     <div id="social-modal-msg" style="display:none;margin-bottom:12px;font-size:.84rem;padding:10px 14px;border-radius:8px"></div>
-    <div style="display:flex;gap:10px;justify-content:flex-end">
+    <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
       <button onclick="cerrarModalSocial()" style="padding:10px 20px;background:none;border:1px solid #2d3748;border-radius:8px;color:#64748b;font-size:.88rem;cursor:pointer">Cancelar</button>
-      <button id="social-generar-btn" onclick="generarContenidoSocial()" style="padding:10px 24px;background:#7c3aed;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">✦ Generar con IA</button>
+      <button id="social-generar-btn-video" onclick="generarContenidoSocial('video')" style="padding:10px 18px;background:#1e3a5f;color:#93c5fd;border:1px solid #2563eb;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer">▶ Generar contenido (video 5s)</button>
+      <button id="social-generar-btn" onclick="generarContenidoSocial('imagen')" style="padding:10px 18px;background:#7c3aed;color:white;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer">✦ Generar contenido (imagen)</button>
     </div>
   </div>
 
@@ -1472,7 +1473,7 @@
     document.getElementById('social-fecha').value = '';
     document.getElementById('social-modal-msg').style.display = 'none';
     document.getElementById('social-generar-btn').disabled = false;
-    document.getElementById('social-generar-btn').textContent = '✦ Generar con IA';
+    document.getElementById('social-generar-btn-video').disabled = false;
     document.getElementById('social-overlay').style.display = 'block';
     document.getElementById('social-modal').style.display = 'block';
     setTimeout(() => document.getElementById('social-tema').focus(), 50);
@@ -1483,33 +1484,37 @@
     document.getElementById('social-modal').style.display = 'none';
   }
 
-  async function generarContenidoSocial() {
+  async function generarContenidoSocial(modo = 'imagen') {
     const tema = document.getElementById('social-tema').value.trim();
     if (!tema) { mostrarSocialMsg('Escribe el tema del contenido.', false); return; }
 
-    const redes = [];
-    if (document.getElementById('soc-fb').checked) redes.push('facebook');
-    if (document.getElementById('soc-ig').checked) redes.push('instagram');
-    if (document.getElementById('soc-tt').checked) redes.push('tiktok');
-    if (document.getElementById('soc-yt').checked) redes.push('youtube');
-    if (redes.length === 0) { mostrarSocialMsg('Selecciona al menos una red.', false); return; }
-
     const fecha_publicacion = document.getElementById('social-fecha').value || null;
 
-    const btn = document.getElementById('social-generar-btn');
-    btn.disabled = true;
-    btn.textContent = 'Generando agentes IA...';
-    mostrarSocialMsg('Los agentes están redactando el contenido y generando la imagen. Esto puede tomar 30-60 segundos...', true);
+    // Modo imagen: solo FB+IG con Soul Cinema
+    // Modo video: FB+IG+TikTok+YouTube con Soul + DoP Turbo
+    const redes = modo === 'imagen'
+      ? ['facebook', 'instagram']
+      : ['facebook', 'instagram', 'tiktok', 'youtube'];
+    const modelo = modo === 'imagen' ? 'soul-cinema' : 'soul';
+
+    const btnImagen = document.getElementById('social-generar-btn');
+    const btnVideo = document.getElementById('social-generar-btn-video');
+    btnImagen.disabled = true;
+    btnVideo.disabled = true;
+    const msgTiempo = modo === 'imagen'
+      ? 'Los agentes están redactando el contenido y generando la imagen. Esto puede tomar 1-2 minutos...'
+      : 'Los agentes están redactando el contenido y generando imagen + video. Esto puede tomar 3-5 minutos...';
+    mostrarSocialMsg(msgTiempo, true);
 
     const r = await fetch('/api/social/generar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ tema, redes, fecha_publicacion }),
+      body: JSON.stringify({ tema, redes, fecha_publicacion, modelo }),
     });
     const data = await r.json();
 
-    btn.disabled = false;
-    btn.textContent = '✦ Generar con IA';
+    btnImagen.disabled = false;
+    btnVideo.disabled = false;
 
     if (!r.ok) {
       mostrarSocialMsg(data.error || 'Error al generar contenido.', false);

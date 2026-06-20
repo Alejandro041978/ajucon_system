@@ -28,7 +28,7 @@ export default async function handler(req, res) {
   const admin = verifyAdmin(req);
   if (!admin) return res.status(401).json({ error: 'No autorizado.' });
 
-  const { tema, redes = ['facebook', 'instagram', 'tiktok', 'youtube'], fecha_publicacion } = req.body;
+  const { tema, redes = ['facebook', 'instagram', 'tiktok', 'youtube'], fecha_publicacion, modelo = 'soul' } = req.body;
   if (!tema) return res.status(400).json({ error: 'Tema requerido.' });
 
   // Agentes 1-4: social-director + content-strategist + copywriter + creative-director
@@ -90,7 +90,8 @@ Responde SOLO en JSON válido, sin texto adicional antes ni después:
   let imagenRequestId = null;
   let hfDebug = null;
   try {
-    const hfRes = await fetch(`${HF_BASE}/v1/text2image/soul`, {
+    const hfEndpoint = modelo === 'soul-cinema' ? '/v1/text2image/soul-cinema' : '/v1/text2image/soul';
+    const hfRes = await fetch(`${HF_BASE}${hfEndpoint}`, {
       method: 'POST',
       headers: hfHeaders(),
       body: JSON.stringify({
