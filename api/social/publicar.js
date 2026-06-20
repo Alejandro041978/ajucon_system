@@ -98,6 +98,8 @@ export default async function handler(req, res) {
     blogId: 6025050,
     text: post.captions?.facebook || post.captions?.instagram || post.tema || '',
     publicationDate: { dateTime: scheduledAt },
+    ...(mediaUrl ? { media: [mediaUrl] } : {}),
+    ...(post.video_url && post.captions?.youtube_titulo ? { ytTitle: post.captions.youtube_titulo } : {}),
     providers,
   };
 
