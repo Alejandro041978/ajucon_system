@@ -62,17 +62,21 @@ export default async function handler(req, res) {
   // Agente 5 (media-assembler): esperar imagen y luego arrancar video
   if (post.estado === 'generando_imagen' && post.imagen_request_id) {
     let hfData;
+    let hfHttpStatus;
     try {
-      const hfRes = await fetch(`${HF_BASE}/requests/${post.imagen_request_id}/status`, {
+      const hfRes = await fetch(`${HF_BASE}/v1/requests/${post.imagen_request_id}`, {
         headers: hfHeaders(),
       });
+      hfHttpStatus = hfRes.status;
       hfData = await hfRes.json();
+      console.log('Poll imagen:', hfHttpStatus, JSON.stringify(hfData).slice(0, 400));
     } catch (e) {
       console.error('Poll imagen error:', e.message);
-      return res.status(200).json(post);
+      return res.status(200).json({ ...post, _poll_error: e.message });
     }
 
     const imgStatus = extractStatus(hfData);
+    console.log('imgStatus extraído:', imgStatus);
     if (imgStatus === 'completed') {
       const imagenUrl = extractUrl(hfData);
       if (imagenUrl) {
@@ -182,5 +186,5 @@ Responde SOLO en JSON: {"aprobado":true,"notas":"breve observación"}`,
   }
 
   const { data: final } = await supabase.from('social_posts').select('*').eq('id', id).single();
-  return res.status(200).json(final);
+  return res.status(200).json({ ...final, _hf_debug: typeof hfData !== 'undefined' ? hfData : undefined });
 }
