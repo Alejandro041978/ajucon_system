@@ -12,11 +12,73 @@
     .back-btn:hover { background: var(--surface2); }
     header h2 { font-size: 1rem; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    main { max-width: 680px; margin: 0 auto; padding: 32px 24px; }
+    main { max-width: 860px; margin: 0 auto; padding: 32px 24px; }
 
     .hero { background: linear-gradient(135deg, #d97706, #f59e0b); border-radius: var(--radius); padding: 28px; color: white; margin-bottom: 28px; }
     .hero h1 { font-size: 1.4rem; margin-bottom: 6px; }
     .hero p { font-size: .9rem; opacity: .9; line-height: 1.5; }
+
+    /* ===== Pantalla selección ===== */
+    #screen-seleccion { }
+
+    .becas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+
+    .beca-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      padding: 24px;
+      transition: border-color .2s, box-shadow .2s;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .beca-card:hover { border-color: #d97706; box-shadow: 0 4px 20px rgba(217,119,6,.15); }
+
+    .beca-nombre { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .beca-institucion { font-size: .82rem; color: #d97706; font-weight: 600; margin-bottom: 16px; }
+
+    .beca-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin-bottom: 16px; }
+    .beca-info-item { }
+    .beca-info-label { font-size: .72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+    .beca-info-value { font-size: .88rem; color: var(--text); font-weight: 500; }
+    .beca-info-value.highlight { color: #d97706; font-weight: 700; }
+
+    .beca-divider { border: none; border-top: 1px solid var(--border); margin: 0 0 14px; }
+
+    .beca-texto-label { font-size: .72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+    .beca-texto { font-size: .85rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 14px; }
+
+    .btn-postular {
+      margin-top: auto;
+      width: 100%; padding: 12px;
+      background: #d97706; color: white;
+      border: none; border-radius: 10px;
+      font-size: .95rem; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-postular:hover { background: #b45309; }
+
+    .sin-becas { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: .95rem; }
+
+    /* ===== Pantalla formulario ===== */
+    #screen-form-wrap { display: none; }
+
+    .btn-volver-seleccion {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text-muted); border-radius: 8px;
+      padding: 8px 14px; font-size: .85rem; cursor: pointer;
+      margin-bottom: 20px; transition: color .2s, border-color .2s;
+    }
+    .btn-volver-seleccion:hover { color: var(--text); border-color: var(--text-muted); }
+
+    .beca-seleccionada-badge {
+      background: #fef3c7; border: 1px solid #fcd34d;
+      border-radius: 10px; padding: 12px 16px;
+      margin-bottom: 24px; font-size: .88rem; color: #92400e;
+      line-height: 1.5;
+    }
+    [data-theme="dark"] .beca-seleccionada-badge { background: #3b2f00; border-color: #78350f; color: #fcd34d; }
+    .beca-seleccionada-badge strong { display: block; font-size: .95rem; margin-bottom: 2px; }
 
     .card { background: var(--surface); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: var(--transition); }
     .section-title { font-size: .8rem; font-weight: 700; color: #d97706; text-transform: uppercase; letter-spacing: .05em; margin: 24px 0 16px; }
@@ -54,13 +116,15 @@
     .msg { margin-top: 16px; padding: 12px; border-radius: var(--radius-sm); font-size: .9rem; display: none; }
     .msg.err { background: #fee2e2; color: #991b1b; display: block; }
     [data-theme="dark"] .msg.err { background: #450a0a; color: #fca5a5; }
+
+    .loading { text-align: center; padding: 60px; color: var(--text-muted); }
   </style>
 </head>
 <body>
 
 <header>
-  <button class="back-btn" onclick="window.location.href='/dashboard.html'">←</button>
-  <h2>Postulación a Becas de Estudios Profesionales</h2>
+  <button class="back-btn" id="btn-back" onclick="volverAtras()">←</button>
+  <h2 id="header-title">Becas de Estudios Profesionales</h2>
   <div class="user-chip">
     <span class="chip-grado" id="h-grado"></span>
     <div class="chip-avatar" id="h-avatar"></div>
@@ -73,134 +137,129 @@
 <main>
   <div class="hero">
     <h1>🎓 Becas de Estudios Profesionales</h1>
-    <p>Postula a becas para financiar tus estudios universitarios o técnico-profesionales. Revisaremos tu solicitud y te contactaremos por email.</p>
+    <p id="hero-desc">Conoce las becas disponibles y postula en línea. Revisaremos tu solicitud y te contactaremos por email.</p>
   </div>
 
-  <div class="card">
-    <div id="screen-form">
-      <div class="info-box">
-        <strong>📋 Requisitos generales</strong>
-        Ser estudiante de 4° o 5° de secundaria · Promedio de notas ≥ 14 · Situación socioeconómica vulnerable · Residencia en Perú
-      </div>
+  <!-- Pantalla 1: Selección de beca -->
+  <div id="screen-seleccion">
+    <div id="becas-container" class="loading">Cargando becas disponibles...</div>
+  </div>
 
-      <form id="form-beca" onsubmit="enviarPostulacion(event)">
+  <!-- Pantalla 2: Formulario de postulación -->
+  <div id="screen-form-wrap">
+    <button class="btn-volver-seleccion" onclick="volverSeleccion()">← Volver a becas disponibles</button>
 
-        <div class="section-title">Datos personales</div>
-        <div class="grid2">
-          <div class="field">
-            <label>DNI</label>
-            <input type="text" id="rut" placeholder="12345678" maxlength="8" required />
+    <div class="beca-seleccionada-badge" id="badge-beca-seleccionada"></div>
+
+    <div class="card">
+      <div id="screen-form">
+        <div class="info-box">
+          <strong>📋 Requisitos generales</strong>
+          Ser estudiante de 4° o 5° de secundaria · Promedio de notas ≥ 14 · Situación socioeconómica vulnerable · Residencia en Perú
+        </div>
+
+        <form id="form-beca" onsubmit="enviarPostulacion(event)">
+          <input type="hidden" id="campo-beca-id" />
+          <input type="hidden" id="campo-beca-nombre" />
+
+          <div class="section-title">Datos personales</div>
+          <div class="grid2">
+            <div class="field">
+              <label>DNI</label>
+              <input type="text" id="rut" placeholder="12345678" maxlength="8" required />
+            </div>
+            <div class="field">
+              <label>Fecha de nacimiento</label>
+              <input type="date" id="fecha_nacimiento" required />
+            </div>
           </div>
           <div class="field">
-            <label>Fecha de nacimiento</label>
-            <input type="date" id="fecha_nacimiento" required />
-          </div>
-        </div>
-        <div class="field">
-          <label>Dirección</label>
-          <input type="text" id="direccion" placeholder="Calle, número" required />
-        </div>
-        <div class="field">
-          <label>Ciudad / Región</label>
-          <select id="region" required>
-            <option value="">Selecciona tu ciudad</option>
-            <option>Amazonas</option>
-            <option>Áncash</option>
-            <option>Apurímac</option>
-            <option>Arequipa</option>
-            <option>Ayacucho</option>
-            <option>Cajamarca</option>
-            <option>Callao</option>
-            <option>Cusco</option>
-            <option>Huancavelica</option>
-            <option>Huánuco</option>
-            <option>Ica</option>
-            <option>Junín</option>
-            <option>La Libertad</option>
-            <option>Lambayeque</option>
-            <option>Lima</option>
-            <option>Loreto</option>
-            <option>Madre de Dios</option>
-            <option>Moquegua</option>
-            <option>Pasco</option>
-            <option>Piura</option>
-            <option>Puno</option>
-            <option>San Martín</option>
-            <option>Tacna</option>
-            <option>Tumbes</option>
-            <option>Ucayali</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Teléfono de contacto</label>
-          <input type="tel" id="telefono" placeholder="9XXXXXXXX" maxlength="9" required />
-        </div>
-
-        <div class="section-title">Modalidad de estudio</div>
-        <div class="field" style="max-width:50%">
-          <label>Modalidad de interés</label>
-          <select id="modalidad" required>
-            <option value="">Selecciona</option>
-            <option value="Online">Online</option>
-            <option value="Presencial">Presencial</option>
-          </select>
-        </div>
-
-        <div class="section-title">Estudios de interés</div>
-        <div class="field">
-          <label>Tipo de institución</label>
-          <select id="tipo_institucion" required>
-            <option value="">Selecciona</option>
-            <option>Instituto Superior Licenciado</option>
-            <option>Universidad Licenciada</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Carrera o programa de interés</label>
-          <select id="carrera_interes" required>
-            <option value="">Selecciona</option>
-            <option>Administración</option>
-            <option>Contabilidad</option>
-            <option>Enfermería</option>
-            <option>Farmacia</option>
-            <option>Marketing</option>
-            <option>Computación</option>
-          </select>
-        </div>
-
-        <div class="section-title">Situación académica y socioeconómica</div>
-        <div class="grid2">
-          <div class="field">
-            <label>Promedio de notas (escala 0-20)</label>
-            <input type="number" id="promedio_notas" min="0" max="20" step="0.1" placeholder="15.5" required />
+            <label>Dirección</label>
+            <input type="text" id="direccion" placeholder="Calle, número" required />
           </div>
           <div class="field">
-            <label>Situación económica familiar</label>
-            <select id="situacion_economica" required>
-              <option value="">Selecciona</option>
-              <option>Muy vulnerable</option>
-              <option>Vulnerable</option>
-              <option>Media-baja</option>
+            <label>Ciudad / Región</label>
+            <select id="region" required>
+              <option value="">Selecciona tu ciudad</option>
+              <option>Amazonas</option><option>Áncash</option><option>Apurímac</option>
+              <option>Arequipa</option><option>Ayacucho</option><option>Cajamarca</option>
+              <option>Callao</option><option>Cusco</option><option>Huancavelica</option>
+              <option>Huánuco</option><option>Ica</option><option>Junín</option>
+              <option>La Libertad</option><option>Lambayeque</option><option>Lima</option>
+              <option>Loreto</option><option>Madre de Dios</option><option>Moquegua</option>
+              <option>Pasco</option><option>Piura</option><option>Puno</option>
+              <option>San Martín</option><option>Tacna</option><option>Tumbes</option>
+              <option>Ucayali</option>
             </select>
           </div>
-        </div>
+          <div class="field">
+            <label>Teléfono de contacto</label>
+            <input type="tel" id="telefono" placeholder="9XXXXXXXX" maxlength="9" required />
+          </div>
 
-        <div class="section-title">Carta de motivación</div>
-        <div class="field">
-          <label>¿Por qué postulas a esta beca y qué harás con ella?</label>
-          <textarea id="motivacion" placeholder="Cuéntanos sobre tus metas, tu situación y cómo esta beca cambiaría tu futuro..." required></textarea>
-        </div>
+          <div class="section-title">Modalidad de estudio</div>
+          <div class="field" style="max-width:50%">
+            <label>Modalidad de interés</label>
+            <select id="modalidad" required>
+              <option value="">Selecciona</option>
+              <option value="Online">Online</option>
+              <option value="Presencial">Presencial</option>
+            </select>
+          </div>
 
-        <button type="submit" id="btn-enviar">Enviar postulación</button>
-        <div class="msg" id="msg-error"></div>
-      </form>
-    </div>
+          <div class="section-title">Estudios de interés</div>
+          <div class="field">
+            <label>Tipo de institución</label>
+            <select id="tipo_institucion" required>
+              <option value="">Selecciona</option>
+              <option>Instituto Superior Licenciado</option>
+              <option>Universidad Licenciada</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Carrera o programa de interés</label>
+            <select id="carrera_interes" required>
+              <option value="">Selecciona</option>
+              <option>Administración</option><option>Contabilidad</option>
+              <option>Enfermería</option><option>Farmacia</option>
+              <option>Marketing</option><option>Computación</option>
+            </select>
+          </div>
 
-    <div id="screen-exito">
-      <div class="icon">✅</div>
-      <h2>¡Postulación enviada!</h2>
-      <p>Hemos recibido tu postulación. Revisaremos tu solicitud y te contactaremos al email registrado en un plazo de <strong>5 a 10 días hábiles</strong>.</p>
-      <a href="/dashboard.html" class="btn-dashboard">Volver al inicio</a>
+          <div class="section-title">Situación académica y socioeconómica</div>
+          <div class="grid2">
+            <div class="field">
+              <label>Promedio de notas (escala 0-20)</label>
+              <input type="number" id="promedio_notas" min="0" max="20" step="0.1" placeholder="15.5" required />
+            </div>
+            <div class="field">
+              <label>Situación económica familiar</label>
+              <select id="situacion_economica" required>
+                <option value="">Selecciona</option>
+                <option>Muy vulnerable</option>
+                <option>Vulnerable</option>
+                <option>Media-baja</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-title">Carta de motivación</div>
+          <div class="field">
+            <label>¿Por qué postulas a esta beca y qué harás con ella?</label>
+            <textarea id="motivacion" placeholder="Cuéntanos sobre tus metas, tu situación y cómo esta beca cambiaría tu futuro..." required></textarea>
+          </div>
+
+          <button type="submit" id="btn-enviar">Enviar postulación</button>
+          <div class="msg" id="msg-error"></div>
+        </form>
+      </div>
+
+      <div id="screen-exito">
+        <div class="icon">✅</div>
+        <h2>¡Postulación enviada!</h2>
+        <p>Hemos recibido tu postulación. Revisaremos tu solicitud y te contactaremos al email registrado en un plazo de <strong>5 a 10 días hábiles</strong>.</p>
+        <a href="/dashboard.html" class="btn-dashboard">Volver al inicio</a>
+      </div>
     </div>
   </div>
 </main>
@@ -222,6 +281,89 @@
     window.location.href = '/index.html';
   }
 
+  function volverAtras() {
+    const formWrap = document.getElementById('screen-form-wrap');
+    if (formWrap.style.display !== 'none' && formWrap.style.display !== '') {
+      volverSeleccion();
+    } else {
+      window.location.href = '/dashboard.html';
+    }
+  }
+
+  function formatMonto(n) {
+    if (!n) return '—';
+    return 'S/ ' + Number(n).toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  }
+
+  function formatFecha(f) {
+    if (!f) return '—';
+    const d = new Date(f + 'T00:00:00');
+    return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  async function cargarBecas() {
+    const container = document.getElementById('becas-container');
+    try {
+      const r = await fetch('/api/becas/disponibles');
+      const becas = await r.json();
+
+      if (!becas.length) {
+        container.className = '';
+        container.innerHTML = '<div class="sin-becas">No hay becas disponibles en este momento.<br>Por favor, vuelve pronto.</div>';
+        return;
+      }
+
+      container.className = 'becas-grid';
+      container.innerHTML = becas.map(b => `
+        <div class="beca-card">
+          <div class="beca-nombre">${b.nombre}</div>
+          <div class="beca-institucion">🏛️ ${b.institucion}</div>
+          <div class="beca-info">
+            <div class="beca-info-item">
+              <div class="beca-info-label">Vacantes disponibles</div>
+              <div class="beca-info-value highlight">${b.cantidad_disponible ?? '—'}</div>
+            </div>
+            <div class="beca-info-item">
+              <div class="beca-info-label">Monto total</div>
+              <div class="beca-info-value highlight">${formatMonto(b.monto_total)}</div>
+            </div>
+            <div class="beca-info-item">
+              <div class="beca-info-label">Vigencia</div>
+              <div class="beca-info-value">${formatFecha(b.vigencia)}</div>
+            </div>
+          </div>
+          <hr class="beca-divider" />
+          ${b.beneficio ? `<div class="beca-texto-label">Beneficio</div><div class="beca-texto">${b.beneficio}</div>` : ''}
+          ${b.condicion_requisitos ? `<div class="beca-texto-label">Condición / Requisitos</div><div class="beca-texto">${b.condicion_requisitos}</div>` : ''}
+          <button class="btn-postular" onclick="seleccionarBeca('${b.id}', ${JSON.stringify(b.nombre)}, ${JSON.stringify(b.institucion)})">Postular →</button>
+        </div>
+      `).join('');
+    } catch {
+      container.className = '';
+      container.innerHTML = '<div class="sin-becas">Error al cargar becas. Intenta de nuevo.</div>';
+    }
+  }
+
+  function seleccionarBeca(id, nombre, institucion) {
+    document.getElementById('campo-beca-id').value = id;
+    document.getElementById('campo-beca-nombre').value = nombre;
+
+    document.getElementById('badge-beca-seleccionada').innerHTML =
+      `<strong>🎓 ${nombre}</strong>Institución: ${institucion}`;
+
+    document.getElementById('screen-seleccion').style.display = 'none';
+    document.getElementById('screen-form-wrap').style.display = 'block';
+    document.getElementById('header-title').textContent = 'Postulación — ' + nombre;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function volverSeleccion() {
+    document.getElementById('screen-form-wrap').style.display = 'none';
+    document.getElementById('screen-seleccion').style.display = 'block';
+    document.getElementById('header-title').textContent = 'Becas de Estudios Profesionales';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   async function enviarPostulacion(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-enviar');
@@ -229,6 +371,8 @@
     btn.textContent = 'Enviando...';
 
     const body = {
+      beca_id: document.getElementById('campo-beca-id').value || null,
+      beca_nombre: document.getElementById('campo-beca-nombre').value || null,
       rut: document.getElementById('rut').value,
       fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
       direccion: document.getElementById('direccion').value,
@@ -260,6 +404,8 @@
       btn.textContent = 'Enviar postulación';
     }
   }
+
+  cargarBecas();
 </script>
 </body>
 </html>

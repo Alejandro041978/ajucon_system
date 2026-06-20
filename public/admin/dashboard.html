@@ -158,6 +158,7 @@
   <div class="nav-item active" onclick="setSeccion('stats', this)">📊 Resumen</div>
   <div class="nav-item" onclick="setSeccion('users', this)">👤 Usuarios</div>
   <div class="nav-item" id="nav-admins" style="display:none" onclick="setSeccion('admins', this)">🔐 Administradores</div>
+  <div class="nav-item" onclick="setSeccion('becas_disponibles', this)">🏷️ Becas Disponibles</div>
   <div class="nav-item" onclick="setSeccion('becas_profesionales', this)">🎓 Becas Profesionales</div>
   <div class="nav-item" onclick="setSeccion('becas_cursos', this)">💻 Becas Cursos</div>
   <div class="nav-item" onclick="setSeccion('gestion_cursos', this)">⚙️ Gestión de Cursos</div>
@@ -203,6 +204,72 @@
         <thead><tr><th>Nombre</th><th>Apellido</th><th>Email</th><th>Grado</th><th>Colegio</th><th>Ciudad</th><th>Registro</th><th></th></tr></thead>
         <tbody id="tbody-users"><tr><td colspan="6" class="empty">Cargando...</td></tr></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Becas Disponibles -->
+  <div class="section" id="sec-becas_disponibles">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <h2 style="margin:0">Becas Disponibles</h2>
+      <button onclick="abrirModalBeca()" style="padding:9px 20px;background:#d97706;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">+ Nueva beca</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Nombre</th><th>Institución</th><th>Vacantes</th><th>Monto total</th>
+          <th>Vigencia</th><th>Estado</th><th>Acciones</th>
+        </tr></thead>
+        <tbody id="tbody-becas_disponibles"><tr><td colspan="7" class="empty">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Beca Disponible -->
+  <div id="beca-overlay" onclick="cerrarModalBeca()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200"></div>
+  <div id="beca-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:201;background:#1e293b;border:1px solid #2d3748;border-radius:16px;padding:28px;width:600px;max-width:95vw;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 id="beca-modal-titulo" style="margin:0;color:#f1f5f9;font-size:1.05rem">Nueva beca</h3>
+      <button onclick="cerrarModalBeca()" style="background:none;border:none;color:#64748b;font-size:1.3rem;cursor:pointer;line-height:1">×</button>
+    </div>
+    <input type="hidden" id="beca-id">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div style="grid-column:1/-1">
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">NOMBRE DE LA BECA *</label>
+        <input id="beca-nombre" type="text" placeholder="Ej: Beca Excelencia Académica 2025" style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;box-sizing:border-box" />
+      </div>
+      <div style="grid-column:1/-1">
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">INSTITUCIÓN EDUCATIVA *</label>
+        <input id="beca-institucion" type="text" placeholder="Ej: Instituto Neumann" style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;box-sizing:border-box" />
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">VACANTES DISPONIBLES</label>
+        <input id="beca-cantidad" type="number" min="0" placeholder="10" style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;box-sizing:border-box" />
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">MONTO TOTAL (S/)</label>
+        <input id="beca-monto" type="number" min="0" step="0.01" placeholder="5000" style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;box-sizing:border-box" />
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">VIGENCIA (FECHA LÍMITE)</label>
+        <input id="beca-vigencia" type="date" style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;box-sizing:border-box" />
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">ORDEN</label>
+        <input id="beca-orden" type="number" min="1" max="99" placeholder="1" style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;box-sizing:border-box" />
+      </div>
+      <div style="grid-column:1/-1">
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">BENEFICIO DE LA BECA</label>
+        <textarea id="beca-beneficio" rows="2" placeholder="Ej: Cobertura total de matrícula y pensiones durante 2 años..." style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;resize:vertical;box-sizing:border-box"></textarea>
+      </div>
+      <div style="grid-column:1/-1">
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">CONDICIÓN / REQUISITOS</label>
+        <textarea id="beca-condicion" rows="2" placeholder="Ej: Promedio mínimo 15, residencia en Tacna, situación socioeconómica vulnerable..." style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;resize:vertical;box-sizing:border-box"></textarea>
+      </div>
+    </div>
+    <div id="beca-modal-msg" style="display:none;margin-bottom:12px;font-size:.84rem;padding:8px 12px;border-radius:6px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="cerrarModalBeca()" style="padding:9px 18px;background:none;border:1px solid #2d3748;border-radius:8px;color:#64748b;font-size:.85rem;cursor:pointer">Cancelar</button>
+      <button onclick="guardarBeca()" style="padding:9px 20px;background:#d97706;color:white;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer">Guardar</button>
     </div>
   </div>
 
@@ -1747,7 +1814,103 @@
     el.textContent = txt;
   }
 
-  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos, redes_sociales:cargarRedesSociales, temas_auto:cargarTemasAuto };
+  /* ===== Becas Disponibles ===== */
+  async function cargarBecasDisponibles() {
+    const tbody = document.getElementById('tbody-becas_disponibles');
+    const r = await fetch('/api/becas/disponibles', { headers: { 'Authorization': 'Bearer ' + token } });
+    const becas = await r.json();
+    if (!becas.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No hay becas registradas.</td></tr>'; return; }
+    tbody.innerHTML = becas.map(b => `
+      <tr>
+        <td><strong>${b.nombre}</strong></td>
+        <td>${b.institucion}</td>
+        <td style="text-align:center">${b.cantidad_disponible ?? '—'}</td>
+        <td>${b.monto_total ? 'S/ ' + Number(b.monto_total).toLocaleString('es-PE') : '—'}</td>
+        <td>${b.vigencia ? new Date(b.vigencia+'T00:00:00').toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
+        <td>
+          <span style="cursor:pointer;font-size:.82rem;padding:3px 10px;border-radius:20px;font-weight:600;${b.activo ? 'background:#14532d;color:#86efac' : 'background:#374151;color:#9ca3af'}"
+            onclick="toggleBeca('${b.id}',${b.activo})">${b.activo ? 'Activa' : 'Inactiva'}</span>
+        </td>
+        <td style="white-space:nowrap">
+          <button onclick="editarBeca(${JSON.stringify(JSON.stringify(b))})" style="background:none;border:1px solid #2d3748;color:#94a3b8;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer;margin-right:4px">Editar</button>
+          <button onclick="borrarBeca('${b.id}')" style="background:none;border:1px solid #450a0a;color:#fca5a5;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer">Eliminar</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  function abrirModalBeca(b = null) {
+    document.getElementById('beca-modal-titulo').textContent = b ? 'Editar beca' : 'Nueva beca';
+    document.getElementById('beca-id').value = b?.id || '';
+    document.getElementById('beca-nombre').value = b?.nombre || '';
+    document.getElementById('beca-institucion').value = b?.institucion || '';
+    document.getElementById('beca-cantidad').value = b?.cantidad_disponible ?? '';
+    document.getElementById('beca-monto').value = b?.monto_total ?? '';
+    document.getElementById('beca-vigencia').value = b?.vigencia || '';
+    document.getElementById('beca-orden').value = b?.orden ?? 99;
+    document.getElementById('beca-beneficio').value = b?.beneficio || '';
+    document.getElementById('beca-condicion').value = b?.condicion_requisitos || '';
+    document.getElementById('beca-modal-msg').style.display = 'none';
+    document.getElementById('beca-overlay').style.display = 'block';
+    document.getElementById('beca-modal').style.display = 'block';
+  }
+
+  function cerrarModalBeca() {
+    document.getElementById('beca-overlay').style.display = 'none';
+    document.getElementById('beca-modal').style.display = 'none';
+  }
+
+  function editarBeca(jsonStr) {
+    abrirModalBeca(JSON.parse(jsonStr));
+  }
+
+  async function guardarBeca() {
+    const id = document.getElementById('beca-id').value;
+    const body = {
+      id: id || undefined,
+      nombre: document.getElementById('beca-nombre').value.trim(),
+      institucion: document.getElementById('beca-institucion').value.trim(),
+      cantidad_disponible: parseInt(document.getElementById('beca-cantidad').value) || null,
+      monto_total: parseFloat(document.getElementById('beca-monto').value) || null,
+      vigencia: document.getElementById('beca-vigencia').value || null,
+      orden: parseInt(document.getElementById('beca-orden').value) || 99,
+      beneficio: document.getElementById('beca-beneficio').value.trim() || null,
+      condicion_requisitos: document.getElementById('beca-condicion').value.trim() || null,
+      activo: true,
+    };
+    if (!body.nombre || !body.institucion) {
+      const el = document.getElementById('beca-modal-msg');
+      el.style.display = 'block'; el.style.background = '#7f1d1d'; el.style.color = '#fca5a5';
+      el.textContent = 'Nombre e institución son requeridos.'; return;
+    }
+    const method = id ? 'PUT' : 'POST';
+    const r = await fetch('/api/becas/disponibles', {
+      method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(body),
+    });
+    if (r.ok) { cerrarModalBeca(); cargarBecasDisponibles(); }
+    else {
+      const d = await r.json();
+      const el = document.getElementById('beca-modal-msg');
+      el.style.display = 'block'; el.style.background = '#7f1d1d'; el.style.color = '#fca5a5';
+      el.textContent = d.error || 'Error al guardar.';
+    }
+  }
+
+  async function toggleBeca(id, activo) {
+    await fetch('/api/becas/disponibles', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ id, activo: !activo }),
+    });
+    cargarBecasDisponibles();
+  }
+
+  async function borrarBeca(id) {
+    if (!confirm('¿Eliminar esta beca? También afectará las postulaciones asociadas.')) return;
+    await fetch(`/api/becas/disponibles?id=${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+    cargarBecasDisponibles();
+  }
+
+  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_disponibles:cargarBecasDisponibles, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos, redes_sociales:cargarRedesSociales, temas_auto:cargarTemasAuto };
   const loaded = new Set();
 
   function setSeccion(sec, el) {

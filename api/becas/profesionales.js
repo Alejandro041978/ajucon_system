@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Token inválido.' });
   }
 
-  const { rut, fecha_nacimiento, direccion, telefono, tipo_institucion, carrera_interes, modalidad, region, promedio_notas, situacion_economica, motivacion } = req.body;
+  const { rut, fecha_nacimiento, direccion, telefono, tipo_institucion, carrera_interes, modalidad, region, promedio_notas, situacion_economica, motivacion, beca_id, beca_nombre } = req.body;
 
   if (!rut || !fecha_nacimiento || !direccion || !telefono || !tipo_institucion || !carrera_interes || !modalidad || !promedio_notas || !situacion_economica || !motivacion) {
     return res.status(400).json({ error: 'Todos los campos son requeridos.' });
@@ -37,6 +37,8 @@ export default async function handler(req, res) {
     rut, fecha_nacimiento, direccion, telefono,
     tipo_institucion, carrera_interes, modalidad, region: region || null,
     promedio_notas, situacion_economica, motivacion,
+    beca_id: beca_id || null,
+    beca_nombre: beca_nombre || null,
   });
 
   if (error) return res.status(500).json({ error: 'Error al guardar la postulación.' });
@@ -57,6 +59,7 @@ export default async function handler(req, res) {
         <table style="width:100%;border-collapse:collapse;font-size:14px">
           <tr><td style="padding:8px 0;color:#64748b;width:40%">Nombre</td><td style="padding:8px 0;color:#1e293b;font-weight:600">${usuario?.nombre || '—'}</td></tr>
           <tr><td style="padding:8px 0;color:#64748b">Email</td><td style="padding:8px 0;color:#1e293b">${usuario?.email || '—'}</td></tr>
+          ${beca_nombre ? `<tr><td style="padding:8px 0;color:#64748b;font-weight:700">Beca postulada</td><td style="padding:8px 0;color:#d97706;font-weight:700">${beca_nombre}</td></tr>` : ''}
           <tr><td style="padding:8px 0;color:#64748b">DNI</td><td style="padding:8px 0;color:#1e293b">${rut}</td></tr>
           <tr><td style="padding:8px 0;color:#64748b">Fecha de nacimiento</td><td style="padding:8px 0;color:#1e293b">${fecha_nacimiento}</td></tr>
           <tr><td style="padding:8px 0;color:#64748b">Dirección</td><td style="padding:8px 0;color:#1e293b">${direccion}</td></tr>
