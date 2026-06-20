@@ -265,6 +265,14 @@
         <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">CONDICIÓN / REQUISITOS</label>
         <textarea id="beca-condicion" rows="2" placeholder="Ej: Promedio mínimo 15, residencia en Tacna, situación socioeconómica vulnerable..." style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;resize:vertical;box-sizing:border-box"></textarea>
       </div>
+      <div style="grid-column:1/-1">
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">CARRERAS DISPONIBLES</label>
+        <textarea id="beca-carreras" rows="2" placeholder="Ej: Administración, Contabilidad, Enfermería, Computación..." style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;resize:vertical;box-sizing:border-box"></textarea>
+      </div>
+      <div style="grid-column:1/-1">
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">MODALIDAD DE ESTUDIOS</label>
+        <input id="beca-modalidad" type="text" placeholder="Ej: Presencial, Online, Híbrida" style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;box-sizing:border-box" />
+      </div>
     </div>
     <div id="beca-modal-msg" style="display:none;margin-bottom:12px;font-size:.84rem;padding:8px 12px;border-radius:6px"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
@@ -1852,6 +1860,8 @@
     document.getElementById('beca-orden').value = b?.orden ?? 99;
     document.getElementById('beca-beneficio').value = b?.beneficio || '';
     document.getElementById('beca-condicion').value = b?.condicion_requisitos || '';
+    document.getElementById('beca-carreras').value = b?.carreras_disponibles || '';
+    document.getElementById('beca-modalidad').value = b?.modalidad_estudios || '';
     document.getElementById('beca-modal-msg').style.display = 'none';
     document.getElementById('beca-overlay').style.display = 'block';
     document.getElementById('beca-modal').style.display = 'block';
@@ -1878,6 +1888,8 @@
       orden: parseInt(document.getElementById('beca-orden').value) || 99,
       beneficio: document.getElementById('beca-beneficio').value.trim() || null,
       condicion_requisitos: document.getElementById('beca-condicion').value.trim() || null,
+      carreras_disponibles: document.getElementById('beca-carreras').value.trim() || null,
+      modalidad_estudios: document.getElementById('beca-modalidad').value.trim() || null,
       activo: true,
     };
     if (!body.nombre || !body.institucion) {

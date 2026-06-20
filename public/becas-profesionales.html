@@ -337,6 +337,8 @@
             </div>
           </div>
           <hr class="beca-divider" />
+          ${b.modalidad_estudios ? `<div class="beca-texto-label">Modalidad de estudios</div><div class="beca-texto">${b.modalidad_estudios}</div>` : ''}
+          ${b.carreras_disponibles ? `<div class="beca-texto-label">Carreras disponibles</div><div class="beca-texto">${b.carreras_disponibles}</div>` : ''}
           ${b.beneficio ? `<div class="beca-texto-label">Beneficio</div><div class="beca-texto">${b.beneficio}</div>` : ''}
           ${b.condicion_requisitos ? `<div class="beca-texto-label">Condición / Requisitos</div><div class="beca-texto">${b.condicion_requisitos}</div>` : ''}
           <button class="btn-postular" onclick="seleccionarBeca('${b.id}')">Postular →</button>
