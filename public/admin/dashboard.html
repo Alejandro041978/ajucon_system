@@ -58,6 +58,9 @@
     }
     .stat-card .num { font-size: 2rem; font-weight: 800; color: #818cf8; }
     .stat-card .label { font-size: .8rem; color: var(--text-muted); margin-top: 4px; }
+    .btn-periodo { padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);cursor:pointer;font-size:.8rem;transition:all .2s; }
+    .btn-periodo:hover { border-color:#818cf8;color:#818cf8; }
+    .btn-periodo-active { border-color:#818cf8 !important;background:#818cf8 !important;color:#fff !important; }
 
     /* Tabla */
     .table-wrap {
@@ -173,7 +176,14 @@
 
   <!-- Resumen -->
   <div class="section active" id="sec-stats">
-    <h2>Resumen general</h2>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+      <h2 style="margin:0;">Resumen general</h2>
+      <div style="display:flex;gap:6px;margin-left:auto;">
+        <button id="btn-periodo-semana" onclick="setPeriodo('semana')" class="btn-periodo">Esta semana</button>
+        <button id="btn-periodo-mes" onclick="setPeriodo('mes')" class="btn-periodo">Este mes</button>
+        <button id="btn-periodo-acumulado" onclick="setPeriodo('acumulado')" class="btn-periodo btn-periodo-active">Acumulado</button>
+      </div>
+    </div>
     <div class="stats" id="stats-grid">
       <div class="stat-card"><div class="num" id="stat-usuarios">—</div><div class="label">Usuarios registrados</div></div>
       <div class="stat-card"><div class="num" id="stat-bp">—</div><div class="label">Becas Profesionales</div></div>
@@ -760,8 +770,20 @@
     </select>`;
   }
 
+  let statsPeriodo = 'acumulado';
+
+  function setPeriodo(p) {
+    statsPeriodo = p;
+    document.querySelectorAll('.btn-periodo').forEach(b => b.classList.remove('btn-periodo-active'));
+    document.getElementById(`btn-periodo-${p}`).classList.add('btn-periodo-active');
+    cargarStats();
+  }
+
   async function cargarStats() {
-    const d = await api('stats'); if (!d) return;
+    ['stat-usuarios','stat-bp','stat-bc','stat-tr','stat-rv','stat-sm','stat-sa'].forEach(id => {
+      document.getElementById(id).textContent = '…';
+    });
+    const d = await api(`stats&periodo=${statsPeriodo}`); if (!d) return;
     document.getElementById('stat-usuarios').textContent = d.usuarios ?? 0;
     document.getElementById('stat-bp').textContent = d.becas_profesionales ?? 0;
     document.getElementById('stat-bc').textContent = d.becas_cursos ?? 0;

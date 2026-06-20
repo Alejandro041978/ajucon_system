@@ -70,14 +70,40 @@ export default async function handler(req, res) {
   }
 
   if (seccion === 'stats') {
+    const { periodo } = req.query; // 'semana' | 'mes' | 'acumulado'
+
+    // Calcular fecha de inicio según periodo (zona horaria Lima UTC-5)
+    let desde = null;
+    if (periodo === 'semana' || periodo === 'mes') {
+      const now = new Date();
+      // Ajustar a Lima (UTC-5)
+      const lima = new Date(now.getTime() - 5 * 60 * 60 * 1000);
+      if (periodo === 'semana') {
+        // Lunes de la semana vigente
+        const day = lima.getUTCDay(); // 0=dom,1=lun...6=sab
+        const diffToMonday = (day === 0 ? -6 : 1 - day);
+        const monday = new Date(lima);
+        monday.setUTCDate(lima.getUTCDate() + diffToMonday);
+        monday.setUTCHours(0, 0, 0, 0);
+        desde = monday.toISOString();
+      } else {
+        // Primer día del mes actual
+        desde = new Date(Date.UTC(lima.getUTCFullYear(), lima.getUTCMonth(), 1)).toISOString();
+      }
+    }
+
+    function applyDesde(query, col = 'created_at') {
+      return desde ? query.gte(col, desde) : query;
+    }
+
     const [u, bp, bc, tr, rv, spManual, spAuto] = await Promise.all([
-      supabase.from('users').select('id', { count: 'exact', head: true }),
-      supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }),
-      supabase.from('inscripciones_cursos').select('id', { count: 'exact', head: true }),
-      supabase.from('test_results').select('id', { count: 'exact', head: true }),
-      supabase.from('reportes_vocacionales').select('id', { count: 'exact', head: true }),
-      supabase.from('social_posts').select('id', { count: 'exact', head: true }).eq('estado', 'publicado').neq('creado_por', 'auto'),
-      supabase.from('social_posts').select('id', { count: 'exact', head: true }).eq('estado', 'publicado').eq('creado_por', 'auto'),
+      applyDesde(supabase.from('users').select('id', { count: 'exact', head: true })),
+      applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true })),
+      applyDesde(supabase.from('inscripciones_cursos').select('id', { count: 'exact', head: true })),
+      applyDesde(supabase.from('test_results').select('id', { count: 'exact', head: true })),
+      applyDesde(supabase.from('reportes_vocacionales').select('id', { count: 'exact', head: true })),
+      applyDesde(supabase.from('social_posts').select('id', { count: 'exact', head: true }).eq('estado', 'publicado').neq('creado_por', 'auto'), 'publicado_en'),
+      applyDesde(supabase.from('social_posts').select('id', { count: 'exact', head: true }).eq('estado', 'publicado').eq('creado_por', 'auto'), 'publicado_en'),
     ]);
     return res.status(200).json({
       usuarios: u.count,
@@ -87,6 +113,7 @@ export default async function handler(req, res) {
       reportes_ia: rv.count,
       social_manual: spManual.count,
       social_auto: spAuto.count,
+      periodo: periodo || 'acumulado',
     });
   }
 
