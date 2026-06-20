@@ -301,6 +301,8 @@
     return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
+  const _becasCache = {};
+
   async function cargarBecas() {
     const container = document.getElementById('becas-container');
     try {
@@ -312,6 +314,8 @@
         container.innerHTML = '<div class="sin-becas">No hay becas disponibles en este momento.<br>Por favor, vuelve pronto.</div>';
         return;
       }
+
+      becas.forEach(b => { _becasCache[b.id] = b; });
 
       container.className = 'becas-grid';
       container.innerHTML = becas.map(b => `
@@ -335,7 +339,7 @@
           <hr class="beca-divider" />
           ${b.beneficio ? `<div class="beca-texto-label">Beneficio</div><div class="beca-texto">${b.beneficio}</div>` : ''}
           ${b.condicion_requisitos ? `<div class="beca-texto-label">Condición / Requisitos</div><div class="beca-texto">${b.condicion_requisitos}</div>` : ''}
-          <button class="btn-postular" onclick="seleccionarBeca('${b.id}', ${JSON.stringify(b.nombre)}, ${JSON.stringify(b.institucion)})">Postular →</button>
+          <button class="btn-postular" onclick="seleccionarBeca('${b.id}')">Postular →</button>
         </div>
       `).join('');
     } catch {
@@ -344,12 +348,14 @@
     }
   }
 
-  function seleccionarBeca(id, nombre, institucion) {
-    document.getElementById('campo-beca-id').value = id;
-    document.getElementById('campo-beca-nombre').value = nombre;
+  function seleccionarBeca(id) {
+    const b = _becasCache[id];
+    if (!b) return;
+    document.getElementById('campo-beca-id').value = b.id;
+    document.getElementById('campo-beca-nombre').value = b.nombre;
 
     document.getElementById('badge-beca-seleccionada').innerHTML =
-      `<strong>🎓 ${nombre}</strong>Institución: ${institucion}`;
+      `<strong>🎓 ${b.nombre}</strong>Institución: ${b.institucion}`;
 
     document.getElementById('screen-seleccion').style.display = 'none';
     document.getElementById('screen-form-wrap').style.display = 'block';
