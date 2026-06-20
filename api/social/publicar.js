@@ -64,17 +64,19 @@ export default async function handler(req, res) {
   const providers = [];
   const redes = post.redes || [];
 
+  const captionFbIg = post.captions?.facebook_instagram || post.captions?.facebook || post.captions?.instagram || post.tema || '';
+
   if (redes.includes('facebook')) {
     providers.push({
       network: 'FACEBOOK',
-      text: post.captions?.facebook || '',
+      text: captionFbIg,
       ...(mediaUrl ? { media: [mediaUrl] } : {}),
     });
   }
   if (redes.includes('instagram')) {
     providers.push({
       network: 'INSTAGRAM',
-      text: post.captions?.instagram || '',
+      text: captionFbIg,
       ...(mediaUrl ? { media: [mediaUrl] } : {}),
     });
   }
@@ -89,7 +91,7 @@ export default async function handler(req, res) {
 
   const publishBody = {
     blogId: 6025050,
-    text: post.captions?.facebook || post.captions?.instagram || post.tema || '',
+    text: post.captions?.facebook_instagram || post.captions?.facebook || post.captions?.instagram || post.tema || '',
     publicationDate: { dateTime: scheduledAt },
     ...(mediaUrl ? { media: [mediaUrl] } : {}),
     providers,

@@ -52,8 +52,9 @@ AGENTE 1 - Social Director: Define el ángulo estratégico (objetivo: awareness,
 AGENTE 2 - Content Strategist: Brief ejecutivo: hook principal, mensaje clave, llamada a la acción y tono adecuado.
 
 AGENTE 3 - Copywriter: Copy adaptado por red social (SOLO para las redes en REDES OBJETIVO, deja vacío el resto):
-${redes.includes('facebook') ? '- facebook: hasta 500 caracteres. Tono profesional y cálido. Orientado a padres y jóvenes.' : ''}
-${redes.includes('instagram') ? '- instagram: hasta 300 caracteres + exactamente 6 hashtags relevantes en español peruano.' : ''}
+${(redes.includes('facebook') && redes.includes('instagram')) ? '- facebook_instagram: hasta 300 caracteres. Tono empático y cercano. Orientado a padres y jóvenes. Termina con exactamente 5 hashtags relevantes en español peruano.' : ''}
+${(redes.includes('facebook') && !redes.includes('instagram')) ? '- facebook: hasta 500 caracteres. Tono profesional y cálido. Orientado a padres y jóvenes.' : ''}
+${(!redes.includes('facebook') && redes.includes('instagram')) ? '- instagram: hasta 300 caracteres + exactamente 6 hashtags relevantes en español peruano.' : ''}
 ${redes.includes('tiktok') ? '- tiktok: máximo 150 caracteres. Gancho viral. Tono joven y directo. Hasta 2 emojis estratégicos.' : ''}
 ${redes.includes('youtube') ? '- youtube_titulo: máximo 60 caracteres. Llamativo para Shorts educativos.\n- youtube_descripcion: máximo 200 caracteres con llamada a la acción.' : ''}
 
@@ -64,6 +65,7 @@ Responde SOLO en JSON válido, sin texto adicional antes ni después:
   "estrategia": { "angulo": "", "objetivo": "", "audiencia": "" },
   "brief": { "hook": "", "mensaje_clave": "", "cta": "", "tono": "" },
   "captions": {
+    "facebook_instagram": "",
     "facebook": "",
     "instagram": "",
     "tiktok": "",
