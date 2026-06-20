@@ -89,6 +89,7 @@ Responde SOLO en JSON válido, sin texto adicional antes ni después:
 
   // Agente 5: higgsfield-creative-director → genera imagen con Soul
   let imagenRequestId = null;
+  let hfDebug = null;
   try {
     const hfRes = await fetch(`${HF_BASE}/v1/text2image/soul`, {
       method: 'POST',
@@ -100,17 +101,18 @@ Responde SOLO en JSON válido, sin texto adicional antes ni después:
           width_and_height: '1024x1024',
           batch_size: 1,
           enhance_prompt: true,
-          style_strength: 1,
         },
         webhook: null,
       }),
     });
     const hfData = await hfRes.json();
+    hfDebug = { status: hfRes.status, data: hfData };
     imagenRequestId = hfData.request_id || null;
     if (!imagenRequestId) {
-      console.error('Higgsfield Soul sin request_id:', JSON.stringify(hfData).slice(0, 300));
+      console.error('Higgsfield Soul sin request_id:', JSON.stringify(hfData).slice(0, 500));
     }
   } catch (e) {
+    hfDebug = { error: e.message };
     console.error('Higgsfield Soul error:', e.message);
   }
 
@@ -132,5 +134,5 @@ Responde SOLO en JSON válido, sin texto adicional antes ni después:
     .single();
 
   if (error) return res.status(500).json({ error: error.message });
-  return res.status(200).json({ post_id: post.id, estado: post.estado });
+  return res.status(200).json({ post_id: post.id, estado: post.estado, hf_debug: hfDebug });
 }
