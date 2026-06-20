@@ -9,8 +9,7 @@ const HF_BASE = 'https://platform.higgsfield.ai';
 
 function hfHeaders() {
   return {
-    'hf-api-key': process.env.HIGGSFIELD_API_KEY,
-    'hf-secret': process.env.HIGGSFIELD_SECRET,
+    'Authorization': `Key ${process.env.HIGGSFIELD_API_KEY}:${process.env.HIGGSFIELD_SECRET}`,
     'Content-Type': 'application/json',
   };
 }

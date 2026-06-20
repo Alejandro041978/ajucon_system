@@ -9,35 +9,35 @@ const HF_BASE = 'https://platform.higgsfield.ai';
 
 function hfHeaders() {
   return {
-    'hf-api-key': process.env.HIGGSFIELD_API_KEY,
-    'hf-secret': process.env.HIGGSFIELD_SECRET,
+    'Authorization': `Key ${process.env.HIGGSFIELD_API_KEY}:${process.env.HIGGSFIELD_SECRET}`,
     'Content-Type': 'application/json',
   };
 }
 
 function extractStatus(hfData) {
-  // Higgsfield wraps response in data.jobs[0].status
+  if (typeof hfData.status === 'string') return hfData.status;
   const job = hfData.data?.jobs?.[0];
   if (job?.status) return job.status;
-  // fallback: top-level status string
-  if (typeof hfData.status === 'string') return hfData.status;
   return null;
 }
 
-function extractUrl(hfData) {
-  // Higgsfield Soul / DoP: data.jobs[0].results[0].url or .urls[0]
+function extractImageUrl(hfData) {
+  // Documented response: { images: [{url}] }
+  if (hfData.images?.[0]?.url) return hfData.images[0].url;
+  if (Array.isArray(hfData.images) && typeof hfData.images[0] === 'string') return hfData.images[0];
+  // fallbacks
   const job = hfData.data?.jobs?.[0];
   if (job?.results?.[0]?.url) return job.results[0].url;
-  if (job?.results?.[0]?.urls?.[0]) return job.results[0].urls[0];
-  if (Array.isArray(job?.results) && typeof job.results[0] === 'string') return job.results[0];
-  // legacy fallbacks
   if (hfData.result?.url) return hfData.result.url;
-  if (hfData.result?.urls?.[0]) return hfData.result.urls[0];
-  if (Array.isArray(hfData.result) && hfData.result[0]) return hfData.result[0];
   if (hfData.output?.[0]) return hfData.output[0];
-  if (hfData.outputs?.[0]) return hfData.outputs[0];
   if (hfData.url) return hfData.url;
   return null;
+}
+
+function extractVideoUrl(hfData) {
+  // Documented response: { video: {url} }
+  if (hfData.video?.url) return hfData.video.url;
+  return extractImageUrl(hfData);
 }
 
 function verifyAdmin(req) {
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
   if (post.estado === 'generando_imagen' && post.imagen_request_id) {
     let hfData;
     try {
-      const hfRes = await fetch(`${HF_BASE}/v1/requests/${post.imagen_request_id}`, {
+      const hfRes = await fetch(`${HF_BASE}/requests/${post.imagen_request_id}/status`, {
         headers: hfHeaders(),
       });
       hfData = await hfRes.json();
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
     const imgStatus = extractStatus(hfData);
     console.log('imgStatus extraído:', imgStatus);
     if (imgStatus === 'completed') {
-      const imagenUrl = extractUrl(hfData);
+      const imagenUrl = extractImageUrl(hfData);
       if (imagenUrl) {
         // Arrancar DoP Turbo (image → video)
         let videoRequestId = null;
@@ -123,7 +123,7 @@ export default async function handler(req, res) {
   else if (post.estado === 'generando_video' && post.video_request_id) {
     let hfData;
     try {
-      const hfRes = await fetch(`${HF_BASE}/v1/requests/${post.video_request_id}`, {
+      const hfRes = await fetch(`${HF_BASE}/requests/${post.video_request_id}/status`, {
         headers: hfHeaders(),
       });
       hfData = await hfRes.json();
@@ -134,7 +134,7 @@ export default async function handler(req, res) {
 
     const vidStatus = extractStatus(hfData);
     if (vidStatus === 'completed') {
-      const videoUrl = extractUrl(hfData);
+      const videoUrl = extractVideoUrl(hfData);
       if (videoUrl) {
         // Agente 6: quality-guardian
         let aprobado = true;
