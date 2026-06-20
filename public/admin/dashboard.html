@@ -481,6 +481,18 @@
             <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
             <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
           </tr>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Redes Sociales</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-redes_sociales-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-redes_sociales-editar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-redes_sociales-borrar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+          </tr>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Temas Auto</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-temas_auto-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-temas_auto-editar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-temas_auto-borrar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -1090,7 +1102,8 @@
       stats: ['ver'], users: ['ver','editar','borrar'],
       becas_profesionales: ['ver','editar'], becas_cursos: ['ver','editar'],
       gestion_cursos: ['ver','editar'], test_results: ['ver'],
-      riasec: ['ver'], valeria_review: ['ver']
+      riasec: ['ver'], valeria_review: ['ver'],
+      redes_sociales: ['ver','editar','borrar'], temas_auto: ['ver','editar','borrar']
     };
     // Normalizar formato antiguo (array plano) al nuevo
     let permsObj = {};
@@ -1149,7 +1162,8 @@
       stats: ['ver'], users: ['ver','editar','borrar'],
       becas_profesionales: ['ver','editar'], becas_cursos: ['ver','editar'],
       gestion_cursos: ['ver','editar'], test_results: ['ver'],
-      riasec: ['ver'], valeria_review: ['ver']
+      riasec: ['ver'], valeria_review: ['ver'],
+      redes_sociales: ['ver','editar','borrar'], temas_auto: ['ver','editar','borrar']
     };
     const permisos = {};
     Object.entries(permMap).forEach(([sec, acciones]) => {
