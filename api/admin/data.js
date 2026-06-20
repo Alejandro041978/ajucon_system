@@ -70,17 +70,23 @@ export default async function handler(req, res) {
   }
 
   if (seccion === 'stats') {
-    const [u, bp, bc, tr] = await Promise.all([
+    const [u, bp, bc, tr, rv, spManual, spAuto] = await Promise.all([
       supabase.from('users').select('id', { count: 'exact', head: true }),
       supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }),
       supabase.from('inscripciones_cursos').select('id', { count: 'exact', head: true }),
       supabase.from('test_results').select('id', { count: 'exact', head: true }),
+      supabase.from('reportes_vocacionales').select('id', { count: 'exact', head: true }),
+      supabase.from('social_posts').select('id', { count: 'exact', head: true }).eq('estado', 'publicado').neq('creado_por', 'auto'),
+      supabase.from('social_posts').select('id', { count: 'exact', head: true }).eq('estado', 'publicado').eq('creado_por', 'auto'),
     ]);
     return res.status(200).json({
       usuarios: u.count,
       becas_profesionales: bp.count,
       becas_cursos: bc.count,
       test_results: tr.count,
+      reportes_ia: rv.count,
+      social_manual: spManual.count,
+      social_auto: spAuto.count,
     });
   }
 

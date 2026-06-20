@@ -179,6 +179,9 @@
       <div class="stat-card"><div class="num" id="stat-bp">—</div><div class="label">Becas Profesionales</div></div>
       <div class="stat-card"><div class="num" id="stat-bc">—</div><div class="label">Becas Cursos</div></div>
       <div class="stat-card"><div class="num" id="stat-tr">—</div><div class="label">Tests completados</div></div>
+      <div class="stat-card"><div class="num" id="stat-rv">—</div><div class="label">Reportes IA generados</div></div>
+      <div class="stat-card"><div class="num" id="stat-sm">—</div><div class="label">Posts manuales publicados</div></div>
+      <div class="stat-card"><div class="num" id="stat-sa">—</div><div class="label">Posts automáticos publicados</div></div>
     </div>
   </div>
 
@@ -751,6 +754,9 @@
     document.getElementById('stat-bp').textContent = d.becas_profesionales ?? 0;
     document.getElementById('stat-bc').textContent = d.becas_cursos ?? 0;
     document.getElementById('stat-tr').textContent = d.test_results ?? 0;
+    document.getElementById('stat-rv').textContent = d.reportes_ia ?? 0;
+    document.getElementById('stat-sm').textContent = d.social_manual ?? 0;
+    document.getElementById('stat-sa').textContent = d.social_auto ?? 0;
   }
 
   async function cargarUsers() {
