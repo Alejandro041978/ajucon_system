@@ -1441,7 +1441,7 @@
     _socialPollInterval = setInterval(async () => {
       let algoPendiente = false;
       for (const id of ids) {
-        const r = await fetch(`/api/social/estado?id=${id}`, { headers: { 'Authorization': 'Bearer ' + token } });
+        const r = await fetch(`/api/social/estado?id=${id}&_t=${Date.now()}`, { headers: { 'Authorization': 'Bearer ' + token } });
         if (!r.ok) continue;
         const post = await r.json();
         actualizarCardSocial(post);
