@@ -186,5 +186,6 @@ Responde SOLO en JSON: {"aprobado":true,"notas":"breve observación"}`,
   }
 
   const { data: final } = await supabase.from('social_posts').select('*').eq('id', id).single();
+  res.setHeader('Cache-Control', 'no-store');
   return res.status(200).json({ ...final, _hf_debug: typeof hfData !== 'undefined' ? hfData : undefined });
 }
