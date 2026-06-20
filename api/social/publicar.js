@@ -68,21 +68,21 @@ export default async function handler(req, res) {
     providers.push({
       network: 'FACEBOOK',
       text: post.captions?.facebook || '',
-      ...(mediaUrl ? { mediaUrls: [mediaUrl] } : {}),
+      ...(mediaUrl ? { media: [mediaUrl] } : {}),
     });
   }
   if (redes.includes('instagram')) {
     providers.push({
       network: 'INSTAGRAM',
       text: post.captions?.instagram || '',
-      ...(mediaUrl ? { mediaUrls: [mediaUrl] } : {}),
+      ...(mediaUrl ? { media: [mediaUrl] } : {}),
     });
   }
   if (redes.includes('tiktok') && (post.video_url || post.imagen_url)) {
     providers.push({
       network: 'TIKTOK',
       text: post.captions?.tiktok || '',
-      mediaUrls: [post.video_url || post.imagen_url],
+      media: [post.video_url || post.imagen_url],
     });
   }
   if (redes.includes('youtube') && post.video_url) {
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
       network: 'YOUTUBE',
       ytTitle: post.captions?.youtube_titulo || post.tema || '',
       text: post.captions?.youtube_descripcion || '',
-      mediaUrls: [post.video_url],
+      media: [post.video_url],
     });
   }
 
