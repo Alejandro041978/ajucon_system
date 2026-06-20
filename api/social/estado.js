@@ -7,6 +7,24 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const HF_BASE = 'https://platform.higgsfield.ai';
 
+async function uploadToSupabase(externalUrl, folder, ext) {
+  try {
+    const resp = await fetch(externalUrl);
+    if (!resp.ok) return externalUrl; // fallback a URL original
+    const buffer = await resp.arrayBuffer();
+    const fileName = `${folder}/${Date.now()}.${ext}`;
+    const contentType = ext === 'mp4' ? 'video/mp4' : 'image/png';
+    const { error } = await supabase.storage
+      .from('social-media')
+      .upload(fileName, Buffer.from(buffer), { contentType, upsert: false });
+    if (error) return externalUrl;
+    const { data } = supabase.storage.from('social-media').getPublicUrl(fileName);
+    return data.publicUrl;
+  } catch {
+    return externalUrl;
+  }
+}
+
 function hfHeaders() {
   return {
     'Authorization': `Key ${process.env.HIGGSFIELD_API_KEY}:${process.env.HIGGSFIELD_SECRET}`,
@@ -80,7 +98,8 @@ export default async function handler(req, res) {
     const imgStatus = extractStatus(hfData);
     console.log('imgStatus extraído:', imgStatus);
     if (imgStatus === 'completed') {
-      const imagenUrl = extractImageUrl(hfData);
+      const rawImagenUrl = extractImageUrl(hfData);
+      const imagenUrl = rawImagenUrl ? await uploadToSupabase(rawImagenUrl, 'imagenes', 'png') : null;
       if (imagenUrl) {
         // Arrancar DoP Turbo (image → video)
         let videoRequestId = null;
@@ -134,7 +153,8 @@ export default async function handler(req, res) {
 
     const vidStatus = extractStatus(hfData);
     if (vidStatus === 'completed') {
-      const videoUrl = extractVideoUrl(hfData);
+      const rawVideoUrl = extractVideoUrl(hfData);
+      const videoUrl = rawVideoUrl ? await uploadToSupabase(rawVideoUrl, 'videos', 'mp4') : null;
       if (videoUrl) {
         // Agente 6: quality-guardian
         let aprobado = true;
