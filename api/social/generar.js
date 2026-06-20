@@ -90,19 +90,13 @@ Responde SOLO en JSON válido, sin texto adicional antes ni después:
   let hfDebug = null;
   try {
     const hfEndpoint = modelo === 'soul-cinema' ? '/higgsfield-ai/soul/cinema' : '/v1/text2image/soul';
+    const hfBody = modelo === 'soul-cinema'
+      ? { prompt: plan.imagen_prompt, quality: '720p', width_and_height: '1536x1536', batch_size: 1, enhance_prompt: true }
+      : { params: { prompt: plan.imagen_prompt, quality: '720p', width_and_height: '1536x1536', batch_size: 1, enhance_prompt: true }, webhook: null };
     const hfRes = await fetch(`${HF_BASE}${hfEndpoint}`, {
       method: 'POST',
       headers: hfHeaders(),
-      body: JSON.stringify({
-        params: {
-          prompt: plan.imagen_prompt,
-          quality: '720p',
-          width_and_height: '1536x1536',
-          batch_size: 1,
-          enhance_prompt: true,
-        },
-        webhook: null,
-      }),
+      body: JSON.stringify(hfBody),
     });
     const hfData = await hfRes.json();
     hfDebug = { status: hfRes.status, data: hfData };
