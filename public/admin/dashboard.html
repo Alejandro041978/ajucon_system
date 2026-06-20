@@ -162,6 +162,7 @@
   <div class="nav-item" onclick="setSeccion('riasec', this)">🧠 Perfiles RIASEC</div>
   <div class="nav-item" onclick="setSeccion('valeria_review', this)">🔍 Revisor Valeria</div>
   <div class="nav-item" onclick="setSeccion('redes_sociales', this)">📱 Redes Sociales</div>
+  <div class="nav-item" onclick="setSeccion('temas_auto', this)">🤖 Temas Auto</div>
   <div class="sidebar-footer">
     <button class="btn-theme" id="theme-btn" onclick="toggleAdminTheme()">☀️ Modo claro</button>
     <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
@@ -528,6 +529,32 @@
   </div>
 
   <!-- Redes Sociales -->
+  <div class="section" id="sec-temas_auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <h2 style="margin:0">🤖 Publicación Automática — Temas</h2>
+      <button onclick="abrirModalTema()" style="padding:9px 20px;background:#7c3aed;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">+ Agregar tema</button>
+    </div>
+    <p style="color:#64748b;font-size:.88rem;margin-bottom:20px">Lista rotativa de temas para publicación automática diaria (9am y 7pm hora Perú) en Facebook e Instagram. Se recomienda 14 temas para cubrir dos semanas.</p>
+    <div id="temas-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div id="temas-msg" style="margin-top:16px;font-size:.85rem"></div>
+
+    <!-- Modal nuevo/editar tema -->
+    <div id="tema-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200" onclick="cerrarModalTema()"></div>
+    <div id="tema-modal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1e293b;border-radius:12px;padding:28px;width:500px;max-width:95vw;z-index:201">
+      <h3 style="margin:0 0 18px;font-size:1rem" id="tema-modal-title">Nuevo tema</h3>
+      <input type="hidden" id="tema-id">
+      <label style="font-size:.82rem;color:#94a3b8;display:block;margin-bottom:6px">TEMA / IDEA DE CONTENIDO</label>
+      <textarea id="tema-texto" rows="4" placeholder="Ej: Orientación vocacional gratuita para jóvenes que no saben qué estudiar..." style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:10px;font-size:.88rem;resize:vertical;box-sizing:border-box"></textarea>
+      <label style="font-size:.82rem;color:#94a3b8;display:block;margin:12px 0 6px">ORDEN</label>
+      <input type="number" id="tema-orden" min="1" max="99" style="width:80px;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:8px;font-size:.88rem">
+      <div id="tema-modal-msg" style="display:none;margin-top:12px;font-size:.84rem;padding:8px 12px;border-radius:6px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px">
+        <button onclick="cerrarModalTema()" style="padding:9px 18px;background:none;border:1px solid #2d3748;border-radius:8px;color:#64748b;font-size:.85rem;cursor:pointer">Cancelar</button>
+        <button onclick="guardarTema()" style="padding:9px 20px;background:#7c3aed;color:white;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="section" id="sec-redes_sociales">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
       <h2 style="margin:0">Redes Sociales — Agentes IA</h2>
@@ -1600,7 +1627,85 @@
   }
   // ===== Fin Redes Sociales =====
 
-  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos, redes_sociales:cargarRedesSociales };
+  // ── TEMAS AUTO ──────────────────────────────────────────────
+  async function cargarTemasAuto() {
+    const r = await fetch('/api/social/temas', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await r.json();
+    const { temas, index } = data;
+    const list = document.getElementById('temas-list');
+    if (!temas || temas.length === 0) {
+      list.innerHTML = '<p style="color:#64748b;font-size:.88rem">No hay temas configurados. Agrega al menos uno.</p>';
+      return;
+    }
+    list.innerHTML = temas.map((t, i) => `
+      <div style="background:#1e293b;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px;border:1px solid ${i === index % temas.length ? '#7c3aed' : '#2d3748'}">
+        <span style="background:#0f172a;color:#64748b;border-radius:6px;padding:4px 10px;font-size:.78rem;min-width:28px;text-align:center">${t.orden}</span>
+        <span style="flex:1;font-size:.88rem;color:${t.activo ? 'white' : '#475569'}">${t.tema}</span>
+        ${i === index % temas.length ? '<span style="background:#7c3aed22;color:#a78bfa;font-size:.75rem;padding:3px 8px;border-radius:99px">▶ Siguiente</span>' : ''}
+        ${!t.activo ? '<span style="background:#1e293b;color:#475569;font-size:.75rem;padding:3px 8px;border-radius:99px;border:1px solid #334155">Inactivo</span>' : ''}
+        <button onclick="editarTema(${JSON.stringify(t).replace(/"/g,'&quot;')})" style="background:none;border:1px solid #334155;color:#94a3b8;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer">Editar</button>
+        <button onclick="toggleTema(${t.id}, ${t.activo})" style="background:none;border:1px solid #334155;color:#94a3b8;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer">${t.activo ? 'Pausar' : 'Activar'}</button>
+        <button onclick="borrarTema(${t.id})" style="background:none;border:1px solid #7f1d1d;color:#f87171;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer">✕</button>
+      </div>`).join('');
+  }
+
+  function abrirModalTema(t = null) {
+    document.getElementById('tema-id').value = t?.id || '';
+    document.getElementById('tema-texto').value = t?.tema || '';
+    document.getElementById('tema-orden').value = t?.orden || (document.querySelectorAll('#temas-list > div').length + 1);
+    document.getElementById('tema-modal-title').textContent = t ? 'Editar tema' : 'Nuevo tema';
+    document.getElementById('tema-modal-msg').style.display = 'none';
+    document.getElementById('tema-overlay').style.display = 'block';
+    document.getElementById('tema-modal').style.display = 'block';
+    setTimeout(() => document.getElementById('tema-texto').focus(), 50);
+  }
+
+  function cerrarModalTema() {
+    document.getElementById('tema-overlay').style.display = 'none';
+    document.getElementById('tema-modal').style.display = 'none';
+  }
+
+  function editarTema(t) { abrirModalTema(t); }
+
+  async function guardarTema() {
+    const id = document.getElementById('tema-id').value;
+    const tema = document.getElementById('tema-texto').value.trim();
+    const orden = parseInt(document.getElementById('tema-orden').value) || 99;
+    if (!tema) { mostrarTemaMsg('Escribe el tema.', false); return; }
+
+    const method = id ? 'PUT' : 'POST';
+    const body = id ? { id: parseInt(id), tema, orden, activo: true } : { tema, orden };
+    const r = await fetch('/api/social/temas', {
+      method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(body),
+    });
+    if (r.ok) { cerrarModalTema(); cargarTemasAuto(); }
+    else { const d = await r.json(); mostrarTemaMsg(d.error || 'Error al guardar.', false); }
+  }
+
+  async function toggleTema(id, activo) {
+    await fetch('/api/social/temas', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ id, activo: !activo }),
+    });
+    cargarTemasAuto();
+  }
+
+  async function borrarTema(id) {
+    if (!confirm('¿Eliminar este tema?')) return;
+    await fetch(`/api/social/temas?id=${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+    cargarTemasAuto();
+  }
+
+  function mostrarTemaMsg(txt, ok) {
+    const el = document.getElementById('tema-modal-msg');
+    el.style.display = 'block';
+    el.style.background = ok ? '#14532d' : '#7f1d1d';
+    el.style.color = ok ? '#86efac' : '#fca5a5';
+    el.textContent = txt;
+  }
+
+  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos, redes_sociales:cargarRedesSociales, temas_auto:cargarTemasAuto };
   const loaded = new Set();
 
   function setSeccion(sec, el) {

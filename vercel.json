@@ -2,5 +2,12 @@
   "outputDirectory": "public",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" }
-  ]
+  ],
+  "crons": [
+    { "path": "/api/social/auto", "schedule": "0 14 * * *" },
+    { "path": "/api/social/auto", "schedule": "0 0 * * *" }
+  ],
+  "functions": {
+    "api/social/auto.js": { "maxDuration": 300 }
+  }
 }
