@@ -107,7 +107,7 @@ Responde SOLO en JSON válido, sin texto adicional antes ni después:
     });
     const hfData = await hfRes.json();
     hfDebug = { status: hfRes.status, data: hfData };
-    imagenRequestId = hfData.request_id || null;
+    imagenRequestId = hfData.request_id || hfData.data?.id || hfData.id || null;
     if (!imagenRequestId) {
       console.error('Higgsfield Soul sin request_id:', JSON.stringify(hfData).slice(0, 500));
     }

@@ -15,13 +15,28 @@ function hfHeaders() {
   };
 }
 
-function extractUrl(data) {
-  if (data.result?.url) return data.result.url;
-  if (data.result?.urls?.[0]) return data.result.urls[0];
-  if (Array.isArray(data.result) && data.result[0]) return data.result[0];
-  if (data.output?.[0]) return data.output[0];
-  if (data.outputs?.[0]) return data.outputs[0];
-  if (data.url) return data.url;
+function extractStatus(hfData) {
+  // Higgsfield wraps response in data.jobs[0].status
+  const job = hfData.data?.jobs?.[0];
+  if (job?.status) return job.status;
+  // fallback: top-level status string
+  if (typeof hfData.status === 'string') return hfData.status;
+  return null;
+}
+
+function extractUrl(hfData) {
+  // Higgsfield Soul / DoP: data.jobs[0].results[0].url or .urls[0]
+  const job = hfData.data?.jobs?.[0];
+  if (job?.results?.[0]?.url) return job.results[0].url;
+  if (job?.results?.[0]?.urls?.[0]) return job.results[0].urls[0];
+  if (Array.isArray(job?.results) && typeof job.results[0] === 'string') return job.results[0];
+  // legacy fallbacks
+  if (hfData.result?.url) return hfData.result.url;
+  if (hfData.result?.urls?.[0]) return hfData.result.urls[0];
+  if (Array.isArray(hfData.result) && hfData.result[0]) return hfData.result[0];
+  if (hfData.output?.[0]) return hfData.output[0];
+  if (hfData.outputs?.[0]) return hfData.outputs[0];
+  if (hfData.url) return hfData.url;
   return null;
 }
 
@@ -57,7 +72,8 @@ export default async function handler(req, res) {
       return res.status(200).json(post);
     }
 
-    if (hfData.status === 'completed') {
+    const imgStatus = extractStatus(hfData);
+    if (imgStatus === 'completed') {
       const imagenUrl = extractUrl(hfData);
       if (imagenUrl) {
         // Arrancar DoP Turbo (image → video)
@@ -88,10 +104,10 @@ export default async function handler(req, res) {
           updated_at: new Date().toISOString(),
         }).eq('id', id);
       }
-    } else if (hfData.status === 'failed' || hfData.status === 'nsfw') {
+    } else if (imgStatus === 'failed' || imgStatus === 'nsfw') {
       await supabase.from('social_posts').update({
         estado: 'error',
-        notas_calidad: `Imagen rechazada: ${hfData.status}`,
+        notas_calidad: `Imagen rechazada: ${imgStatus}`,
         updated_at: new Date().toISOString(),
       }).eq('id', id);
     }
@@ -110,7 +126,8 @@ export default async function handler(req, res) {
       return res.status(200).json(post);
     }
 
-    if (hfData.status === 'completed') {
+    const vidStatus = extractStatus(hfData);
+    if (vidStatus === 'completed') {
       const videoUrl = extractUrl(hfData);
       if (videoUrl) {
         // Agente 6: quality-guardian
@@ -153,12 +170,12 @@ Responde SOLO en JSON: {"aprobado":true,"notas":"breve observación"}`,
           updated_at: new Date().toISOString(),
         }).eq('id', id);
       }
-    } else if (hfData.status === 'failed' || hfData.status === 'nsfw') {
+    } else if (vidStatus === 'failed' || vidStatus === 'nsfw') {
       // Video falló: marcar listo con solo imagen
       await supabase.from('social_posts').update({
         estado: 'listo',
         aprobado: true,
-        notas_calidad: `Video ${hfData.status} — se publicará con imagen estática`,
+        notas_calidad: `Video ${vidStatus} — se publicará con imagen estática`,
         updated_at: new Date().toISOString(),
       }).eq('id', id);
     }
