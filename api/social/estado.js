@@ -59,20 +59,22 @@ export default async function handler(req, res) {
   const { data: post } = await supabase.from('social_posts').select('*').eq('id', id).single();
   if (!post) return res.status(404).json({ error: 'Post no encontrado.' });
 
+  let _hfPollDebug = null;
+
   // Agente 5 (media-assembler): esperar imagen y luego arrancar video
   if (post.estado === 'generando_imagen' && post.imagen_request_id) {
     let hfData;
-    let hfHttpStatus;
     try {
-      const hfRes = await fetch(`${HF_BASE}/v1/requests/${post.imagen_request_id}`, {
+      const hfRes = await fetch(`${HF_BASE}/v1/requests/${post.imagen_request_id}/status`, {
         headers: hfHeaders(),
       });
-      hfHttpStatus = hfRes.status;
       hfData = await hfRes.json();
-      console.log('Poll imagen:', hfHttpStatus, JSON.stringify(hfData).slice(0, 400));
+      _hfPollDebug = { http: hfRes.status, data: hfData };
+      console.log('Poll imagen:', hfRes.status, JSON.stringify(hfData).slice(0, 400));
     } catch (e) {
       console.error('Poll imagen error:', e.message);
-      return res.status(200).json({ ...post, _poll_error: e.message });
+      _hfPollDebug = { error: e.message };
+      return res.status(200).json({ ...post, _hf_debug: _hfPollDebug });
     }
 
     const imgStatus = extractStatus(hfData);
@@ -187,5 +189,5 @@ Responde SOLO en JSON: {"aprobado":true,"notas":"breve observación"}`,
 
   const { data: final } = await supabase.from('social_posts').select('*').eq('id', id).single();
   res.setHeader('Cache-Control', 'no-store');
-  return res.status(200).json({ ...final, _hf_debug: typeof hfData !== 'undefined' ? hfData : undefined });
+  return res.status(200).json({ ...final, _hf_debug: _hfPollDebug });
 }
