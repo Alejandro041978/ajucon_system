@@ -1815,11 +1815,14 @@
   }
 
   /* ===== Becas Disponibles ===== */
+  const _becasMap = {};
+
   async function cargarBecasDisponibles() {
     const tbody = document.getElementById('tbody-becas_disponibles');
     const r = await fetch('/api/becas/disponibles', { headers: { 'Authorization': 'Bearer ' + token } });
     const becas = await r.json();
     if (!becas.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No hay becas registradas.</td></tr>'; return; }
+    becas.forEach(b => { _becasMap[b.id] = b; });
     tbody.innerHTML = becas.map(b => `
       <tr>
         <td><strong>${b.nombre}</strong></td>
@@ -1832,7 +1835,7 @@
             onclick="toggleBeca('${b.id}',${b.activo})">${b.activo ? 'Activa' : 'Inactiva'}</span>
         </td>
         <td style="white-space:nowrap">
-          <button onclick="editarBeca(${JSON.stringify(JSON.stringify(b))})" style="background:none;border:1px solid #2d3748;color:#94a3b8;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer;margin-right:4px">Editar</button>
+          <button onclick="editarBeca('${b.id}')" style="background:none;border:1px solid #2d3748;color:#94a3b8;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer;margin-right:4px">Editar</button>
           <button onclick="borrarBeca('${b.id}')" style="background:none;border:1px solid #450a0a;color:#fca5a5;border-radius:6px;padding:4px 10px;font-size:.78rem;cursor:pointer">Eliminar</button>
         </td>
       </tr>`).join('');
@@ -1859,8 +1862,8 @@
     document.getElementById('beca-modal').style.display = 'none';
   }
 
-  function editarBeca(jsonStr) {
-    abrirModalBeca(JSON.parse(jsonStr));
+  function editarBeca(id) {
+    abrirModalBeca(_becasMap[id]);
   }
 
   async function guardarBeca() {
