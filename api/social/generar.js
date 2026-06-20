@@ -51,12 +51,11 @@ AGENTE 1 - Social Director: Define el ángulo estratégico (objetivo: awareness,
 
 AGENTE 2 - Content Strategist: Brief ejecutivo: hook principal, mensaje clave, llamada a la acción y tono adecuado.
 
-AGENTE 3 - Copywriter: Copy adaptado por red social:
-- facebook: hasta 500 caracteres. Tono profesional y cálido. Orientado a padres y jóvenes.
-- instagram: hasta 300 caracteres + exactamente 6 hashtags relevantes en español peruano.
-- tiktok: máximo 150 caracteres. Gancho viral. Tono joven y directo. Hasta 2 emojis estratégicos.
-- youtube_titulo: máximo 60 caracteres. Llamativo para Shorts educativos.
-- youtube_descripcion: máximo 200 caracteres con llamada a la acción.
+AGENTE 3 - Copywriter: Copy adaptado por red social (SOLO para las redes en REDES OBJETIVO, deja vacío el resto):
+${redes.includes('facebook') ? '- facebook: hasta 500 caracteres. Tono profesional y cálido. Orientado a padres y jóvenes.' : ''}
+${redes.includes('instagram') ? '- instagram: hasta 300 caracteres + exactamente 6 hashtags relevantes en español peruano.' : ''}
+${redes.includes('tiktok') ? '- tiktok: máximo 150 caracteres. Gancho viral. Tono joven y directo. Hasta 2 emojis estratégicos.' : ''}
+${redes.includes('youtube') ? '- youtube_titulo: máximo 60 caracteres. Llamativo para Shorts educativos.\n- youtube_descripcion: máximo 200 caracteres con llamada a la acción.' : ''}
 
 AGENTE 4 - Creative Director: Prompt en inglés para generar una imagen fotorrealista con IA. La imagen debe mostrar jóvenes estudiantes peruanos en un ambiente educativo moderno, optimista y profesional. Evitar texto, logos o números en la imagen. Photorealistic, natural lighting, bright colors, authentic Peruvian youth in modern educational setting.
 
@@ -90,7 +89,7 @@ Responde SOLO en JSON válido, sin texto adicional antes ni después:
   let imagenRequestId = null;
   let hfDebug = null;
   try {
-    const hfEndpoint = modelo === 'soul-cinema' ? '/v1/text2image/soul-cinema' : '/v1/text2image/soul';
+    const hfEndpoint = modelo === 'soul-cinema' ? '/higgsfield-ai/soul/cinema' : '/v1/text2image/soul';
     const hfRes = await fetch(`${HF_BASE}${hfEndpoint}`, {
       method: 'POST',
       headers: hfHeaders(),
