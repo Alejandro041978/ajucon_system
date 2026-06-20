@@ -128,6 +128,7 @@ Responde SOLO en JSON válido, sin texto adicional antes ni después:
       captions: plan.captions,
       imagen_prompt: plan.imagen_prompt,
       imagen_request_id: imagenRequestId,
+      notas_calidad: imagenRequestId ? null : `HF_DEBUG: ${JSON.stringify(hfDebug)}`,
       creado_por: admin.email,
     })
     .select()
