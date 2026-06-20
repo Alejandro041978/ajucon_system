@@ -65,7 +65,7 @@ export default async function handler(req, res) {
   if (post.estado === 'generando_imagen' && post.imagen_request_id) {
     let hfData;
     try {
-      const hfRes = await fetch(`${HF_BASE}/v1/requests/${post.imagen_request_id}/status`, {
+      const hfRes = await fetch(`${HF_BASE}/v1/requests/${post.imagen_request_id}`, {
         headers: hfHeaders(),
       });
       hfData = await hfRes.json();
@@ -123,7 +123,7 @@ export default async function handler(req, res) {
   else if (post.estado === 'generando_video' && post.video_request_id) {
     let hfData;
     try {
-      const hfRes = await fetch(`${HF_BASE}/requests/${post.video_request_id}/status`, {
+      const hfRes = await fetch(`${HF_BASE}/v1/requests/${post.video_request_id}`, {
         headers: hfHeaders(),
       });
       hfData = await hfRes.json();
