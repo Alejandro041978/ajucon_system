@@ -98,7 +98,7 @@ Responde SOLO en JSON válido, sin texto adicional antes ni después:
         params: {
           prompt: plan.imagen_prompt,
           quality: '720p',
-          width_and_height: '1024x1024',
+          width_and_height: '1536x1536',
           batch_size: 1,
           enhance_prompt: true,
         },
