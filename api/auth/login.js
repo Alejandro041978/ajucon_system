@@ -50,7 +50,10 @@ export default async function handler(req, res) {
         body: `🎓 AJUCON\n\nHola ${user.nombre}, tu código de acceso es:\n\n*${code}*\n\nVálido por 15 minutos. No lo compartas con nadie.`,
       });
     } catch (e) {
-      return res.status(500).json({ error: 'Error al enviar el mensaje de WhatsApp. Intenta por email.' });
+      console.error('[TWILIO ERROR]', e.message, e.code, e.status);
+      return res.status(500).json({
+        error: `Error WhatsApp: ${e.message || 'desconocido'} (código ${e.code || '?'})`,
+      });
     }
     return res.status(200).json({ message: 'Código enviado por WhatsApp.', canal: 'whatsapp', tiene_telefono: true });
   }
