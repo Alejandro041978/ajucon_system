@@ -593,13 +593,13 @@
   </div>
 
   <!-- Modal detalle beca profesional -->
-  <div class="overlay" id="beca-overlay" onclick="cerrarBeca()"></div>
-  <div id="beca-modal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);width:500px;max-width:95vw;max-height:85vh;overflow-y:auto;background:#1e2535;border:1px solid #2d3748;border-radius:16px;padding:28px;z-index:200;opacity:0;pointer-events:none;transition:all .2s ease">
+  <div class="overlay" id="ver-beca-overlay" onclick="cerrarBeca()"></div>
+  <div id="ver-beca-modal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.96);width:500px;max-width:95vw;max-height:85vh;overflow-y:auto;background:#1e2535;border:1px solid #2d3748;border-radius:16px;padding:28px;z-index:200;opacity:0;pointer-events:none;transition:all .2s ease">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
       <h3 style="color:#f1f5f9;font-size:1rem;margin:0">Detalle de postulación</h3>
       <button onclick="cerrarBeca()" style="background:none;border:none;color:#64748b;font-size:1.3rem;cursor:pointer;line-height:1">×</button>
     </div>
-    <div id="beca-modal-body"></div>
+    <div id="ver-beca-modal-body"></div>
   </div>
 
   <!-- Modal edición de curso -->
@@ -928,23 +928,23 @@
         <span style="color:#e2e8f0;font-weight:500;text-align:right;max-width:60%">${v}</span>
       </div>`).join('');
 
-    document.getElementById('beca-modal-body').innerHTML = `
+    document.getElementById('ver-beca-modal-body').innerHTML = `
       ${filas}
       <div style="margin-top:16px">
         <div style="font-size:.72rem;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Carta de motivación</div>
         <div style="font-size:.85rem;color:#cbd5e1;line-height:1.6;background:#0d1117;padding:14px;border-radius:8px">${b.motivacion || '—'}</div>
       </div>`;
 
-    document.getElementById('beca-overlay').classList.add('open');
-    const modal = document.getElementById('beca-modal');
+    document.getElementById('ver-beca-overlay').classList.add('open');
+    const modal = document.getElementById('ver-beca-modal');
     modal.style.opacity = '1';
     modal.style.pointerEvents = 'auto';
     modal.style.transform = 'translate(-50%,-50%) scale(1)';
   }
 
   function cerrarBeca() {
-    document.getElementById('beca-overlay').classList.remove('open');
-    const modal = document.getElementById('beca-modal');
+    document.getElementById('ver-beca-overlay').classList.remove('open');
+    const modal = document.getElementById('ver-beca-modal');
     modal.style.opacity = '0';
     modal.style.pointerEvents = 'none';
     modal.style.transform = 'translate(-50%,-50%) scale(.96)';
