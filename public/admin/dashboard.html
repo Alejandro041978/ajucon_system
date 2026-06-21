@@ -217,9 +217,9 @@
       <table>
         <thead><tr>
           <th>Nombre</th><th>Institución</th><th>Vacantes</th><th>Monto total</th>
-          <th>Vigencia</th><th>Estado</th><th>Acciones</th>
+          <th>Vigencia</th><th>Modalidad</th><th>Carreras</th><th>Estado</th><th>Acciones</th>
         </tr></thead>
-        <tbody id="tbody-becas_disponibles"><tr><td colspan="7" class="empty">Cargando...</td></tr></tbody>
+        <tbody id="tbody-becas_disponibles"><tr><td colspan="9" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -1829,7 +1829,7 @@
     const tbody = document.getElementById('tbody-becas_disponibles');
     const r = await fetch('/api/becas/disponibles', { headers: { 'Authorization': 'Bearer ' + token } });
     const becas = await r.json();
-    if (!becas.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No hay becas registradas.</td></tr>'; return; }
+    if (!becas.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty">No hay becas registradas.</td></tr>'; return; }
     becas.forEach(b => { _becasMap[b.id] = b; });
     tbody.innerHTML = becas.map(b => `
       <tr>
@@ -1838,6 +1838,8 @@
         <td style="text-align:center">${b.cantidad_disponible ?? '—'}</td>
         <td>${b.monto_total ? 'S/ ' + Number(b.monto_total).toLocaleString('es-PE') : '—'}</td>
         <td>${b.vigencia ? new Date(b.vigencia+'T00:00:00').toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
+        <td style="max-width:120px;color:var(--text-muted);font-size:.82rem">${b.modalidad_estudios || '—'}</td>
+        <td style="max-width:180px;color:var(--text-muted);font-size:.82rem">${b.carreras_disponibles || '—'}</td>
         <td>
           <span style="cursor:pointer;font-size:.82rem;padding:3px 10px;border-radius:20px;font-weight:600;${b.activo ? 'background:#14532d;color:#86efac' : 'background:#374151;color:#9ca3af'}"
             onclick="toggleBeca('${b.id}',${b.activo})">${b.activo ? 'Activa' : 'Inactiva'}</span>
