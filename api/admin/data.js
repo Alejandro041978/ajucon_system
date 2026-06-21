@@ -15,8 +15,18 @@ function verifyAdmin(req) {
 }
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') return res.status(405).end();
   if (!verifyAdmin(req)) return res.status(401).json({ error: 'No autorizado.' });
+
+  if (req.method === 'DELETE') {
+    const { tabla, id } = req.query;
+    const tablas = ['becas_profesionales', 'inscripciones_cursos', 'users'];
+    if (!tablas.includes(tabla) || !id) return res.status(400).json({ error: 'Parámetros inválidos.' });
+    const { error } = await supabase.from(tabla).delete().eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ ok: true });
+  }
+
+  if (req.method !== 'GET') return res.status(405).end();
 
   const { seccion } = req.query;
 

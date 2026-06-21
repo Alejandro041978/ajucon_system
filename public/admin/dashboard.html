@@ -898,7 +898,10 @@
         <td>${b.carrera_interes||'—'}</td>
         <td>${b.promedio_notas||'—'}</td>
         <td>${conEditar ? badgeEstado(b.estado,'becas_profesionales',b.id) : `<span class="badge">${b.estado||'—'}</span>`}</td>
-        <td><button onclick="verBeca('${b.id}')" style="padding:4px 12px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#818cf8';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Ver</button></td>
+        <td style="white-space:nowrap">
+          <button onclick="verBeca('${b.id}')" style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer;margin-right:4px" onmouseover="this.style.borderColor='#818cf8';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Ver</button>
+          ${puedoBorrar('becas_profesionales') ? `<button onclick="borrarPostulacion('${b.id}')" style="padding:4px 10px;background:none;border:1px solid #450a0a;border-radius:6px;color:#fca5a5;font-size:.78rem;cursor:pointer">Borrar</button>` : ''}
+        </td>
       </tr>`).join('') : '<tr><td colspan="8" class="empty">Sin postulaciones aún.</td></tr>';
   }
 
@@ -940,6 +943,15 @@
     modal.style.opacity = '1';
     modal.style.pointerEvents = 'auto';
     modal.style.transform = 'translate(-50%,-50%) scale(1)';
+  }
+
+  async function borrarPostulacion(id) {
+    if (!confirm('¿Eliminar esta postulación? Esta acción no se puede deshacer.')) return;
+    const r = await fetch(`/api/admin/data?tabla=becas_profesionales&id=${id}`, {
+      method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (r.ok) cargarBecasProfesionales();
+    else { const d = await r.json(); alert(d.error || 'Error al eliminar.'); }
   }
 
   function cerrarBeca() {
