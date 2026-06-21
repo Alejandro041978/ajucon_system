@@ -161,6 +161,7 @@
         <form id="form-beca" onsubmit="enviarPostulacion(event)">
           <input type="hidden" id="campo-beca-id" />
           <input type="hidden" id="campo-beca-nombre" />
+          <input type="hidden" id="campo-beca-institucion" />
 
           <div class="section-title">Datos personales</div>
           <div class="grid2">
@@ -355,6 +356,7 @@
     if (!b) return;
     document.getElementById('campo-beca-id').value = b.id;
     document.getElementById('campo-beca-nombre').value = b.nombre;
+    document.getElementById('campo-beca-institucion').value = b.institucion;
 
     document.getElementById('badge-beca-seleccionada').innerHTML =
       `<strong>🎓 ${b.nombre}</strong>Institución: ${b.institucion}`;
@@ -381,6 +383,7 @@
     const body = {
       beca_id: document.getElementById('campo-beca-id').value || null,
       beca_nombre: document.getElementById('campo-beca-nombre').value || null,
+      beca_institucion: document.getElementById('campo-beca-institucion').value || null,
       rut: document.getElementById('rut').value,
       fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
       direccion: document.getElementById('direccion').value,

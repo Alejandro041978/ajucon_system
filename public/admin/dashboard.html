@@ -286,8 +286,8 @@
     <h2>Postulaciones — Becas Profesionales</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Nombre</th><th>Email</th><th>Carrera</th><th>Promedio</th><th>Estado</th><th></th></tr></thead>
-        <tbody id="tbody-becas_profesionales"><tr><td colspan="6" class="empty">Cargando...</td></tr></tbody>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Beca postulada</th><th>Institución</th><th>Carrera</th><th>Promedio</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="tbody-becas_profesionales"><tr><td colspan="8" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -890,11 +890,13 @@
     tbody.innerHTML = data.length ? data.map(b => `
       <tr>
         <td>${b.users?.nombre||'—'}</td><td>${b.users?.email||'—'}</td>
+        <td style="font-weight:600;color:#d97706">${b.beca_nombre||'—'}</td>
+        <td style="color:var(--text-muted);font-size:.83rem">${b.beca_institucion||'—'}</td>
         <td>${b.carrera_interes||'—'}</td>
         <td>${b.promedio_notas||'—'}</td>
         <td>${conEditar ? badgeEstado(b.estado,'becas_profesionales',b.id) : `<span class="badge">${b.estado||'—'}</span>`}</td>
         <td><button onclick='verBeca(${JSON.stringify(b).replace(/'/g,"&#39;")})' style="padding:4px 12px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#818cf8';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Ver</button></td>
-      </tr>`).join('') : '<tr><td colspan="6" class="empty">Sin postulaciones aún.</td></tr>';
+      </tr>`).join('') : '<tr><td colspan="8" class="empty">Sin postulaciones aún.</td></tr>';
   }
 
   function verBeca(b) {
@@ -907,6 +909,8 @@
       ['Dirección', b.direccion || '—'],
       ['Ciudad / Región', b.region || '—'],
       ['Teléfono', b.telefono || '—'],
+      ['Beca postulada', b.beca_nombre || '—'],
+      ['Institución de la beca', b.beca_institucion || '—'],
       ['Modalidad', b.modalidad || '—'],
       ['Tipo de institución', b.tipo_institucion || '—'],
       ['Carrera', b.carrera_interes || '—'],
