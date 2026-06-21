@@ -883,10 +883,13 @@
       </tr>`).join('') : '<tr><td colspan="7" class="empty">Sin usuarios aún.</td></tr>';
   }
 
+  const _becasProfMap = {};
+
   async function cargarBecasProfesionales() {
     const data = await api('becas_profesionales'); if (!data) return;
     const tbody = document.getElementById('tbody-becas_profesionales');
     const conEditar = puedoEditar('becas_profesionales');
+    data.forEach(b => { _becasProfMap[b.id] = b; });
     tbody.innerHTML = data.length ? data.map(b => `
       <tr>
         <td>${b.users?.nombre||'—'}</td><td>${b.users?.email||'—'}</td>
@@ -895,11 +898,13 @@
         <td>${b.carrera_interes||'—'}</td>
         <td>${b.promedio_notas||'—'}</td>
         <td>${conEditar ? badgeEstado(b.estado,'becas_profesionales',b.id) : `<span class="badge">${b.estado||'—'}</span>`}</td>
-        <td><button onclick='verBeca(${JSON.stringify(b).replace(/'/g,"&#39;")})' style="padding:4px 12px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#818cf8';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Ver</button></td>
+        <td><button onclick="verBeca('${b.id}')" style="padding:4px 12px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#818cf8';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Ver</button></td>
       </tr>`).join('') : '<tr><td colspan="8" class="empty">Sin postulaciones aún.</td></tr>';
   }
 
-  function verBeca(b) {
+  function verBeca(id) {
+    const b = _becasProfMap[id];
+    if (!b) return;
     const u = b.users || {};
     const filas = [
       ['Nombre', u.nombre || '—'],
