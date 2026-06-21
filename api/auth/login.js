@@ -1,7 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
-import twilio from 'twilio';
-
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -9,14 +7,29 @@ function generateCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-function twilioClient() {
+async function sendWhatsApp(to, body) {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const apiKeySid = process.env.TWILIO_API_KEY_SID;
-  const apiKeySecret = process.env.TWILIO_API_KEY_SECRET;
-  if (apiKeySid && apiKeySecret) {
-    return twilio(apiKeySid, apiKeySecret, { accountSid });
-  }
-  return twilio(accountSid, process.env.TWILIO_AUTH_TOKEN);
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const from = process.env.TWILIO_WHATSAPP_FROM;
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+  const params = new URLSearchParams({
+    From: `whatsapp:${from}`,
+    To: `whatsapp:${to}`,
+    Body: body,
+  });
+  const creds = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
+  console.log('[TWILIO] accountSid:', accountSid?.slice(0, 8), 'authToken len:', authToken?.length, 'from:', from, 'to:', to);
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${creds}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: params.toString(),
+  });
+  const data = await r.json();
+  console.log('[TWILIO RESPONSE]', r.status, JSON.stringify(data));
+  if (!r.ok) throw new Error(`${data.message || 'Error'} (${data.code})`);
 }
 
 export default async function handler(req, res) {
@@ -50,15 +63,11 @@ export default async function handler(req, res) {
 
   if (canal === 'whatsapp') {
     try {
-      await twilioClient().messages.create({
-        from: `whatsapp:${process.env.TWILIO_WHATSAPP_FROM}`,
-        to: `whatsapp:${user.telefono}`,
-        body: `🎓 AJUCON\n\nHola ${user.nombre}, tu código de acceso es:\n\n*${code}*\n\nVálido por 15 minutos. No lo compartas con nadie.`,
-      });
+      await sendWhatsApp(user.telefono, `🎓 AJUCON\n\nHola ${user.nombre}, tu código de acceso es:\n\n*${code}*\n\nVálido por 15 minutos. No lo compartas con nadie.`);
     } catch (e) {
-      console.error('[TWILIO ERROR]', e.message, e.code, e.status);
+      console.error('[TWILIO ERROR]', e.message);
       return res.status(500).json({
-        error: `Error WhatsApp: ${e.message || 'desconocido'} (código ${e.code || '?'})`,
+        error: `Error WhatsApp: ${e.message}`,
       });
     }
     return res.status(200).json({ message: 'Código enviado por WhatsApp.', canal: 'whatsapp', tiene_telefono: true });
