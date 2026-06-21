@@ -18,18 +18,28 @@ async function sendWhatsApp(to, body) {
     Body: body,
   });
   const creds = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
-  console.log('[TWILIO] accountSid:', accountSid?.slice(0, 8), 'authToken len:', authToken?.length, 'from:', from, 'to:', to);
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Basic ${creds}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: params.toString(),
-  });
-  const data = await r.json();
-  console.log('[TWILIO RESPONSE]', r.status, JSON.stringify(data));
-  if (!r.ok) throw new Error(`${data.message || 'Error'} (${data.code})`);
+  console.error('[TWILIO DEBUG] url:', url, '| creds b64 len:', creds.length, '| params:', params.toString().replace(/Body=[^&]+/, 'Body=***'));
+  let r, text;
+  try {
+    r = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${creds}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+    text = await r.text();
+  } catch (fetchErr) {
+    console.error('[TWILIO FETCH ERR]', fetchErr.message);
+    throw fetchErr;
+  }
+  console.error('[TWILIO RESPONSE]', r.status, text.slice(0, 300));
+  if (!r.ok) {
+    let data = {};
+    try { data = JSON.parse(text); } catch {}
+    throw new Error(`${data.message || text} (${data.code || r.status})`);
+  }
 }
 
 export default async function handler(req, res) {
