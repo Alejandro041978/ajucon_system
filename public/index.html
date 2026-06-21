@@ -57,6 +57,15 @@
     [data-theme="dark"] .msg.ok { background: #14532d; color: #86efac; }
     [data-theme="dark"] .msg.err { background: #450a0a; color: #fca5a5; }
     .code-group { display: none; }
+    .canal-btns { display: flex; gap: 8px; margin-bottom: 16px; }
+    .canal-btn {
+      flex: 1; padding: 11px 8px; border-radius: var(--radius-sm);
+      border: 2px solid var(--border); background: var(--surface2);
+      color: var(--text-muted); cursor: pointer; font-size: .88rem;
+      font-weight: 600; transition: var(--transition); text-align: center;
+    }
+    .canal-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .canal-btn:disabled { opacity: .4; cursor: default; }
     .theme-toggle {
       position: fixed; top: 16px; right: 16px;
       z-index: 10;
@@ -104,6 +113,8 @@
         <label>Nombre del colegio</label>
         <input type="text" id="colegio" placeholder="Ej: I.E. Jorge Basadre Grohmann" />
       </div>
+      <label>WhatsApp <span style="font-weight:400;color:var(--text-faint)">(opcional — para recibir códigos por WhatsApp)</span></label>
+      <input type="tel" id="telefono-reg" placeholder="+51 9XXXXXXXX" />
       <label>Ciudad de residencia</label>
       <select id="ciudad" required>
         <option value="">Selecciona tu región</option>
@@ -147,10 +158,17 @@
     <div id="campos-login">
       <label>Email</label>
       <input type="email" id="email-login" placeholder="tu@email.com" required />
-      <button type="submit">Enviar código</button>
+      <div id="canal-selector" style="display:none;margin-bottom:4px">
+        <label style="margin-bottom:8px">¿Cómo quieres recibir tu código?</label>
+        <div class="canal-btns">
+          <button type="button" class="canal-btn active" id="btn-canal-email" onclick="setCanal('email')">✉️ Email</button>
+          <button type="button" class="canal-btn" id="btn-canal-wa" onclick="setCanal('whatsapp')">💬 WhatsApp</button>
+        </div>
+      </div>
+      <button type="submit" id="btn-login-submit">Enviar código</button>
     </div>
     <div class="code-group" id="verify-login">
-      <label>Código de 6 dígitos</label>
+      <label id="verify-login-label">Código de 6 dígitos</label>
       <input type="text" id="code-login" maxlength="6" placeholder="123456" />
       <button type="button" onclick="handleVerify('login')">Verificar</button>
     </div>
@@ -186,9 +204,18 @@
     el.className = 'msg' + (type ? ' ' + type : '');
   }
 
+  let _canalLogin = 'email';
+
+  function setCanal(canal) {
+    _canalLogin = canal;
+    document.getElementById('btn-canal-email').classList.toggle('active', canal === 'email');
+    document.getElementById('btn-canal-wa').classList.toggle('active', canal === 'whatsapp');
+  }
+
   async function handleRegistro(e) {
     e.preventDefault();
     const grado = document.getElementById('grado').value;
+    const telefono = document.getElementById('telefono-reg').value.trim();
     const body = {
       nombre: document.getElementById('nombres').value.trim(),
       apellido: document.getElementById('apellidos').value.trim(),
@@ -196,6 +223,7 @@
       grado,
       ciudad: document.getElementById('ciudad').value,
       colegio: grado.includes('Secundaria') ? document.getElementById('colegio').value : null,
+      telefono: telefono || null,
     };
     const r = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await r.json();
@@ -211,12 +239,44 @@
   async function handleLogin(e) {
     e.preventDefault();
     const email = document.getElementById('email-login').value;
-    const r = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+
+    // Primera llamada: verificar si el usuario tiene teléfono
+    const canalSelector = document.getElementById('canal-selector');
+    if (canalSelector.style.display === 'none') {
+      // Consultar si tiene teléfono antes de mostrar opciones
+      const check = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, canal: 'check' }),
+      });
+      const checkData = await check.json();
+      if (!check.ok) { showMsg(checkData.error, 'err'); return; }
+
+      if (checkData.tiene_telefono) {
+        // Mostrar selector de canal
+        canalSelector.style.display = 'block';
+        document.getElementById('btn-login-submit').textContent = 'Enviar código';
+        showMsg('¿Por dónde quieres recibir tu código?', 'ok');
+        return;
+      }
+      // Sin teléfono: enviar directo por email
+    }
+
+    // Enviar código por el canal elegido
+    const r = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, canal: _canalLogin }),
+    });
     const data = await r.json();
     if (r.ok) {
       document.getElementById('campos-login').style.display = 'none';
       document.getElementById('verify-login').style.display = 'block';
-      showMsg('Código enviado a tu email.', 'ok');
+      const labelTxt = _canalLogin === 'whatsapp'
+        ? '💬 Código enviado por WhatsApp'
+        : '✉️ Código enviado al email';
+      document.getElementById('verify-login-label').textContent = labelTxt;
+      showMsg(data.message, 'ok');
     } else {
       showMsg(data.error, 'err');
     }
