@@ -10,7 +10,10 @@ function generateCode() {
 }
 
 function twilioClient() {
-  return twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  const sid = process.env.TWILIO_ACCOUNT_SID || '';
+  const token = process.env.TWILIO_AUTH_TOKEN || '';
+  console.log('[TWILIO] SID:', sid.slice(0, 6) + '***', '| TOKEN len:', token.length, '| FROM:', process.env.TWILIO_WHATSAPP_FROM);
+  return twilio(sid, token);
 }
 
 export default async function handler(req, res) {
