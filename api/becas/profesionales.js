@@ -1,9 +1,57 @@
 import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
 import { Resend } from 'resend';
+import Anthropic from '@anthropic-ai/sdk';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const resend = new Resend(process.env.RESEND_API_KEY);
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+const PUNTAJE_MINIMO = 65;
+
+async function evaluarConIA(postulacionId, datos) {
+  const { promedio_notas, situacion_economica, motivacion, carrera_interes, modalidad,
+    beca_nombre, beca_institucion, condicion_requisitos, nombre_usuario } = datos;
+
+  const prompt = `Eres un evaluador de becas académicas de AJUCON, plataforma peruana de orientación vocacional.
+
+Evalúa la siguiente postulación y devuelve SOLO un JSON válido con este formato exacto:
+{"puntaje": <número 0-100>, "aprobada": <true/false>, "evaluacion": "<texto breve en español>"}
+
+Criterios de evaluación:
+- Promedio de notas (escala 0-20): peso 40%. Promedio >= 14 es bueno, >= 16 excelente. Promedio < 12 es deficiente.
+- Situación económica: peso 30%. "Muy vulnerable" = máximo puntaje, "Vulnerable" = bueno, "Media-baja" = regular.
+- Carta de motivación: peso 30%. Evalúa claridad, coherencia, metas concretas y genuinidad.
+- Puntaje mínimo para aprobar: ${PUNTAJE_MINIMO}/100.
+
+Datos de la postulación:
+- Beca: ${beca_nombre || 'No especificada'}
+- Institución: ${beca_institucion || 'No especificada'}
+- Requisitos de la beca: ${condicion_requisitos || 'No especificados'}
+- Carrera de interés: ${carrera_interes}
+- Modalidad: ${modalidad}
+- Promedio de notas: ${promedio_notas}/20
+- Situación económica: ${situacion_economica}
+- Carta de motivación: "${motivacion}"
+
+Responde SOLO con el JSON, sin texto adicional.`;
+
+  const msg = await anthropic.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 300,
+    messages: [{ role: 'user', content: prompt }],
+  });
+
+  const texto = msg.content[0].text.trim();
+  const resultado = JSON.parse(texto);
+
+  const estado = resultado.aprobada ? 'aprobada' : 'rechazada';
+  await supabase.from('becas_profesionales').update({
+    puntaje_ia: resultado.puntaje,
+    evaluacion_ia: resultado.evaluacion,
+    estado,
+  }).eq('id', postulacionId);
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
@@ -18,37 +66,45 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Token inválido.' });
   }
 
-  const { rut, fecha_nacimiento, direccion, telefono, tipo_institucion, carrera_interes, modalidad, region, promedio_notas, situacion_economica, motivacion, beca_id, beca_nombre, beca_institucion, documentos } = req.body;
+  const { rut, fecha_nacimiento, direccion, telefono, carrera_interes, modalidad, region,
+    promedio_notas, situacion_economica, motivacion, beca_id, beca_nombre, beca_institucion, documentos } = req.body;
 
   if (!rut || !fecha_nacimiento || !direccion || !telefono || !carrera_interes || !modalidad || !promedio_notas || !situacion_economica || !motivacion) {
     return res.status(400).json({ error: 'Todos los campos son requeridos.' });
   }
+  if (!region) return res.status(400).json({ error: 'Debes seleccionar tu ciudad / región.' });
+  if (promedio_notas < 0 || promedio_notas > 20) return res.status(400).json({ error: 'El promedio debe estar entre 0 y 20.' });
 
-  if (!region) {
-    return res.status(400).json({ error: 'Debes seleccionar tu ciudad / región.' });
-  }
-
-  if (promedio_notas < 0 || promedio_notas > 20) {
-    return res.status(400).json({ error: 'El promedio debe estar entre 0 y 20.' });
-  }
-
-  const { error } = await supabase.from('becas_profesionales').insert({
+  const { data: postulacion, error } = await supabase.from('becas_profesionales').insert({
     user_id: payload.id,
     rut, fecha_nacimiento, direccion, telefono,
-    tipo_institucion, carrera_interes, modalidad, region: region || null,
+    carrera_interes, modalidad, region: region || null,
     promedio_notas, situacion_economica, motivacion,
     beca_id: beca_id || null,
     beca_nombre: beca_nombre || null,
     beca_institucion: beca_institucion || null,
     documentos: documentos || null,
-  });
+    estado: 'pendiente',
+  }).select('id').single();
 
   if (error) return res.status(500).json({ error: 'Error al guardar la postulación.' });
 
-  // Obtener nombre del usuario
   const { data: usuario } = await supabase.from('users').select('nombre, email').eq('id', payload.id).single();
 
-  // Email de confirmación al usuario
+  // Obtener requisitos de la beca para el contexto de la IA
+  let condicion_requisitos = null;
+  if (beca_id) {
+    const { data: beca } = await supabase.from('becas_disponibles').select('condicion_requisitos').eq('id', beca_id).single();
+    condicion_requisitos = beca?.condicion_requisitos || null;
+  }
+
+  // Evaluación IA en segundo plano (no bloquea la respuesta)
+  evaluarConIA(postulacion.id, {
+    promedio_notas, situacion_economica, motivacion, carrera_interes, modalidad,
+    beca_nombre, beca_institucion, condicion_requisitos, nombre_usuario: usuario?.nombre,
+  }).catch(err => console.error('[IA EVAL ERROR]', err.message));
+
+  // Email confirmación al usuario
   resend.emails.send({
     from: 'AJUCON <noreply@ajucon.org.pe>',
     to: usuario?.email,
@@ -74,11 +130,11 @@ export default async function handler(req, res) {
       </div>`,
   }).catch(() => {});
 
-  // Email de notificación al administrador
+  // Email notificación al administrador
   resend.emails.send({
     from: 'AJUCON <noreply@ajucon.org.pe>',
     to: 'admin@balticec.com',
-    subject: `Nueva postulación — Beca Profesional`,
+    subject: `Nueva postulación — ${beca_nombre || 'Beca Profesional'}`,
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px">
         <div style="background:linear-gradient(135deg,#d97706,#f59e0b);border-radius:12px;padding:24px;color:white;margin-bottom:24px">
@@ -88,16 +144,11 @@ export default async function handler(req, res) {
         <table style="width:100%;border-collapse:collapse;font-size:14px">
           <tr><td style="padding:8px 0;color:#64748b;width:40%">Nombre</td><td style="padding:8px 0;color:#1e293b;font-weight:600">${usuario?.nombre || '—'}</td></tr>
           <tr><td style="padding:8px 0;color:#64748b">Email</td><td style="padding:8px 0;color:#1e293b">${usuario?.email || '—'}</td></tr>
-          ${beca_nombre ? `<tr><td style="padding:8px 0;color:#64748b;font-weight:700">Beca postulada</td><td style="padding:8px 0;color:#d97706;font-weight:700">${beca_nombre}</td></tr>` : ''}
+          ${beca_nombre ? `<tr><td style="padding:8px 0;color:#64748b;font-weight:700">Beca</td><td style="padding:8px 0;color:#d97706;font-weight:700">${beca_nombre}</td></tr>` : ''}
           ${beca_institucion ? `<tr><td style="padding:8px 0;color:#64748b">Institución</td><td style="padding:8px 0;color:#1e293b">${beca_institucion}</td></tr>` : ''}
           <tr><td style="padding:8px 0;color:#64748b">DNI</td><td style="padding:8px 0;color:#1e293b">${rut}</td></tr>
-          <tr><td style="padding:8px 0;color:#64748b">Fecha de nacimiento</td><td style="padding:8px 0;color:#1e293b">${fecha_nacimiento}</td></tr>
-          <tr><td style="padding:8px 0;color:#64748b">Dirección</td><td style="padding:8px 0;color:#1e293b">${direccion}</td></tr>
-          <tr><td style="padding:8px 0;color:#64748b">Teléfono</td><td style="padding:8px 0;color:#1e293b">${telefono}</td></tr>
-          <tr><td style="padding:8px 0;color:#64748b">Modalidad</td><td style="padding:8px 0;color:#1e293b">${modalidad}${region ? ' — ' + region : ''}</td></tr>
-          <tr><td style="padding:8px 0;color:#64748b">Tipo de institución</td><td style="padding:8px 0;color:#1e293b">${tipo_institucion}</td></tr>
           <tr><td style="padding:8px 0;color:#64748b">Carrera</td><td style="padding:8px 0;color:#1e293b">${carrera_interes}</td></tr>
-          <tr><td style="padding:8px 0;color:#64748b">Promedio</td><td style="padding:8px 0;color:#1e293b">${promedio_notas}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b">Promedio</td><td style="padding:8px 0;color:#1e293b">${promedio_notas}/20</td></tr>
           <tr><td style="padding:8px 0;color:#64748b">Situación económica</td><td style="padding:8px 0;color:#1e293b">${situacion_economica}</td></tr>
         </table>
         <div style="margin-top:20px;padding:16px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0">

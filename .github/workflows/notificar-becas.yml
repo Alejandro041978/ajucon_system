@@ -1,0 +1,19 @@
+name: Notificar becas aprobadas
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'   # cada 4 horas
+  workflow_dispatch:          # ejecución manual desde GitHub
+
+jobs:
+  notificar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar endpoint de notificación
+        run: |
+          curl -s -X POST https://system.ajucon.org.pe/api/admin/notificar-becas \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --fail \
+            | tee resultado.json
+          cat resultado.json
