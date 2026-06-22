@@ -198,32 +198,22 @@
             <input type="tel" id="telefono" placeholder="9XXXXXXXX" maxlength="9" required />
           </div>
 
-          <div class="section-title">Modalidad de estudio</div>
+          <div class="section-title">Institución y modalidad</div>
+          <div class="field">
+            <label>Institución educativa</label>
+            <input type="text" id="campo-institucion-visible" readonly style="background:var(--surface2);color:var(--text-muted);cursor:not-allowed;" />
+          </div>
           <div class="field" style="max-width:50%">
-            <label>Modalidad de interés</label>
-            <select id="modalidad" required>
-              <option value="">Selecciona</option>
-              <option value="Online">Online</option>
-              <option value="Presencial">Presencial</option>
-            </select>
+            <label>Modalidad de estudios</label>
+            <input type="text" id="campo-modalidad-visible" readonly style="background:var(--surface2);color:var(--text-muted);cursor:not-allowed;" />
+            <input type="hidden" id="modalidad" />
           </div>
 
-          <div class="section-title">Estudios de interés</div>
-          <div class="field">
-            <label>Tipo de institución</label>
-            <select id="tipo_institucion" required>
-              <option value="">Selecciona</option>
-              <option>Instituto Superior Licenciado</option>
-              <option>Universidad Licenciada</option>
-            </select>
-          </div>
+          <div class="section-title">Carrera de interés</div>
           <div class="field">
             <label>Carrera o programa de interés</label>
             <select id="carrera_interes" required>
               <option value="">Selecciona</option>
-              <option>Administración</option><option>Contabilidad</option>
-              <option>Enfermería</option><option>Farmacia</option>
-              <option>Marketing</option><option>Computación</option>
             </select>
           </div>
 
@@ -354,16 +344,38 @@
   function seleccionarBeca(id) {
     const b = _becasCache[id];
     if (!b) return;
+
+    // Campos ocultos para el envío
     document.getElementById('campo-beca-id').value = b.id;
     document.getElementById('campo-beca-nombre').value = b.nombre;
     document.getElementById('campo-beca-institucion').value = b.institucion;
+
+    // Institución bloqueada
+    document.getElementById('campo-institucion-visible').value = b.institucion || '';
+
+    // Modalidad bloqueada
+    const modalidad = b.modalidad_estudios || '';
+    document.getElementById('campo-modalidad-visible').value = modalidad;
+    document.getElementById('modalidad').value = modalidad;
+
+    // Carreras dinámicas desde la beca
+    const selectCarrera = document.getElementById('carrera_interes');
+    selectCarrera.innerHTML = '<option value="">Selecciona</option>';
+    if (b.carreras_disponibles) {
+      b.carreras_disponibles.split(',').map(c => c.trim()).filter(Boolean).forEach(carrera => {
+        const opt = document.createElement('option');
+        opt.value = carrera;
+        opt.textContent = carrera;
+        selectCarrera.appendChild(opt);
+      });
+    }
 
     document.getElementById('badge-beca-seleccionada').innerHTML =
       `<strong>🎓 ${b.nombre}</strong>Institución: ${b.institucion}`;
 
     document.getElementById('screen-seleccion').style.display = 'none';
     document.getElementById('screen-form-wrap').style.display = 'block';
-    document.getElementById('header-title').textContent = 'Postulación — ' + nombre;
+    document.getElementById('header-title').textContent = 'Postulación — ' + b.nombre;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -388,7 +400,6 @@
       fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
       direccion: document.getElementById('direccion').value,
       telefono: document.getElementById('telefono').value,
-      tipo_institucion: document.getElementById('tipo_institucion').value,
       carrera_interes: document.getElementById('carrera_interes').value,
       promedio_notas: parseFloat(document.getElementById('promedio_notas').value),
       situacion_economica: document.getElementById('situacion_economica').value,
