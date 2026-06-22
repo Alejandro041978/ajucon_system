@@ -67,7 +67,7 @@ export default async function handler(req, res) {
           <tr><td style="padding:8px 0;color:#64748b">Modalidad</td><td style="padding:8px 0;color:#1e293b">${modalidad}</td></tr>
         </table>
         <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:16px;margin:20px 0">
-          <p style="margin:0;font-size:14px;color:#92400e;line-height:1.6">⏳ Revisaremos tu solicitud y te contactaremos a este email en un plazo de <strong>5 a 10 días hábiles</strong>.</p>
+          <p style="margin:0;font-size:14px;color:#92400e;line-height:1.6">⏳ Revisaremos tu solicitud y te contactaremos a este email en un plazo de <strong>3 a 5 días hábiles</strong>.</p>
         </div>
         <p style="color:#94a3b8;font-size:13px">Si tienes alguna consulta puedes responder a este correo.<br>— Equipo AJUCON</p>
       </div>`,
