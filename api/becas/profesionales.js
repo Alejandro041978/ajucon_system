@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
   const { rut, fecha_nacimiento, direccion, telefono, tipo_institucion, carrera_interes, modalidad, region, promedio_notas, situacion_economica, motivacion, beca_id, beca_nombre, beca_institucion } = req.body;
 
-  if (!rut || !fecha_nacimiento || !direccion || !telefono || !tipo_institucion || !carrera_interes || !modalidad || !promedio_notas || !situacion_economica || !motivacion) {
+  if (!rut || !fecha_nacimiento || !direccion || !telefono || !carrera_interes || !modalidad || !promedio_notas || !situacion_economica || !motivacion) {
     return res.status(400).json({ error: 'Todos los campos son requeridos.' });
   }
 
@@ -47,6 +47,33 @@ export default async function handler(req, res) {
   // Obtener nombre del usuario
   const { data: usuario } = await supabase.from('users').select('nombre, email').eq('id', payload.id).single();
 
+  // Email de confirmación al usuario
+  resend.emails.send({
+    from: 'AJUCON <noreply@ajucon.org.pe>',
+    to: usuario?.email,
+    subject: `Tu postulación fue recibida — ${beca_nombre || 'Beca Profesional'}`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:500px;margin:0 auto;padding:32px 24px">
+        <div style="background:linear-gradient(135deg,#d97706,#f59e0b);border-radius:12px;padding:24px;color:white;margin-bottom:24px">
+          <h1 style="margin:0 0 4px;font-size:20px">¡Postulación recibida! 🎓</h1>
+          <p style="margin:0;opacity:.85;font-size:14px">AJUCON — Becas de Estudios Profesionales</p>
+        </div>
+        <p style="color:#1e293b;font-size:15px">Hola <strong>${usuario?.nombre || ''}</strong>,</p>
+        <p style="color:#475569;font-size:14px;line-height:1.6">Hemos recibido tu postulación con éxito. Aquí el resumen:</p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;margin:16px 0">
+          ${beca_nombre ? `<tr><td style="padding:8px 0;color:#64748b;width:40%">Beca</td><td style="padding:8px 0;color:#d97706;font-weight:700">${beca_nombre}</td></tr>` : ''}
+          ${beca_institucion ? `<tr><td style="padding:8px 0;color:#64748b">Institución</td><td style="padding:8px 0;color:#1e293b;font-weight:600">${beca_institucion}</td></tr>` : ''}
+          <tr><td style="padding:8px 0;color:#64748b">Carrera</td><td style="padding:8px 0;color:#1e293b">${carrera_interes}</td></tr>
+          <tr><td style="padding:8px 0;color:#64748b">Modalidad</td><td style="padding:8px 0;color:#1e293b">${modalidad}</td></tr>
+        </table>
+        <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:16px;margin:20px 0">
+          <p style="margin:0;font-size:14px;color:#92400e;line-height:1.6">⏳ Revisaremos tu solicitud y te contactaremos a este email en un plazo de <strong>5 a 10 días hábiles</strong>.</p>
+        </div>
+        <p style="color:#94a3b8;font-size:13px">Si tienes alguna consulta puedes responder a este correo.<br>— Equipo AJUCON</p>
+      </div>`,
+  }).catch(() => {});
+
+  // Email de notificación al administrador
   resend.emails.send({
     from: 'AJUCON <noreply@ajucon.org.pe>',
     to: 'admin@balticec.com',
