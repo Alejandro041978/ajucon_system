@@ -234,6 +234,24 @@
             </div>
           </div>
 
+          <div class="section-title">Documentos de respaldo <span style="font-weight:400;color:var(--text-faint)">(opcionales)</span></div>
+          <div class="info-box" style="margin-bottom:16px">
+            <strong>📎 Sube las evidencias que acrediten los requisitos de la beca</strong>
+            Formatos aceptados: PDF o JPG. Tamaño máximo: 5 MB por archivo.
+          </div>
+          <div class="field">
+            <label>Documento 1</label>
+            <input type="file" id="doc-1" accept=".pdf,.jpg,.jpeg" style="padding:8px" />
+          </div>
+          <div class="field">
+            <label>Documento 2</label>
+            <input type="file" id="doc-2" accept=".pdf,.jpg,.jpeg" style="padding:8px" />
+          </div>
+          <div class="field">
+            <label>Documento 3</label>
+            <input type="file" id="doc-3" accept=".pdf,.jpg,.jpeg" style="padding:8px" />
+          </div>
+
           <div class="section-title">Carta de motivación</div>
           <div class="field">
             <label>¿Por qué postulas a esta beca y qué harás con ella?</label>
@@ -386,11 +404,59 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  async function subirArchivo(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result.split(',')[1];
+        const r = await fetch('/api/becas/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ base64, filename: file.name, mimetype: file.type }),
+        });
+        const data = await r.json();
+        if (r.ok) resolve(data.url);
+        else reject(new Error(data.error || 'Error al subir archivo'));
+      };
+      reader.onerror = () => reject(new Error('Error al leer el archivo'));
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function enviarPostulacion(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-enviar');
     btn.disabled = true;
-    btn.textContent = 'Enviando...';
+    btn.textContent = 'Subiendo documentos...';
+
+    // Subir documentos opcionales
+    const documentos = [];
+    for (const id of ['doc-1', 'doc-2', 'doc-3']) {
+      const file = document.getElementById(id).files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          const el = document.getElementById('msg-error');
+          el.textContent = `El archivo "${file.name}" supera el límite de 5 MB.`;
+          el.className = 'msg err';
+          btn.disabled = false;
+          btn.textContent = 'Enviar postulación';
+          return;
+        }
+        try {
+          const url = await subirArchivo(file);
+          documentos.push(url);
+        } catch (err) {
+          const el = document.getElementById('msg-error');
+          el.textContent = err.message;
+          el.className = 'msg err';
+          btn.disabled = false;
+          btn.textContent = 'Enviar postulación';
+          return;
+        }
+      }
+    }
+
+    btn.textContent = 'Enviando postulación...';
 
     const body = {
       beca_id: document.getElementById('campo-beca-id').value || null,
@@ -406,6 +472,7 @@
       modalidad: document.getElementById('modalidad').value,
       region: document.getElementById('region').value || null,
       motivacion: document.getElementById('motivacion').value,
+      documentos: documentos.length ? documentos : null,
     };
 
     const r = await fetch('/api/becas/profesionales', {
