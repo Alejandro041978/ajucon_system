@@ -283,7 +283,18 @@
 
   <!-- Becas Profesionales -->
   <div class="section" id="sec-becas_profesionales">
-    <h2>Postulaciones — Becas Profesionales</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="margin:0">Postulaciones — Becas Profesionales</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:.8rem;color:var(--text-muted)">Filtrar:</span>
+        <select id="filtro-bp-estado" onchange="filtrarBecasProf()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 10px;font-size:.83rem;cursor:pointer">
+          <option value="">Todos</option>
+          <option value="en_revision">En revisión</option>
+          <option value="aprobada">Aprobada</option>
+          <option value="rechazada">Rechazada</option>
+        </select>
+      </div>
+    </div>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Nombre</th><th>Email</th><th>Beca postulada</th><th>Institución</th><th>Carrera</th><th>Promedio</th><th>Estado</th><th></th></tr></thead>
@@ -838,8 +849,11 @@
   }
 
   function badgeEstado(estado, tabla, id) {
+    const opciones = tabla === 'becas_profesionales'
+      ? ['en_revision','aprobada','rechazada']
+      : ['pendiente','en_revision','aprobada','rechazada'];
     return `<select class="estado-select" onchange="setEstado('${tabla}','${id}',this.value)">
-      ${['pendiente','en_revision','aprobada','rechazada'].map(e =>
+      ${opciones.map(e =>
         `<option value="${e}" ${e === estado ? 'selected' : ''}>${e.replace('_',' ')}</option>`
       ).join('')}
     </select>`;
@@ -884,12 +898,11 @@
   }
 
   const _becasProfMap = {};
+  let _becasProfData = [];
 
-  async function cargarBecasProfesionales() {
-    const data = await api('becas_profesionales'); if (!data) return;
+  function renderBecasProf(data) {
     const tbody = document.getElementById('tbody-becas_profesionales');
     const conEditar = puedoEditar('becas_profesionales');
-    data.forEach(b => { _becasProfMap[b.id] = b; });
     tbody.innerHTML = data.length ? data.map(b => `
       <tr>
         <td>${b.users?.nombre||'—'}</td><td>${b.users?.email||'—'}</td>
@@ -902,7 +915,20 @@
           <button onclick="verBeca('${b.id}')" style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer;margin-right:4px" onmouseover="this.style.borderColor='#818cf8';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Ver</button>
           ${puedoBorrar('becas_profesionales') ? `<button onclick="borrarPostulacion('${b.id}')" style="padding:4px 10px;background:none;border:1px solid #450a0a;border-radius:6px;color:#fca5a5;font-size:.78rem;cursor:pointer">Borrar</button>` : ''}
         </td>
-      </tr>`).join('') : '<tr><td colspan="8" class="empty">Sin postulaciones aún.</td></tr>';
+      </tr>`).join('') : '<tr><td colspan="8" class="empty">Sin postulaciones para este filtro.</td></tr>';
+  }
+
+  function filtrarBecasProf() {
+    const filtro = document.getElementById('filtro-bp-estado').value;
+    const datos = filtro ? _becasProfData.filter(b => b.estado === filtro) : _becasProfData;
+    renderBecasProf(datos);
+  }
+
+  async function cargarBecasProfesionales() {
+    const data = await api('becas_profesionales'); if (!data) return;
+    data.forEach(b => { _becasProfMap[b.id] = b; });
+    _becasProfData = data;
+    filtrarBecasProf();
   }
 
   function verBeca(id) {
