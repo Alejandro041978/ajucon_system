@@ -114,8 +114,17 @@ export default async function handler(req, res) {
                 Luego de revisar tu postulación a la beca <strong>${p.beca_nombre || 'Beca Profesional'}</strong>,
                 lamentamos informarte que en esta oportunidad no cumple con todos los criterios requeridos.
               </p>
+              <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:16px;margin:20px 0">
+                <p style="margin:0;font-size:14px;color:#92400e;line-height:1.7">
+                  💡 <strong>¿Puedo volver a postular?</strong><br/>
+                  Sí, puedes volver a postular cuando lo desees. Te recomendamos revisar los requisitos de la beca y mejorar los siguientes aspectos antes de tu próxima postulación:
+                  <br/>• <strong>Promedio de notas:</strong> un promedio más alto mejora significativamente tus posibilidades.
+                  <br/>• <strong>Carta de motivación:</strong> explica con detalle tus metas, tu situación y por qué mereces esta beca.
+                  <br/>• <strong>Documentos de respaldo:</strong> adjunta evidencia que sustente tu situación económica y académica.
+                </p>
+              </div>
               <p style="color:#475569;font-size:14px;line-height:1.6">
-                Te invitamos a seguir preparándote y a estar atento a nuevas becas disponibles en la plataforma AJUCON.
+                Ingresa a <strong>system.ajucon.org.pe</strong>, revisa las becas disponibles y vuelve a postular con la información actualizada. ¡Estamos para apoyarte!
               </p>
               <p style="color:#94a3b8;font-size:13px;margin-top:24px">— Equipo AJUCON</p>
             </div>`,
