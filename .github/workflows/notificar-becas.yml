@@ -2,7 +2,7 @@ name: Notificar becas aprobadas
 
 on:
   schedule:
-    - cron: '0 */4 * * *'   # cada 4 horas
+    - cron: '0 * * * *'     # cada hora
   workflow_dispatch:          # ejecución manual desde GitHub
 
 jobs:

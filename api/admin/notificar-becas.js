@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   }
 
   // Postulaciones aprobadas con más de 80 horas y aún no notificadas
-  const hace80h = new Date(Date.now() - 80 * 60 * 60 * 1000).toISOString();
+  const hace80h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
   const { data: pendientes, error } = await supabase
     .from('becas_profesionales')
