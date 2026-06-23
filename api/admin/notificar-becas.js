@@ -92,7 +92,7 @@ export default async function handler(req, res) {
           </div>
 
           <p style="color:#94a3b8;font-size:13px;margin-top:24px">
-            Si tienes dudas, responde a este correo o contáctanos.<br/>
+            Si tienes dudas, comunícate con la asesora de ${p.beca_institucion || 'la institución'}.<br/>
             — Equipo AJUCON
           </p>
         </div>`,
