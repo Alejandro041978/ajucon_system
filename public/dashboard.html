@@ -72,6 +72,35 @@
     }
     .card.soon { opacity: .5; cursor: default; }
     .card.soon:hover { transform: none; box-shadow: var(--shadow); border-color: var(--border); }
+
+    .programa {
+      margin-bottom: 40px;
+    }
+    .programa-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+    }
+    .programa-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .programa-header h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0;
+    }
+    .programa-header span {
+      font-size: .8rem;
+      color: var(--text-muted);
+      margin-left: auto;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -93,57 +122,73 @@
     <p>¿En qué te podemos ayudar hoy?</p>
   </div>
 
-  <div class="grid">
-
-    <a class="card" href="chat.html?agente=psicologa" style="--color:#7c3aed;--bg:#f5f3ff">
-      <div class="card-icon">🧠</div>
-      <h3>Psicóloga Vocacional Online</h3>
-      <p>Conversa con nuestra psicóloga IA para descubrir tu vocación y orientarte sobre tu futuro.</p>
-      <span class="badge">Agente IA</span>
-    </a>
-
-    <a class="card" href="chat.html?agente=profesor" style="--color:#0369a1;--bg:#e0f2fe">
-      <div class="card-icon">📚</div>
-      <h3>Profesor Preuniversitario Online</h3>
-      <p>Refuerza matemáticas, lenguaje, ciencias y más con un profesor IA disponible 24/7.</p>
-      <span class="badge">Agente IA</span>
-    </a>
-
-    <a class="card" href="test-vocacional.html" style="--color:#059669;--bg:#d1fae5">
-      <div class="card-icon">✏️</div>
-      <h3>Test Vocacional</h3>
-      <p>Responde un cuestionario y descubre qué carreras se alinean mejor con tu perfil e intereses.</p>
-      <span class="badge">Cuestionario</span>
-    </a>
-
-    <a class="card" href="becas-profesionales.html" style="--color:#d97706;--bg:#fef3c7">
-      <div class="card-icon">🎓</div>
-      <h3>Postulación a Becas de Estudios Profesionales</h3>
-      <p>Conoce las becas disponibles para estudios universitarios y técnicos, y postula en línea.</p>
-      <span class="badge">Formulario</span>
-    </a>
-
-    <a class="card" href="becas-cursos.html" style="--color:#db2777;--bg:#fce7f3">
-      <div class="card-icon">💻</div>
-      <h3>Acceso a Becas para Cursos Online</h3>
-      <p>Accede a becas para plataformas de cursos online como Coursera, Udemy y más.</p>
-      <span class="badge">Formulario</span>
-    </a>
-
-    <a class="card" href="reporte.html" style="--color:#6366f1;--bg:#ede9fe">
-      <div class="card-icon">📄</div>
-      <h3>Mi Reporte Vocacional</h3>
-      <p>Descarga tu informe personalizado con tu perfil RIASEC, resultados CHASIDE y orientación de carrera generada por IA.</p>
-      <span class="badge">PDF</span>
-    </a>
-
-    <div class="card soon" style="--color:#94a3b8;--bg:#f1f5f9">
-      <div class="card-icon">🚀</div>
-      <h3>Próximamente</h3>
-      <p>Estamos preparando más servicios para apoyarte en tu camino académico.</p>
-      <span class="badge">En desarrollo</span>
+  <!-- Programa 1 -->
+  <div class="programa">
+    <div class="programa-header">
+      <div class="programa-icon" style="background:#f5f3ff;color:#7c3aed">🎯</div>
+      <h3>Programa Vocacional Jóvenes con Futuro</h3>
+      <span>4 servicios disponibles</span>
     </div>
+    <div class="grid">
+      <a class="card" href="chat.html?agente=psicologa" style="--color:#7c3aed;--bg:#f5f3ff">
+        <div class="card-icon">🧠</div>
+        <h3>Psicóloga Vocacional Online</h3>
+        <p>Conversa con nuestra psicóloga IA para descubrir tu vocación y orientarte sobre tu futuro.</p>
+        <span class="badge">Agente IA</span>
+      </a>
+      <a class="card" href="chat.html?agente=profesor" style="--color:#0369a1;--bg:#e0f2fe">
+        <div class="card-icon">📚</div>
+        <h3>Profesor Preuniversitario Online</h3>
+        <p>Refuerza matemáticas, lenguaje, ciencias y más con un profesor IA disponible 24/7.</p>
+        <span class="badge">Agente IA</span>
+      </a>
+      <a class="card" href="test-vocacional.html" style="--color:#059669;--bg:#d1fae5">
+        <div class="card-icon">✏️</div>
+        <h3>Test Vocacional</h3>
+        <p>Responde un cuestionario y descubre qué carreras se alinean mejor con tu perfil e intereses.</p>
+        <span class="badge">Cuestionario</span>
+      </a>
+      <a class="card" href="reporte.html" style="--color:#6366f1;--bg:#ede9fe">
+        <div class="card-icon">📄</div>
+        <h3>Mi Reporte Vocacional</h3>
+        <p>Descarga tu informe personalizado con tu perfil RIASEC, resultados CHASIDE y orientación de carrera generada por IA.</p>
+        <span class="badge">PDF</span>
+      </a>
+    </div>
+  </div>
 
+  <!-- Programa 2 -->
+  <div class="programa">
+    <div class="programa-header">
+      <div class="programa-icon" style="background:#fce7f3;color:#db2777">🌐</div>
+      <h3>Programa Nacional Jóvenes Perú 2026</h3>
+      <span>1 servicio disponible</span>
+    </div>
+    <div class="grid">
+      <a class="card" href="becas-cursos.html" style="--color:#db2777;--bg:#fce7f3">
+        <div class="card-icon">💻</div>
+        <h3>Acceso a Becas para Cursos Online</h3>
+        <p>Accede a becas para plataformas de cursos online como Coursera, Udemy y más.</p>
+        <span class="badge">Formulario</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Programa 3 -->
+  <div class="programa">
+    <div class="programa-header">
+      <div class="programa-icon" style="background:#fef3c7;color:#d97706">🎓</div>
+      <h3>Programa de Becas de Estudio</h3>
+      <span>1 servicio disponible</span>
+    </div>
+    <div class="grid">
+      <a class="card" href="becas-profesionales.html" style="--color:#d97706;--bg:#fef3c7">
+        <div class="card-icon">🎓</div>
+        <h3>Postulación a Becas de Estudios Profesionales</h3>
+        <p>Conoce las becas disponibles para estudios universitarios y técnicos, y postula en línea.</p>
+        <span class="badge">Formulario</span>
+      </a>
+    </div>
   </div>
 </main>
 
