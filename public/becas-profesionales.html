@@ -107,6 +107,42 @@
     button[type=submit]:hover { background: #b45309; }
     button[type=submit]:disabled { background: var(--text-faint); cursor: default; }
 
+    .declaracion-box {
+      background: #fff7ed;
+      border: 2px solid #fed7aa;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0 8px;
+    }
+    [data-theme="dark"] .declaracion-box { background: #431407; border-color: #9a3412; }
+    .declaracion-box p {
+      font-size: .85rem;
+      color: #9a3412;
+      line-height: 1.65;
+      margin: 0 0 14px;
+    }
+    [data-theme="dark"] .declaracion-box p { color: #fdba74; }
+    .declaracion-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .declaracion-check input[type=checkbox] {
+      width: 20px; height: 20px;
+      min-width: 20px;
+      margin-top: 2px;
+      accent-color: #d97706;
+      cursor: pointer;
+    }
+    .declaracion-check span {
+      font-size: .88rem;
+      font-weight: 600;
+      color: #7c2d12;
+      line-height: 1.55;
+    }
+    [data-theme="dark"] .declaracion-check span { color: #fb923c; }
+
     #screen-exito { display: none; text-align: center; padding: 48px 32px; }
     #screen-exito .icon { font-size: 3rem; margin-bottom: 16px; }
     #screen-exito h2 { font-size: 1.4rem; color: var(--text); margin-bottom: 8px; }
@@ -258,6 +294,16 @@
             <textarea id="motivacion" placeholder="Cuéntanos sobre tus metas, tu situación y cómo esta beca cambiaría tu futuro..." required></textarea>
           </div>
 
+          <div class="declaracion-box">
+            <p>⚠️ <strong>Declaración jurada obligatoria</strong><br/>
+              Esta beca es exclusivamente para personas que desean <strong>iniciar su carrera</strong> en la institución indicada. No está disponible para estudiantes actuales ni exestudiantes de dicha institución.
+            </p>
+            <label class="declaracion-check">
+              <input type="checkbox" id="declaracion-jurada" required />
+              <span>Declaro que NO soy ni he sido estudiante de <span id="declaracion-institucion">la institución</span> a la que postulo, y entiendo que esta beca es exclusiva para nuevos estudiantes que desean iniciar su carrera en dicha institución.</span>
+            </label>
+          </div>
+
           <button type="submit" id="btn-enviar">Enviar postulación</button>
           <div class="msg" id="msg-error"></div>
         </form>
@@ -266,7 +312,7 @@
       <div id="screen-exito">
         <div class="icon">✅</div>
         <h2>¡Postulación enviada!</h2>
-        <p>Hemos recibido tu postulación. Revisaremos tu solicitud y te contactaremos al email registrado en un plazo de <strong>3 a 5 días hábiles</strong>.</p>
+        <p>Hemos recibido tu postulación. Revisaremos tu solicitud y te contactaremos al email registrado en un plazo de <strong>24 horas</strong>.</p>
         <a href="/dashboard.html" class="btn-dashboard">Volver al inicio</a>
       </div>
     </div>
@@ -390,6 +436,10 @@
 
     document.getElementById('badge-beca-seleccionada').innerHTML =
       `<strong>🎓 ${b.nombre}</strong>Institución: ${b.institucion}`;
+
+    // Actualizar nombre institución en declaración jurada
+    document.getElementById('declaracion-institucion').textContent = b.institucion || 'la institución';
+    document.getElementById('declaracion-jurada').checked = false;
 
     document.getElementById('screen-seleccion').style.display = 'none';
     document.getElementById('screen-form-wrap').style.display = 'block';
