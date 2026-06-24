@@ -28,22 +28,22 @@ export default async function handler(req, res) {
   if (!verifyAdmin(req)) return res.status(401).json({ error: 'No autorizado.' });
 
   if (req.method === 'POST') {
-    const { nombre, institucion, cantidad_disponible, condicion_requisitos, monto_total, vigencia, beneficio, carreras_disponibles, modalidad_estudios, orden } = req.body;
+    const { nombre, institucion, cantidad_disponible, condicion_requisitos, monto_total, vigencia, beneficio, carreras_disponibles, modalidad_estudios, orden, email_institucion } = req.body;
     if (!nombre || !institucion) return res.status(400).json({ error: 'Nombre e institución son requeridos.' });
     const { data, error } = await supabase
       .from('becas_disponibles')
-      .insert({ nombre, institucion, cantidad_disponible, condicion_requisitos, monto_total, vigencia: vigencia || null, beneficio, carreras_disponibles: carreras_disponibles || null, modalidad_estudios: modalidad_estudios || null, orden: orden || 99, activo: true })
+      .insert({ nombre, institucion, cantidad_disponible, condicion_requisitos, monto_total, vigencia: vigencia || null, beneficio, carreras_disponibles: carreras_disponibles || null, modalidad_estudios: modalidad_estudios || null, orden: orden || 99, activo: true, email_institucion: email_institucion || null })
       .select().single();
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json(data);
   }
 
   if (req.method === 'PUT') {
-    const { id, nombre, institucion, cantidad_disponible, condicion_requisitos, monto_total, vigencia, beneficio, carreras_disponibles, modalidad_estudios, orden, activo } = req.body;
+    const { id, nombre, institucion, cantidad_disponible, condicion_requisitos, monto_total, vigencia, beneficio, carreras_disponibles, modalidad_estudios, orden, activo, email_institucion } = req.body;
     if (!id) return res.status(400).json({ error: 'ID requerido.' });
     const { data, error } = await supabase
       .from('becas_disponibles')
-      .update({ nombre, institucion, cantidad_disponible, condicion_requisitos, monto_total, vigencia: vigencia || null, beneficio, carreras_disponibles: carreras_disponibles || null, modalidad_estudios: modalidad_estudios || null, orden, activo })
+      .update({ nombre, institucion, cantidad_disponible, condicion_requisitos, monto_total, vigencia: vigencia || null, beneficio, carreras_disponibles: carreras_disponibles || null, modalidad_estudios: modalidad_estudios || null, orden, activo, email_institucion: email_institucion || null })
       .eq('id', id)
       .select().single();
     if (error) return res.status(500).json({ error: error.message });

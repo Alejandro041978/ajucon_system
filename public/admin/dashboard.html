@@ -273,6 +273,11 @@
         <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">MODALIDAD DE ESTUDIOS</label>
         <input id="beca-modalidad" type="text" placeholder="Ej: Presencial, Online, Híbrida" style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;box-sizing:border-box" />
       </div>
+      <div style="grid-column:1/-1">
+        <label style="font-size:.75rem;color:#94a3b8;display:block;margin-bottom:5px">CORREO DE LA INSTITUCIÓN</label>
+        <input id="beca-email" type="email" placeholder="Ej: admisiones@institucion.edu.pe" style="width:100%;background:#0f172a;border:1px solid #2d3748;border-radius:8px;color:white;padding:9px 12px;font-size:.88rem;box-sizing:border-box" />
+        <span style="font-size:.73rem;color:#475569;margin-top:4px;display:block">Las notificaciones de nuevas postulaciones se enviarán a este correo.</span>
+      </div>
     </div>
     <div id="beca-modal-msg" style="display:none;margin-bottom:12px;font-size:.84rem;padding:8px 12px;border-radius:6px"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
@@ -1911,6 +1916,7 @@
     document.getElementById('beca-condicion').value = b?.condicion_requisitos || '';
     document.getElementById('beca-carreras').value = b?.carreras_disponibles || '';
     document.getElementById('beca-modalidad').value = b?.modalidad_estudios || '';
+    document.getElementById('beca-email').value = b?.email_institucion || '';
     document.getElementById('beca-modal-msg').style.display = 'none';
     document.getElementById('beca-overlay').style.display = 'block';
     document.getElementById('beca-modal').style.display = 'block';
@@ -1939,6 +1945,7 @@
       condicion_requisitos: document.getElementById('beca-condicion').value.trim() || null,
       carreras_disponibles: document.getElementById('beca-carreras').value.trim() || null,
       modalidad_estudios: document.getElementById('beca-modalidad').value.trim() || null,
+      email_institucion: document.getElementById('beca-email').value.trim() || null,
       activo: true,
     };
     if (!body.nombre || !body.institucion) {

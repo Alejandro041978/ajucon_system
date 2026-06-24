@@ -91,11 +91,13 @@ export default async function handler(req, res) {
 
   const { data: usuario } = await supabase.from('users').select('nombre, email').eq('id', payload.id).single();
 
-  // Obtener requisitos de la beca para el contexto de la IA
+  // Obtener requisitos y email de la beca para el contexto de la IA y notificaciones
   let condicion_requisitos = null;
+  let email_institucion = null;
   if (beca_id) {
-    const { data: beca } = await supabase.from('becas_disponibles').select('condicion_requisitos').eq('id', beca_id).single();
+    const { data: beca } = await supabase.from('becas_disponibles').select('condicion_requisitos, email_institucion').eq('id', beca_id).single();
     condicion_requisitos = beca?.condicion_requisitos || null;
+    email_institucion = beca?.email_institucion || null;
   }
 
   // Evaluación IA en segundo plano (no bloquea la respuesta)
@@ -130,10 +132,13 @@ export default async function handler(req, res) {
       </div>`,
   }).catch(() => {});
 
-  // Email notificación al administrador
+  // Email notificación al administrador (y a la institución si tiene correo)
+  const destinatariosAdmin = ['admin@balticec.com'];
+  if (email_institucion) destinatariosAdmin.push(email_institucion);
+
   resend.emails.send({
     from: 'AJUCON <noreply@ajucon.org.pe>',
-    to: 'admin@balticec.com',
+    to: destinatariosAdmin,
     subject: `Nueva postulación — ${beca_nombre || 'Beca Profesional'}`,
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px">
