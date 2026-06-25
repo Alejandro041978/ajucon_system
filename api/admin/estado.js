@@ -54,11 +54,21 @@ export default async function handler(req, res) {
   if (tabla === 'becas_profesionales' && (estado === 'aprobada' || estado === 'rechazada')) {
     const { data: p } = await supabase
       .from('becas_profesionales')
-      .select('beca_nombre, beca_institucion, carrera_interes, modalidad, user_id')
+      .select('beca_nombre, beca_institucion, beca_id, carrera_interes, modalidad, user_id')
       .eq('id', id).single();
 
     const { data: usuario } = await supabase
       .from('users').select('nombre, email').eq('id', p?.user_id).single();
+
+    // Obtener email de la institución
+    let email_institucion = null;
+    if (p?.beca_id) {
+      const { data: beca } = await supabase
+        .from('becas_disponibles').select('email_institucion').eq('id', p.beca_id).single();
+      email_institucion = beca?.email_institucion || null;
+    }
+    const destinatariosAdmin = ['admin@balticec.com'];
+    if (email_institucion) destinatariosAdmin.push(email_institucion);
 
     if (usuario?.email && p) {
       if (estado === 'aprobada') {

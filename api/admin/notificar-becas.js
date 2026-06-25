@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
   const { data: pendientes, error } = await supabase
     .from('becas_profesionales')
-    .select('id, beca_nombre, beca_institucion, carrera_interes, modalidad, user_id, puntaje_ia, evaluacion_ia')
+    .select('id, beca_id, beca_nombre, beca_institucion, carrera_interes, modalidad, user_id, puntaje_ia, evaluacion_ia')
     .eq('estado', 'aprobada')
     .is('notificada_at', null)
     .lte('created_at', hace80h);
@@ -45,6 +45,17 @@ export default async function handler(req, res) {
       .single();
 
     if (!usuario?.email) continue;
+
+    // Obtener email de la institución
+    let email_institucion = null;
+    if (p.beca_id) {
+      const { data: beca } = await supabase
+        .from('becas_disponibles')
+        .select('email_institucion')
+        .eq('id', p.beca_id)
+        .single();
+      email_institucion = beca?.email_institucion || null;
+    }
 
     // Guardar código y marcar como notificada
     await supabase.from('becas_profesionales').update({
@@ -98,10 +109,13 @@ export default async function handler(req, res) {
         </div>`,
     });
 
-    // Notificar también al admin
+    // Notificar al admin y a la institución
+    const destinatarios = ['admin@balticec.com'];
+    if (email_institucion) destinatarios.push(email_institucion);
+
     resend.emails.send({
       from: 'AJUCON <noreply@ajucon.org.pe>',
-      to: 'admin@balticec.com',
+      to: destinatarios,
       subject: `Beca otorgada — ${usuario.nombre} — ${p.beca_nombre || ''}`,
       html: `<div style="font-family:system-ui,sans-serif;padding:24px">
         <h2 style="color:#059669">Beca otorgada automáticamente</h2>
