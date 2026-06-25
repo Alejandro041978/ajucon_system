@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { Resend } from 'resend';
+import { sendEmail } from '../utils/sendEmail.js';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 function generarCodigo() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -64,10 +63,10 @@ export default async function handler(req, res) {
     }).eq('id', p.id);
 
     // Email al estudiante con el código
-    await resend.emails.send({
-      from: 'AJUCON <noreply@ajucon.org.pe>',
+    await sendEmail({
       to: usuario.email,
       subject: `🎉 ¡Tu beca fue aprobada! — ${p.beca_nombre || 'Beca Profesional'}`,
+      tipo: 'beca_aprobada_estudiante',
       html: `
         <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px">
           <div style="background:linear-gradient(135deg,#059669,#10b981);border-radius:12px;padding:28px;color:white;margin-bottom:24px;text-align:center">
@@ -113,10 +112,10 @@ export default async function handler(req, res) {
     const destinatarios = ['admin@balticec.com'];
     if (email_institucion) destinatarios.push(email_institucion);
 
-    resend.emails.send({
-      from: 'AJUCON <noreply@ajucon.org.pe>',
+    await sendEmail({
       to: destinatarios,
       subject: `Beca otorgada — ${usuario.nombre} — ${p.beca_nombre || ''}`,
+      tipo: 'beca_aprobada_admin',
       html: `<div style="font-family:system-ui,sans-serif;padding:24px">
         <h2 style="color:#059669">Beca otorgada automáticamente</h2>
         <p><strong>Estudiante:</strong> ${usuario.nombre} (${usuario.email})</p>
@@ -126,7 +125,7 @@ export default async function handler(req, res) {
         <p><strong>Código asignado:</strong> <code style="font-size:18px;font-weight:800;color:#059669">${codigo}</code></p>
         <p><strong>Evaluación IA:</strong> ${p.evaluacion_ia || '—'}</p>
       </div>`,
-    }).catch(() => {});
+    });
 
     notificadas++;
   }

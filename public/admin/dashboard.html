@@ -167,6 +167,7 @@
   <div class="nav-item" onclick="setSeccion('valeria_review', this)">🔍 Revisor Valeria</div>
   <div class="nav-item" onclick="setSeccion('redes_sociales', this)">📱 Redes Sociales</div>
   <div class="nav-item" onclick="setSeccion('temas_auto', this)">🤖 Temas Auto</div>
+  <div class="nav-item" onclick="setSeccion('email_logs', this)" id="nav-email-logs">📧 Emails <span id="badge-email-error" style="display:none;background:#ef4444;color:white;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px">!</span></div>
   <div class="sidebar-footer">
     <button class="btn-theme" id="theme-btn" onclick="toggleAdminTheme()">☀️ Modo claro</button>
     <button class="btn-logout" onclick="logout()">Cerrar sesión</button>
@@ -788,6 +789,30 @@
   <div class="up-section">
     <div class="up-section-title">Solicitudes — Becas Cursos Online</div>
     <div id="up-becas-cur-content"><span class="up-empty">Sin solicitudes.</span></div>
+  </div>
+</div>
+
+<!-- Sección Email Logs -->
+<div class="section" id="sec-email_logs">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <h2 style="margin:0">📧 Log de Correos</h2>
+    <button onclick="cargarEmailLogs()" style="padding:8px 16px;background:#374151;color:#e2e8f0;border:none;border-radius:8px;font-size:.85rem;cursor:pointer">↻ Actualizar</button>
+  </div>
+  <p style="color:#64748b;font-size:.85rem;margin-bottom:20px">Registro de todos los correos enviados por el sistema. Los errores aparecen resaltados en rojo.</p>
+  <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+      <thead>
+        <tr style="border-bottom:1px solid #2d3748">
+          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Fecha</th>
+          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Tipo</th>
+          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Destinatario</th>
+          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Asunto</th>
+          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Estado</th>
+          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Error</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-email-logs"><tr><td colspan="6" style="text-align:center;padding:24px;color:#64748b">Cargando...</td></tr></tbody>
+    </table>
   </div>
 </div>
 
@@ -1981,7 +2006,59 @@
     cargarBecasDisponibles();
   }
 
-  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_disponibles:cargarBecasDisponibles, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos, redes_sociales:cargarRedesSociales, temas_auto:cargarTemasAuto };
+  async function cargarEmailLogs() {
+    const tbody = document.getElementById('tbody-email-logs');
+    const { data, error } = await fetch('/api/admin/email-logs', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(r => r.json());
+
+    if (error || !data?.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:#64748b">${error || 'No hay registros aún.'}</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(log => {
+      const isError = log.estado === 'error';
+      const rowStyle = isError ? 'background:rgba(239,68,68,.08);' : '';
+      const fecha = new Date(log.created_at).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
+      const tipoLabel = {
+        confirmacion_postulacion: 'Confirmación postulación',
+        notificacion_postulacion_admin: 'Notif. postulación (admin)',
+        beca_aprobada_estudiante: 'Beca aprobada (estudiante)',
+        beca_aprobada_admin: 'Beca aprobada (admin/inst.)',
+        beca_rechazada_estudiante: 'Beca rechazada (estudiante)',
+      }[log.tipo] || log.tipo;
+      return `<tr style="border-bottom:1px solid #1e293b;${rowStyle}">
+        <td style="padding:10px 12px;color:#94a3b8;white-space:nowrap">${fecha}</td>
+        <td style="padding:10px 12px;color:#cbd5e1">${tipoLabel}</td>
+        <td style="padding:10px 12px;color:#cbd5e1;font-size:.8rem">${log.destinatario}</td>
+        <td style="padding:10px 12px;color:#94a3b8;font-size:.8rem">${log.asunto || '—'}</td>
+        <td style="padding:10px 12px">
+          <span style="padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700;background:${isError ? '#7f1d1d' : '#14532d'};color:${isError ? '#fca5a5' : '#86efac'}">
+            ${isError ? 'Error' : 'Enviado'}
+          </span>
+        </td>
+        <td style="padding:10px 12px;color:#f87171;font-size:.78rem">${log.error || '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function verificarEmailErrors() {
+    try {
+      const r = await fetch('/api/admin/email-logs', { headers: { 'Authorization': 'Bearer ' + token } });
+      const { data } = await r.json();
+      const errores = (data || []).filter(l => l.estado === 'error');
+      const badge = document.getElementById('badge-email-error');
+      if (errores.length > 0) {
+        badge.textContent = errores.length;
+        badge.style.display = 'inline';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch {}
+  }
+
+  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_disponibles:cargarBecasDisponibles, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos, redes_sociales:cargarRedesSociales, temas_auto:cargarTemasAuto, email_logs:cargarEmailLogs };
   const loaded = new Set();
 
   function setSeccion(sec, el) {
@@ -2089,6 +2166,7 @@
 
   cargarStats();
   loaded.add('stats');
+  verificarEmailErrors();
 </script>
 </body>
 </html>

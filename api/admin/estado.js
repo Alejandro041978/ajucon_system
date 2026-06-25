@@ -1,9 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
-import { Resend } from 'resend';
+import { sendEmail } from '../utils/sendEmail.js';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 function verifyAdmin(req) {
   const auth = req.headers.authorization?.replace('Bearer ', '');
@@ -72,10 +71,10 @@ export default async function handler(req, res) {
 
     if (usuario?.email && p) {
       if (estado === 'aprobada') {
-        resend.emails.send({
-          from: 'AJUCON <noreply@ajucon.org.pe>',
+        await sendEmail({
           to: usuario.email,
           subject: `🎉 ¡Tu beca fue aprobada! — ${p.beca_nombre || 'Beca Profesional'}`,
+          tipo: 'beca_aprobada_estudiante',
           html: `
             <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px">
               <div style="background:linear-gradient(135deg,#059669,#10b981);border-radius:12px;padding:28px;color:white;margin-bottom:24px;text-align:center">
@@ -107,12 +106,12 @@ export default async function handler(req, res) {
               </div>
               <p style="color:#94a3b8;font-size:13px">— Equipo AJUCON</p>
             </div>`,
-        }).catch(() => {});
+        });
       } else {
-        resend.emails.send({
-          from: 'AJUCON <noreply@ajucon.org.pe>',
+        await sendEmail({
           to: usuario.email,
           subject: `Resultado de tu postulación — ${p.beca_nombre || 'Beca Profesional'}`,
+          tipo: 'beca_rechazada_estudiante',
           html: `
             <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;padding:32px 24px">
               <div style="background:linear-gradient(135deg,#475569,#64748b);border-radius:12px;padding:28px;color:white;margin-bottom:24px">
@@ -138,7 +137,7 @@ export default async function handler(req, res) {
               </p>
               <p style="color:#94a3b8;font-size:13px;margin-top:24px">— Equipo AJUCON</p>
             </div>`,
-        }).catch(() => {});
+        });
       }
     }
   }

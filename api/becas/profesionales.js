@@ -1,10 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
-import { Resend } from 'resend';
 import Anthropic from '@anthropic-ai/sdk';
+import { sendEmail } from '../utils/sendEmail.js';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-const resend = new Resend(process.env.RESEND_API_KEY);
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const PUNTAJE_MINIMO = 65;
@@ -111,10 +110,10 @@ export default async function handler(req, res) {
   }
 
   // Email confirmación al usuario
-  resend.emails.send({
-    from: 'AJUCON <noreply@ajucon.org.pe>',
+  await sendEmail({
     to: usuario?.email,
     subject: `Tu postulación fue recibida — ${beca_nombre || 'Beca Profesional'}`,
+    tipo: 'confirmacion_postulacion',
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:500px;margin:0 auto;padding:32px 24px">
         <div style="background:linear-gradient(135deg,#d97706,#f59e0b);border-radius:12px;padding:24px;color:white;margin-bottom:24px">
@@ -134,16 +133,16 @@ export default async function handler(req, res) {
         </div>
         <p style="color:#94a3b8;font-size:13px">Si tienes alguna consulta puedes responder a este correo.<br>— Equipo AJUCON</p>
       </div>`,
-  }).catch(() => {});
+  });
 
   // Email notificación al administrador (y a la institución si tiene correo)
   const destinatariosAdmin = ['admin@balticec.com'];
   if (email_institucion) destinatariosAdmin.push(email_institucion);
 
-  resend.emails.send({
-    from: 'AJUCON <noreply@ajucon.org.pe>',
+  await sendEmail({
     to: destinatariosAdmin,
     subject: `Nueva postulación — ${beca_nombre || 'Beca Profesional'}`,
+    tipo: 'notificacion_postulacion_admin',
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:32px 24px">
         <div style="background:linear-gradient(135deg,#d97706,#f59e0b);border-radius:12px;padding:24px;color:white;margin-bottom:24px">
@@ -165,7 +164,7 @@ export default async function handler(req, res) {
           <p style="margin:0;font-size:14px;color:#1e293b;line-height:1.6">${motivacion}</p>
         </div>
       </div>`,
-  }).catch(() => {});
+  });
 
   return res.status(200).json({ ok: true });
 }
