@@ -100,11 +100,15 @@ export default async function handler(req, res) {
     email_institucion = beca?.email_institucion || null;
   }
 
-  // Evaluación IA en segundo plano (no bloquea la respuesta)
-  evaluarConIA(postulacion.id, {
-    promedio_notas, situacion_economica, motivacion, carrera_interes, modalidad,
-    beca_nombre, beca_institucion, condicion_requisitos, nombre_usuario: usuario?.nombre,
-  }).catch(err => console.error('[IA EVAL ERROR]', err.message));
+  // Evaluación IA (awaited — Vercel termina la función al enviar respuesta)
+  try {
+    await evaluarConIA(postulacion.id, {
+      promedio_notas, situacion_economica, motivacion, carrera_interes, modalidad,
+      beca_nombre, beca_institucion, condicion_requisitos, nombre_usuario: usuario?.nombre,
+    });
+  } catch (err) {
+    console.error('[IA EVAL ERROR]', err.message);
+  }
 
   // Email confirmación al usuario
   resend.emails.send({
