@@ -747,6 +747,30 @@
     </div>
   </div>
 
+  <!-- Sección Email Logs -->
+  <div class="section" id="sec-email_logs">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="margin:0">📧 Log de Correos</h2>
+      <button onclick="cargarEmailLogs()" style="padding:8px 16px;background:#374151;color:#e2e8f0;border:none;border-radius:8px;font-size:.85rem;cursor:pointer">↻ Actualizar</button>
+    </div>
+    <p style="color:#64748b;font-size:.85rem;margin-bottom:20px">Registro de todos los correos enviados por el sistema. Los errores aparecen resaltados en rojo.</p>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:.85rem">
+        <thead>
+          <tr style="border-bottom:1px solid #2d3748">
+            <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Fecha</th>
+            <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Tipo</th>
+            <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Destinatario</th>
+            <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Asunto</th>
+            <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Estado</th>
+            <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Error</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-email-logs"><tr><td colspan="6" style="text-align:center;padding:24px;color:#64748b">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <!-- Overlay y panel lateral de usuario -->
@@ -789,30 +813,6 @@
   <div class="up-section">
     <div class="up-section-title">Solicitudes — Becas Cursos Online</div>
     <div id="up-becas-cur-content"><span class="up-empty">Sin solicitudes.</span></div>
-  </div>
-</div>
-
-<!-- Sección Email Logs -->
-<div class="section" id="sec-email_logs">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <h2 style="margin:0">📧 Log de Correos</h2>
-    <button onclick="cargarEmailLogs()" style="padding:8px 16px;background:#374151;color:#e2e8f0;border:none;border-radius:8px;font-size:.85rem;cursor:pointer">↻ Actualizar</button>
-  </div>
-  <p style="color:#64748b;font-size:.85rem;margin-bottom:20px">Registro de todos los correos enviados por el sistema. Los errores aparecen resaltados en rojo.</p>
-  <div style="overflow-x:auto">
-    <table style="width:100%;border-collapse:collapse;font-size:.85rem">
-      <thead>
-        <tr style="border-bottom:1px solid #2d3748">
-          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Fecha</th>
-          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Tipo</th>
-          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Destinatario</th>
-          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Asunto</th>
-          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Estado</th>
-          <th style="text-align:left;padding:10px 12px;color:#64748b;font-weight:600;font-size:.75rem;text-transform:uppercase">Error</th>
-        </tr>
-      </thead>
-      <tbody id="tbody-email-logs"><tr><td colspan="6" style="text-align:center;padding:24px;color:#64748b">Cargando...</td></tr></tbody>
-    </table>
   </div>
 </div>
 
