@@ -59,12 +59,16 @@ export default async function handler(req, res) {
     const { data: usuario } = await supabase
       .from('users').select('nombre, email').eq('id', p?.user_id).single();
 
-    // Obtener email de la institución
+    // Obtener datos completos de la beca
     let email_institucion = null;
+    let cantidad_disponible = null;
+    let monto_total = null;
     if (p?.beca_id) {
       const { data: beca } = await supabase
-        .from('becas_disponibles').select('email_institucion').eq('id', p.beca_id).single();
+        .from('becas_disponibles').select('email_institucion, cantidad_disponible, monto_total').eq('id', p.beca_id).single();
       email_institucion = beca?.email_institucion || null;
+      cantidad_disponible = beca?.cantidad_disponible || null;
+      monto_total = beca?.monto_total || null;
     }
     const destinatariosAdmin = ['admin@balticec.com'];
     if (email_institucion) destinatariosAdmin.push(email_institucion);
@@ -86,6 +90,13 @@ export default async function handler(req, res) {
                 Nos complace informarte que tu postulación a la beca <strong>${p.beca_nombre || 'Beca Profesional'}</strong>
                 ${p.beca_institucion ? `en <strong>${p.beca_institucion}</strong>` : ''} ha sido <strong style="color:#059669">aprobada</strong>.
               </p>
+              ${(cantidad_disponible || monto_total) ? `
+              <div style="background:#ecfdf5;border-left:4px solid #059669;border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0">
+                <p style="margin:0;font-size:14px;color:#065f46;line-height:1.7">
+                  🏆 Lo felicitamos por recibir${cantidad_disponible ? ` una de las <strong>${cantidad_disponible} becas disponibles</strong>` : ' esta beca'}${monto_total ? ` valorizada en <strong>S/ ${Number(monto_total).toLocaleString('es-PE')}</strong>` : ''}.
+                  Esta distinción reconoce su esfuerzo y potencial académico.
+                </p>
+              </div>` : ''}
               <table style="width:100%;border-collapse:collapse;font-size:14px;margin:16px 0">
                 ${p.beca_nombre ? `<tr><td style="padding:8px 0;color:#64748b;width:40%">Beca</td><td style="padding:8px 0;color:#1e293b;font-weight:600">${p.beca_nombre}</td></tr>` : ''}
                 ${p.beca_institucion ? `<tr><td style="padding:8px 0;color:#64748b">Institución</td><td style="padding:8px 0;color:#1e293b">${p.beca_institucion}</td></tr>` : ''}
