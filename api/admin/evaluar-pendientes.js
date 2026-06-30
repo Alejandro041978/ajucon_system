@@ -76,6 +76,7 @@ Responde SOLO con el JSON, sin texto adicional.`;
       evaluadas++;
     } catch (err) {
       console.error(`[EVAL ERROR] id=${p.id}`, err.message);
+      return res.status(200).json({ evaluadas, total: pendientes.length, error_debug: err.message, error_id: p.id });
     }
   }
 
