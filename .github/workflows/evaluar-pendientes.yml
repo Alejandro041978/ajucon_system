@@ -1,0 +1,19 @@
+name: Evaluar postulaciones pendientes
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # cada 30 minutos
+  workflow_dispatch:
+
+jobs:
+  evaluar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar endpoint de evaluación
+        run: |
+          curl -s -X POST https://system.ajucon.org.pe/api/admin/evaluar-pendientes \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --fail \
+            | tee resultado.json
+          cat resultado.json
