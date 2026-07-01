@@ -106,12 +106,11 @@ export default async function handler(req, res) {
       return desde ? query.gte(col, desde) : query;
     }
 
-    const [u, bp, bpOtorgadas, bpPendientes, bpEnRevision, bpRechazadas, bc, cursosDisp, tr, rv, spManual, spAuto] = await Promise.all([
+    const [u, bp, bpOtorgadas, bpPendientes, bpRechazadas, bc, cursosDisp, tr, rv, spManual, spAuto] = await Promise.all([
       applyDesde(supabase.from('users').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true })),
       supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'aprobada'),
       supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'pendiente'),
-      supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'en_revision'),
       supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'rechazada'),
       applyDesde(supabase.from('inscripciones_cursos').select('id', { count: 'exact', head: true })),
       supabase.from('cursos').select('id', { count: 'exact', head: true }).eq('activo', true),
@@ -125,7 +124,7 @@ export default async function handler(req, res) {
       becas_profesionales: bp.count,
       becas_otorgadas: bpOtorgadas.count,
       becas_pendientes: bpPendientes.count,
-      becas_en_revision: bpEnRevision.count,
+
       becas_rechazadas: bpRechazadas.count,
       becas_cursos: bc.count,
       cursos_disponibles: cursosDisp.count,

@@ -238,7 +238,7 @@
           <div class="stat-card"><div class="num" id="stat-bp">—</div><div class="label">Postulaciones recibidas</div></div>
           <div class="stat-card"><div class="num" id="stat-bp-otorgadas">—</div><div class="label">Becas otorgadas</div></div>
           <div class="stat-card"><div class="num" id="stat-bp-pendientes" style="color:#94a3b8">—</div><div class="label">Pendientes</div></div>
-          <div class="stat-card"><div class="num" id="stat-bp-revision" style="color:#f59e0b">—</div><div class="label">En revisión</div></div>
+
           <div class="stat-card"><div class="num" id="stat-bp-rechazadas" style="color:#ef4444">—</div><div class="label">Rechazadas</div></div>
         </div>
       </div>
@@ -954,7 +954,7 @@
   }
 
   async function cargarStats() {
-    ['stat-usuarios','stat-bp','stat-bp-otorgadas','stat-bp-pendientes','stat-bp-revision','stat-bp-rechazadas','stat-bc','stat-cursos-disp','stat-tr','stat-rv','stat-sm','stat-sa'].forEach(id => {
+    ['stat-usuarios','stat-bp','stat-bp-otorgadas','stat-bp-pendientes','stat-bp-rechazadas','stat-bc','stat-cursos-disp','stat-tr','stat-rv','stat-sm','stat-sa'].forEach(id => {
       document.getElementById(id).textContent = '…';
     });
     const d = await api(`stats&periodo=${statsPeriodo}`); if (!d) return;
@@ -962,7 +962,7 @@
     document.getElementById('stat-bp').textContent = d.becas_profesionales ?? 0;
     document.getElementById('stat-bp-otorgadas').textContent = d.becas_otorgadas ?? 0;
     document.getElementById('stat-bp-pendientes').textContent = d.becas_pendientes ?? 0;
-    document.getElementById('stat-bp-revision').textContent = d.becas_en_revision ?? 0;
+
     document.getElementById('stat-bp-rechazadas').textContent = d.becas_rechazadas ?? 0;
     document.getElementById('stat-bc').textContent = d.becas_cursos ?? 0;
     document.getElementById('stat-cursos-disp').textContent = d.cursos_disponibles ?? 0;
