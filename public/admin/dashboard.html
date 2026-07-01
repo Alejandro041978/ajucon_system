@@ -848,7 +848,11 @@
           <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Correo del contacto</label>
           <input id="convenio-correo" type="email" placeholder="correo@institución.pe" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
         </div>
-        <div style="grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:10px 0">
+        <div style="grid-column:1/-1">
+          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Clave de acceso <span style="color:#94a3b8;font-weight:400">(la institución la comparte con sus alumnos)</span></label>
+          <input id="convenio-clave" placeholder="Ej: NEUMANN2026" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+        </div>
+        <div style="grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:6px 0">
           <input type="checkbox" id="convenio-activo" style="width:18px;height:18px;accent-color:#6366f1;cursor:pointer" checked />
           <label for="convenio-activo" style="font-size:.9rem;color:var(--text);cursor:pointer">Convenio activo</label>
         </div>
@@ -2172,6 +2176,7 @@
     document.getElementById('convenio-nombre-contacto').value = c?.nombre_contacto || '';
     document.getElementById('convenio-correo').value = c?.correo_contacto || '';
     document.getElementById('convenio-telefono').value = c?.telefono_contacto || '';
+    document.getElementById('convenio-clave').value = c?.clave || '';
     document.getElementById('convenio-activo').checked = c ? c.activo !== false : true;
     document.getElementById('convenio-error').style.display = 'none';
     document.getElementById('modal-convenio').style.display = 'flex';
@@ -2191,6 +2196,7 @@
       nombre_contacto: document.getElementById('convenio-nombre-contacto').value.trim() || null,
       correo_contacto: document.getElementById('convenio-correo').value.trim() || null,
       telefono_contacto: document.getElementById('convenio-telefono').value.trim() || null,
+      clave: document.getElementById('convenio-clave').value.trim() || null,
       activo: document.getElementById('convenio-activo').checked,
     };
     if (!body.institucion) {

@@ -34,8 +34,19 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Token inválido.' });
   }
 
-  const { curso_id } = req.body;
+  const { curso_id, convenio_id, clave } = req.body;
   if (!curso_id) return res.status(400).json({ error: 'Debes seleccionar un curso.' });
+  if (!convenio_id || !clave) return res.status(400).json({ error: 'Debes seleccionar tu institución e ingresar la clave de acceso.' });
+
+  // Validar clave del convenio
+  const { data: convenio } = await supabase
+    .from('convenios')
+    .select('clave, activo')
+    .eq('id', convenio_id)
+    .single();
+
+  if (!convenio || !convenio.activo) return res.status(400).json({ error: 'Institución no disponible.' });
+  if (convenio.clave !== clave) return res.status(400).json({ error: 'Clave de acceso incorrecta.' });
 
   // Obtener datos del curso desde BD
   const { data: curso } = await supabase

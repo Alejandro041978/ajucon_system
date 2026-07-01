@@ -158,16 +158,37 @@
       </div>`;
   }
 
+  let CONVENIOS = [];
+
   function renderCatalogo() {
-    const opciones = CURSOS.map((c, i) =>
+    const opcionesCursos = CURSOS.map((c, i) =>
       `<option value="${c.id}">${i + 1}. ${c.nombre}</option>`).join('');
+    const opcionesConvenios = CONVENIOS.map(c =>
+      `<option value="${c.id}" data-contacto="${c.nombre_contacto || ''}" data-telefono="${c.telefono_contacto || ''}">${c.institucion}</option>`).join('');
 
     return `
       <div class="catalogo-title">Elige tu próximo curso</div>
-      <div class="catalogo-sub">Selecciona un curso y haz clic en "Inscribirme". Recibirás los datos de acceso al campus por email.</div>
+      <div class="catalogo-sub">Selecciona tu institución, ingresa la clave de acceso y elige el curso.</div>
+
+      <label style="font-size:.85rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px;margin-top:4px">Institución</label>
+      <select class="curso-select" id="convenio-select" onchange="seleccionarConvenio(this)">
+        <option value="">— Selecciona tu institución —</option>
+        ${opcionesConvenios}
+      </select>
+
+      <div id="bloque-clave" style="display:none;margin-top:16px">
+        <div id="glosa-convenio" style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:12px 16px;font-size:.85rem;color:#92400e;margin-bottom:14px;line-height:1.6"></div>
+        <label style="font-size:.85rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Clave de acceso</label>
+        <input type="password" id="clave-input" placeholder="Ingresa la clave de tu institución"
+          style="width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:10px;font-size:.95rem;background:var(--surface2);color:var(--text);box-sizing:border-box;outline:none;transition:border-color .2s"
+          onfocus="this.style.borderColor='#db2777'" onblur="this.style.borderColor='var(--border)'"
+          oninput="actualizarBoton()" />
+      </div>
+
+      <label style="font-size:.85rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px;margin-top:16px">Curso</label>
       <select class="curso-select" id="curso-select" onchange="seleccionarCurso(this)">
         <option value="">— Selecciona un curso —</option>
-        ${opciones}
+        ${opcionesCursos}
       </select>
       <div class="inscribir-bar">
         <button class="btn-inscribir" id="btn-inscribir" onclick="inscribirse()" disabled>Inscribirme</button>
@@ -175,13 +196,34 @@
       <div class="msg" id="msg"></div>`;
   }
 
+  function seleccionarConvenio(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    const bloque = document.getElementById('bloque-clave');
+    if (!sel.value) { bloque.style.display = 'none'; actualizarBoton(); return; }
+    const contacto = opt.dataset.contacto;
+    const telefono = opt.dataset.telefono;
+    document.getElementById('glosa-convenio').innerHTML =
+      `🔑 Si no dispones de la clave de acceso para tu institución, comunícate con <strong>${contacto || 'el responsable'}</strong>${telefono ? ` al teléfono <strong>${telefono}</strong>` : ''}.`;
+    bloque.style.display = 'block';
+    actualizarBoton();
+  }
+
   function seleccionarCurso(sel) {
     cursoSeleccionado = sel.value || null;
-    document.getElementById('btn-inscribir').disabled = !cursoSeleccionado;
+    actualizarBoton();
+  }
+
+  function actualizarBoton() {
+    const convenio = document.getElementById('convenio-select')?.value;
+    const clave = document.getElementById('clave-input')?.value?.trim();
+    const btn = document.getElementById('btn-inscribir');
+    if (btn) btn.disabled = !(convenio && clave && cursoSeleccionado);
   }
 
   async function inscribirse() {
     if (!cursoSeleccionado) return;
+    const convenio_id = document.getElementById('convenio-select').value;
+    const clave = document.getElementById('clave-input').value.trim();
     const btn = document.getElementById('btn-inscribir');
     const msg = document.getElementById('msg');
     btn.disabled = true;
@@ -191,7 +233,7 @@
     const r = await fetch('/api/cursos/inscribir', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ curso_id: cursoSeleccionado }),
+      body: JSON.stringify({ curso_id: cursoSeleccionado, convenio_id, clave }),
     });
     const data = await r.json();
 
@@ -211,11 +253,13 @@
     const contenido = document.getElementById('contenido');
     const loading = document.getElementById('loading');
 
-    const [rCursos, r] = await Promise.all([
+    const [rCursos, rConvenios, r] = await Promise.all([
       fetch('/api/cursos/catalogo', { headers: { 'Authorization': 'Bearer ' + token } }),
+      fetch('/api/convenios/activos'),
       fetch('/api/cursos/mi-curso', { headers: { 'Authorization': 'Bearer ' + token } }),
     ]);
     CURSOS = rCursos.ok ? await rCursos.json() : [];
+    CONVENIOS = rConvenios.ok ? await rConvenios.json() : [];
     const data = await r.json();
     loading.style.display = 'none';
     contenido.style.display = 'block';
