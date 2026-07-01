@@ -390,15 +390,9 @@
     <!-- Paso 1: upload -->
     <div id="csv-paso1">
       <p style="font-size:.85rem;color:#94a3b8;margin-bottom:16px">
-        El CSV debe tener las columnas: <code style="background:#0d1117;padding:2px 6px;border-radius:4px;color:#818cf8">nombre, apellido, email, curso, dni, celular, grado, ciudad, fecha_registro</code><br/>
-        <span style="color:#64748b;font-size:.8rem">La columna <em>curso</em> debe coincidir con el nombre exacto del curso. <em>dni, celular, grado, ciudad, fecha_registro</em> son opcionales. Si <em>fecha_registro</em> está vacío, se usará la fecha de hoy.</span>
+        El CSV debe tener las columnas: <code style="background:#0d1117;padding:2px 6px;border-radius:4px;color:#818cf8">nombre, apellido, email, curso, convenio, dni, celular, grado, ciudad, fecha_registro</code><br/>
+        <span style="color:#64748b;font-size:.8rem">La columna <em>curso</em> debe coincidir con el nombre exacto del curso. La columna <em>convenio</em> debe coincidir con el nombre exacto de la institución. <em>convenio, dni, celular, grado, ciudad, fecha_registro</em> son opcionales. Si <em>fecha_registro</em> está vacío, se usará la fecha de hoy.</span>
       </p>
-      <div style="margin-bottom:16px">
-        <label style="font-size:.82rem;color:#94a3b8;display:block;margin-bottom:6px">Institución / Convenio *</label>
-        <select id="csv-convenio-select" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #2d3748;background:#0d1117;color:#e2e8f0;font-size:.9rem">
-          <option value="">— Selecciona la institución —</option>
-        </select>
-      </div>
       <div id="csv-dropzone"
         ondragover="event.preventDefault();this.style.borderColor='#6366f1'"
         ondragleave="this.style.borderColor='#2d3748'"
@@ -426,6 +420,7 @@
               <th style="padding:8px 12px;text-align:left;color:#64748b;font-weight:600">Apellido</th>
               <th style="padding:8px 12px;text-align:left;color:#64748b;font-weight:600">Email</th>
               <th style="padding:8px 12px;text-align:left;color:#64748b;font-weight:600">Curso</th>
+              <th style="padding:8px 12px;text-align:left;color:#64748b;font-weight:600">Convenio</th>
               <th style="padding:8px 12px;text-align:left;color:#64748b;font-weight:600">DNI</th>
               <th style="padding:8px 12px;text-align:left;color:#64748b;font-weight:600">Celular</th>
               <th style="padding:8px 12px;text-align:left;color:#64748b;font-weight:600">Grado</th>
@@ -1594,23 +1589,10 @@
   // ===== Importar CSV =====
   let _csvFilas = [];
 
-  async function abrirImportCSV() {
+  function abrirImportCSV() {
     csvReset();
     document.getElementById('csv-overlay').style.display = 'block';
     document.getElementById('csv-modal').style.display = 'block';
-    // Cargar convenios activos en el selector
-    const sel = document.getElementById('csv-convenio-select');
-    sel.innerHTML = '<option value="">— Selecciona la institución —</option>';
-    const r = await fetch('/api/convenios/activos');
-    if (r.ok) {
-      const convenios = await r.json();
-      convenios.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = c.institucion;
-        sel.appendChild(opt);
-      });
-    }
   }
 
   function cerrarImportCSV() {
@@ -1658,6 +1640,7 @@
     const iApellido = encabezado.indexOf('apellido');
     const iEmail = encabezado.indexOf('email');
     const iCurso = encabezado.indexOf('curso');
+    const iConvenio = encabezado.indexOf('convenio');
     const iDni = encabezado.indexOf('dni');
     const iCelular = encabezado.indexOf('celular');
     const iGrado = encabezado.indexOf('grado');
@@ -1678,6 +1661,7 @@
         apellido: cols[iApellido] || '',
         email: cols[iEmail] || '',
         curso: cols[iCurso] || '',
+        convenio: iConvenio >= 0 ? (cols[iConvenio] || '') : '',
         dni: iDni >= 0 ? (cols[iDni] || '') : '',
         celular: iCelular >= 0 ? (cols[iCelular] || '') : '',
         grado: iGrado >= 0 ? (cols[iGrado] || '') : '',
@@ -1688,11 +1672,6 @@
 
     if (_csvFilas.length === 0) { mostrarCsvError('No se encontraron filas con datos.'); return; }
 
-    // Verificar que se haya seleccionado institución
-    if (!document.getElementById('csv-convenio-select').value) {
-      mostrarCsvError('Debes seleccionar la institución antes de cargar el archivo.'); return;
-    }
-
     // Mostrar preview
     document.getElementById('csv-resumen').textContent = `${_csvFilas.length} fila${_csvFilas.length > 1 ? 's' : ''} encontrada${_csvFilas.length > 1 ? 's' : ''}`;
     const tbody = document.getElementById('csv-preview-tbody');
@@ -1702,6 +1681,7 @@
         <td style="padding:7px 12px;color:#e2e8f0">${f.apellido}</td>
         <td style="padding:7px 12px;color:#94a3b8">${f.email}</td>
         <td style="padding:7px 12px;color:#818cf8">${f.curso}</td>
+        <td style="padding:7px 12px;color:#a78bfa">${f.convenio || '—'}</td>
         <td style="padding:7px 12px;color:#64748b">${f.dni || '—'}</td>
         <td style="padding:7px 12px;color:#64748b">${f.celular || '—'}</td>
         <td style="padding:7px 12px;color:#64748b">${f.grado || '—'}</td>
@@ -1723,11 +1703,10 @@
     const btn = document.getElementById('csv-importar-btn');
     btn.disabled = true; btn.textContent = 'Importando...';
 
-    const convenio_id = document.getElementById('csv-convenio-select').value;
     const r = await fetch('/api/admin/import-becas-cursos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ filas: _csvFilas, convenio_id: convenio_id || null }),
+      body: JSON.stringify({ filas: _csvFilas }),
     });
     const data = await r.json();
     btn.disabled = false; btn.textContent = 'Importar e inscribir';

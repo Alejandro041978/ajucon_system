@@ -33,22 +33,26 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   if (!verifyAdmin(req)) return res.status(403).json({ error: 'No autorizado.' });
 
-  const { filas, convenio_id } = req.body;
-  // filas: [{nombre, apellido, email, curso, dni, celular, grado, ciudad, fecha_registro}]
+  const { filas } = req.body;
+  // filas: [{nombre, apellido, email, curso, convenio, dni, celular, grado, ciudad, fecha_registro}]
   if (!Array.isArray(filas) || filas.length === 0) {
     return res.status(400).json({ error: 'No hay filas para importar.' });
   }
   const hoy = new Date().toISOString().slice(0, 10);
 
-  // Cargar todos los cursos para match por nombre
+  // Cargar todos los cursos y convenios para match por nombre
   const { data: cursosDB } = await supabase.from('cursos').select('id, nombre, moodle_curso_id');
   const cursoMap = {};
   (cursosDB || []).forEach(c => { cursoMap[c.nombre.toLowerCase().trim()] = c; });
 
+  const { data: conveniosDB } = await supabase.from('convenios').select('id, institucion').eq('activo', true);
+  const convenioMap = {};
+  (conveniosDB || []).forEach(c => { convenioMap[c.institucion.toLowerCase().trim()] = c.id; });
+
   const resultados = [];
 
   for (const fila of filas) {
-    const { nombre, apellido, email, curso: cursoNombre, dni, celular, grado, ciudad, fecha_registro } = fila;
+    const { nombre, apellido, email, curso: cursoNombre, convenio: convenioNombre, dni, celular, grado, ciudad, fecha_registro } = fila;
     const result = { email, nombre: `${nombre} ${apellido}`, curso: cursoNombre, ok: false, mensaje: '' };
 
     if (!nombre || !apellido || !email || !cursoNombre) {
@@ -139,13 +143,15 @@ export default async function handler(req, res) {
       }
 
       // Insertar inscripción en BD
+      const convenio_id = convenioNombre ? (convenioMap[convenioNombre.toLowerCase().trim()] || null) : null;
+
       const { error: inscErr } = await supabase.from('inscripciones_cursos').insert({
         user_id: userId,
         curso_nombre: curso.nombre,
         moodle_curso_id: curso.moodle_curso_id,
         moodle_user_id: moodleUserId,
         estado: 'aprobado',
-        convenio_id: convenio_id || null,
+        convenio_id,
         fecha_registro: fecha_registro || hoy,
       });
       if (inscErr) { result.mensaje = `Error al registrar inscripción: ${inscErr.message}`; resultados.push(result); continue; }
