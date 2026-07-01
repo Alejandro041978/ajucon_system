@@ -613,6 +613,12 @@
             <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-users-borrar" style="accent-color:#ef4444;width:15px;height:15px" /></td>
           </tr>
           <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Becas Disponibles</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-becas_disponibles-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-becas_disponibles-editar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+          </tr>
+          <tr>
             <td style="color:#e2e8f0;padding:7px 8px">Becas Profesionales</td>
             <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-becas_profesionales-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
             <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-becas_profesionales-editar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
@@ -628,6 +634,12 @@
             <td style="color:#e2e8f0;padding:7px 8px">Gestión de Cursos</td>
             <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-gestion_cursos-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
             <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-gestion_cursos-editar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
+          </tr>
+          <tr>
+            <td style="color:#e2e8f0;padding:7px 8px">Convenios</td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-convenios-ver" style="accent-color:#6366f1;width:15px;height:15px" /></td>
+            <td style="text-align:center;padding:7px 8px"><input type="checkbox" id="perm-convenios-editar" style="accent-color:#6366f1;width:15px;height:15px" /></td>
             <td style="text-align:center;padding:7px 8px"><span style="color:#334155">—</span></td>
           </tr>
           <tr>
@@ -972,7 +984,7 @@
     document.getElementById('nav-admins').style.display = 'block';
   } else {
     // Ocultar secciones sin permiso de ver
-    ['users','becas_profesionales','becas_cursos','gestion_cursos','test_results','riasec','valeria_review'].forEach(sec => {
+    ['users','becas_disponibles','becas_profesionales','becas_cursos','gestion_cursos','convenios','test_results','riasec','valeria_review','redes_sociales','temas_auto'].forEach(sec => {
       if (!puedoVer(sec)) {
         const el = document.querySelector(`[onclick="setSeccion('${sec}', this)"]`);
         if (el) el.style.display = 'none';
@@ -1417,8 +1429,9 @@
     // Permisos — marcar checkboxes según nuevo formato {seccion: [acciones]}
     const permMap = {
       stats: ['ver'], users: ['ver','editar','borrar'],
-      becas_profesionales: ['ver','editar'], becas_cursos: ['ver','editar'],
-      gestion_cursos: ['ver','editar'], test_results: ['ver'],
+      becas_disponibles: ['ver','editar'], becas_profesionales: ['ver','editar'],
+      becas_cursos: ['ver','editar'], gestion_cursos: ['ver','editar'],
+      convenios: ['ver','editar'], test_results: ['ver'],
       riasec: ['ver'], valeria_review: ['ver'],
       redes_sociales: ['ver','editar','borrar'], temas_auto: ['ver','editar','borrar']
     };
@@ -1477,8 +1490,9 @@
     const rol = document.getElementById('admin-rol').value;
     const permMap = {
       stats: ['ver'], users: ['ver','editar','borrar'],
-      becas_profesionales: ['ver','editar'], becas_cursos: ['ver','editar'],
-      gestion_cursos: ['ver','editar'], test_results: ['ver'],
+      becas_disponibles: ['ver','editar'], becas_profesionales: ['ver','editar'],
+      becas_cursos: ['ver','editar'], gestion_cursos: ['ver','editar'],
+      convenios: ['ver','editar'], test_results: ['ver'],
       riasec: ['ver'], valeria_review: ['ver'],
       redes_sociales: ['ver','editar','borrar'], temas_auto: ['ver','editar','borrar']
     };
