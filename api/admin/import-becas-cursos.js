@@ -40,6 +40,14 @@ export default async function handler(req, res) {
   }
   const hoy = new Date().toISOString().slice(0, 10);
 
+  function normalizarFecha(f) {
+    if (!f) return hoy;
+    // DD/MM/YYYY → YYYY-MM-DD
+    const m = f.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+    return f; // ya está en YYYY-MM-DD u otro formato
+  }
+
   // Cargar todos los cursos y convenios para match por nombre
   const { data: cursosDB } = await supabase.from('cursos').select('id, nombre, moodle_curso_id');
   const cursoMap = {};
@@ -152,7 +160,7 @@ export default async function handler(req, res) {
         moodle_user_id: moodleUserId,
         estado: 'aprobado',
         convenio_id,
-        fecha_registro: fecha_registro || hoy,
+        fecha_registro: normalizarFecha(fecha_registro),
       });
       if (inscErr) { result.mensaje = `Error al registrar inscripción: ${inscErr.message}`; resultados.push(result); continue; }
 
