@@ -367,14 +367,19 @@
 
   <!-- Becas Cursos -->
   <div class="section" id="sec-becas_cursos">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-      <h2 style="margin:0">Postulaciones — Becas Cursos Online</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h2 style="margin:0">Registro de Inscritos a Cursos Online</h2>
       <button onclick="abrirImportCSV()" style="padding:9px 20px;background:#0891b2;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">⬆ Importar CSV</button>
+    </div>
+    <div style="margin-bottom:16px">
+      <select id="filtro-convenio-bc" onchange="filtrarBecasCursos()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.88rem;min-width:240px">
+        <option value="">— Todos los convenios —</option>
+      </select>
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Nombre</th><th>Email</th><th>Curso</th><th>Nota</th><th>Estado</th></tr></thead>
-        <tbody id="tbody-becas_cursos"><tr><td colspan="5" class="empty">Cargando...</td></tr></tbody>
+        <thead><tr><th>Nombre</th><th>Email</th><th>Curso</th><th>Convenio</th><th>Nota</th><th>Estado</th></tr></thead>
+        <tbody id="tbody-becas_cursos"><tr><td colspan="6" class="empty">Cargando...</td></tr></tbody>
       </table>
     </div>
   </div>
@@ -1168,19 +1173,39 @@
     modal.style.transform = 'translate(-50%,-50%) scale(.96)';
   }
 
+  let _becasCursosData = [];
+
   async function cargarBecasCursos() {
     const data = await api('becas_cursos'); if (!data) return;
+    _becasCursosData = data;
+
+    // Poblar filtro de convenios
+    const sel = document.getElementById('filtro-convenio-bc');
+    const valorActual = sel.value;
+    const conveniosUnicos = [...new Set(data.map(b => b.convenios?.institucion).filter(Boolean))].sort();
+    sel.innerHTML = '<option value="">— Todos los convenios —</option>' +
+      conveniosUnicos.map(c => `<option value="${c}">${c}</option>`).join('');
+    if (valorActual) sel.value = valorActual;
+
+    filtrarBecasCursos();
+  }
+
+  function filtrarBecasCursos() {
+    const filtro = document.getElementById('filtro-convenio-bc').value;
+    const datos = filtro ? _becasCursosData.filter(b => b.convenios?.institucion === filtro) : _becasCursosData;
     const tbody = document.getElementById('tbody-becas_cursos');
-    tbody.innerHTML = data.length ? data.map(b => {
+    tbody.innerHTML = datos.length ? datos.map(b => {
       const nombre = [b.users?.nombre, b.users?.apellido].filter(Boolean).join(' ') || '—';
+      const convenio = b.convenios?.institucion || '—';
       const estadoColor = b.estado === 'aprobado' ? 'background:#14532d;color:#86efac' : 'background:#1e293b;color:#64748b';
       return `<tr>
         <td>${nombre}</td><td>${b.users?.email||'—'}</td>
         <td>${b.curso_nombre||'—'}</td>
+        <td>${convenio}</td>
         <td>${b.nota !== null && b.nota !== undefined ? b.nota + '%' : '—'}</td>
         <td><span class="badge" style="${estadoColor}">${b.estado||'—'}</span></td>
       </tr>`;
-    }).join('') : '<tr><td colspan="5" class="empty">Sin inscripciones aún.</td></tr>';
+    }).join('') : '<tr><td colspan="6" class="empty">Sin inscripciones para este filtro.</td></tr>';
   }
 
   async function cargarTestResults() {

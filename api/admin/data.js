@@ -49,7 +49,7 @@ export default async function handler(req, res) {
   if (seccion === 'becas_cursos') {
     const { data } = await supabase
       .from('inscripciones_cursos')
-      .select('*, users(nombre, apellido, email)')
+      .select('*, users(nombre, apellido, email), convenios(institucion)')
       .order('created_at', { ascending: false });
     return res.status(200).json(data);
   }
