@@ -111,7 +111,7 @@ export default async function handler(req, res) {
       applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'aprobada')),
       applyDesde(supabase.from('inscripciones_cursos').select('id', { count: 'exact', head: true })),
-      supabase.from('becas_disponibles').select('id', { count: 'exact', head: true }).eq('activa', true),
+      supabase.from('cursos').select('id', { count: 'exact', head: true }).eq('activo', true),
       applyDesde(supabase.from('test_results').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('reportes_vocacionales').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('social_posts').select('id', { count: 'exact', head: true }).eq('estado', 'publicado').neq('creado_por', 'auto'), 'publicado_en'),
