@@ -373,10 +373,15 @@
       <h2 style="margin:0">Registro de Inscritos a Cursos Online</h2>
       <button onclick="abrirImportCSV()" style="padding:9px 20px;background:#0891b2;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer">⬆ Importar CSV</button>
     </div>
-    <div style="margin-bottom:16px">
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <select id="filtro-convenio-bc" onchange="filtrarBecasCursos()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.88rem;min-width:240px">
         <option value="">— Todos los convenios —</option>
       </select>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:.82rem;font-weight:600;background:var(--surface2);color:var(--text-muted)">Inscritos <strong id="stat-bc-total" style="color:var(--text)">—</strong></span>
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:.82rem;font-weight:600;background:#fef3c7;color:#92400e">Participando <strong id="stat-bc-participando">—</strong></span>
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:.82rem;font-weight:600;background:#d1fae5;color:#065f46">Aprobados <strong id="stat-bc-aprobados">—</strong></span>
+      </div>
     </div>
     <div class="table-wrap">
       <table>
@@ -1197,6 +1202,11 @@
   function filtrarBecasCursos() {
     const filtro = document.getElementById('filtro-convenio-bc').value;
     const datos = filtro ? _becasCursosData.filter(b => b.convenios?.institucion === filtro) : _becasCursosData;
+
+    document.getElementById('stat-bc-total').textContent = datos.length;
+    document.getElementById('stat-bc-participando').textContent = datos.filter(b => b.estado === 'inscrito').length;
+    document.getElementById('stat-bc-aprobados').textContent = datos.filter(b => b.estado === 'aprobado').length;
+
     const tbody = document.getElementById('tbody-becas_cursos');
     tbody.innerHTML = datos.length ? datos.map(b => {
       const nombre = [b.users?.nombre, b.users?.apellido].filter(Boolean).join(' ') || '—';
