@@ -261,8 +261,12 @@
     <div class="table-wrap">
       <table>
         <thead><tr><th>Nombre</th><th>Apellido</th><th>Email</th><th>Grado</th><th>Colegio</th><th>Ciudad</th><th>Registro</th><th></th></tr></thead>
-        <tbody id="tbody-users"><tr><td colspan="6" class="empty">Cargando...</td></tr></tbody>
+        <tbody id="tbody-users"><tr><td colspan="8" class="empty">Cargando...</td></tr></tbody>
       </table>
+    </div>
+    <div id="users-pagination" style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;flex-wrap:wrap;gap:10px">
+      <span id="users-pag-info" style="font-size:.83rem;color:var(--text-muted)"></span>
+      <div id="users-pag-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
     </div>
   </div>
 
@@ -1076,19 +1080,60 @@
     document.getElementById('stat-sa').textContent = d.social_auto ?? 0;
   }
 
+  let _usersData = [];
+  let _usersPagina = 1;
+  const _usersPorPagina = 20;
+
   async function cargarUsers() {
     const data = await api('users'); if (!data) return;
-    const tbody = document.getElementById('tbody-users');
+    _usersData = data;
+    _usersPagina = 1;
+    renderUsers();
+  }
+
+  function renderUsers() {
     const conEditar = puedoEditar('users');
     const conBorrar = puedoBorrar('users');
-    tbody.innerHTML = data.length ? data.map(u => `
+    const total = _usersData.length;
+    const totalPags = Math.ceil(total / _usersPorPagina);
+    const inicio = (_usersPagina - 1) * _usersPorPagina;
+    const pagina = _usersData.slice(inicio, inicio + _usersPorPagina);
+
+    const tbody = document.getElementById('tbody-users');
+    tbody.innerHTML = pagina.length ? pagina.map(u => `
       <tr>
         <td>${u.nombre||'—'}</td><td>${u.apellido||'—'}</td><td>${u.email}</td><td>${u.grado}</td><td>${u.colegio || '—'}</td><td>${u.ciudad || '—'}</td><td>${fecha(u.created_at)}</td>
         <td style="white-space:nowrap">
           ${conEditar ? `<button onclick='abrirModalUsuario(${JSON.stringify(u)})' style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#6366f1';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Editar</button>` : ''}
           ${conBorrar ? `<button onclick="borrarUsuario('${u.id}')" style="margin-left:4px;padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Borrar</button>` : ''}
         </td>
-      </tr>`).join('') : '<tr><td colspan="7" class="empty">Sin usuarios aún.</td></tr>';
+      </tr>`).join('') : '<tr><td colspan="8" class="empty">Sin usuarios aún.</td></tr>';
+
+    // Info
+    const fin = Math.min(inicio + _usersPorPagina, total);
+    document.getElementById('users-pag-info').textContent =
+      `Mostrando ${inicio + 1}–${fin} de ${total} registros`;
+
+    // Botones de página
+    const btnStyle = (activo) =>
+      `padding:5px 11px;border-radius:6px;border:1px solid ${activo ? '#6366f1' : '#334155'};background:${activo ? '#6366f1' : 'none'};color:${activo ? 'white' : '#94a3b8'};font-size:.82rem;cursor:pointer`;
+    let btns = '';
+    if (_usersPagina > 1) btns += `<button onclick="irPaginaUsers(${_usersPagina - 1})" style="${btnStyle(false)}">‹ Anterior</button>`;
+    for (let p = 1; p <= totalPags; p++) {
+      if (totalPags <= 7 || p === 1 || p === totalPags || Math.abs(p - _usersPagina) <= 1) {
+        btns += `<button onclick="irPaginaUsers(${p})" style="${btnStyle(p === _usersPagina)}">${p}</button>`;
+      } else if (Math.abs(p - _usersPagina) === 2) {
+        btns += `<span style="padding:5px 4px;color:#475569">…</span>`;
+      }
+    }
+    if (_usersPagina < totalPags) btns += `<button onclick="irPaginaUsers(${_usersPagina + 1})" style="${btnStyle(false)}">Siguiente ›</button>`;
+    document.getElementById('users-pag-btns').innerHTML = btns;
+  }
+
+  function irPaginaUsers(p) {
+    _usersPagina = p;
+    renderUsers();
+    document.getElementById('sec-users').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   const _becasProfMap = {};
