@@ -179,6 +179,7 @@
   <div class="nav-group">Jóvenes Perú</div>
   <div class="nav-item" onclick="setSeccion('becas_cursos', this)">💻 Becas Cursos</div>
   <div class="nav-item" onclick="setSeccion('gestion_cursos', this)">⚙️ Gestión de Cursos</div>
+  <div class="nav-item" onclick="setSeccion('convenios', this)">🤝 Convenios</div>
 
   <div class="nav-group">Vocatium 360</div>
   <div class="nav-item" onclick="setSeccion('test_results', this)">✏️ Test CHASIDE</div>
@@ -789,6 +790,75 @@
     <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:20px">Análisis automático diario de las conversaciones con Valeria para mejorar su prompt.</p>
     <div id="review-list"></div>
     <div id="review-empty" style="display:none;text-align:center;color:var(--text-faint);padding:40px">Sin análisis disponibles aún.</div>
+  </div>
+
+  <!-- Convenios -->
+  <div class="section" id="sec-convenios">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+      <h2 style="margin:0">Convenios — Jóvenes Perú</h2>
+      <button onclick="abrirModalConvenio(null)" style="padding:9px 18px;background:#6366f1;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer">+ Nuevo convenio</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Institución</th><th>Tipo</th><th>Ciudad</th><th>Región</th>
+            <th>Contacto</th><th>Correo</th><th>Teléfono</th><th>Vigencia</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-convenios"><tr><td colspan="9" class="empty">Cargando...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Convenio -->
+  <div id="modal-convenio" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center">
+    <div style="background:var(--surface);border-radius:16px;padding:32px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;margin:16px">
+      <h3 id="modal-convenio-titulo" style="margin:0 0 24px;color:var(--text)">Nuevo convenio</h3>
+      <input type="hidden" id="convenio-id" />
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div style="grid-column:1/-1">
+          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Institución *</label>
+          <input id="convenio-institucion" placeholder="Nombre de la institución" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+        </div>
+        <div>
+          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Tipo *</label>
+          <select id="convenio-tipo" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem">
+            <option value="publica">Pública</option>
+            <option value="privada">Privada</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Ciudad</label>
+          <input id="convenio-ciudad" placeholder="Ciudad" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+        </div>
+        <div>
+          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Región</label>
+          <input id="convenio-region" placeholder="Región" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+        </div>
+        <div>
+          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Nombre del contacto</label>
+          <input id="convenio-nombre-contacto" placeholder="Nombre completo" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+        </div>
+        <div>
+          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Teléfono del contacto</label>
+          <input id="convenio-telefono" placeholder="Ej: 999999999" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+        </div>
+        <div style="grid-column:1/-1">
+          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Correo del contacto</label>
+          <input id="convenio-correo" type="email" placeholder="correo@institución.pe" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+        </div>
+        <div style="grid-column:1/-1">
+          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Vigencia</label>
+          <input id="convenio-vigencia" type="date" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+        </div>
+      </div>
+      <div id="convenio-error" style="display:none;color:#ef4444;font-size:.85rem;margin-top:12px"></div>
+      <div style="display:flex;gap:10px;margin-top:24px;justify-content:flex-end">
+        <button onclick="cerrarModalConvenio()" style="padding:9px 18px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--text-muted);cursor:pointer;font-size:.88rem">Cancelar</button>
+        <button onclick="guardarConvenio()" style="padding:9px 18px;background:#6366f1;color:white;border:none;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer">Guardar</button>
+      </div>
+    </div>
   </div>
 
   <!-- Test CHASIDE -->
@@ -2066,6 +2136,96 @@
     cargarBecasDisponibles();
   }
 
+  async function cargarConvenios() {
+    const tbody = document.getElementById('tbody-convenios');
+    const r = await fetch('/api/admin/convenios', { headers: { 'Authorization': 'Bearer ' + token } });
+    if (r.status === 401) { logout(); return; }
+    const data = await r.json();
+    if (!Array.isArray(data) || !data.length) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty">Sin convenios registrados.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map(c => `
+      <tr>
+        <td style="font-weight:600;color:var(--text)">${c.institucion}</td>
+        <td><span style="padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;background:${c.tipo==='publica'?'#dbeafe':'#fce7f3'};color:${c.tipo==='publica'?'#1d4ed8':'#9d174d'}">${c.tipo==='publica'?'Pública':'Privada'}</span></td>
+        <td style="color:var(--text-muted)">${c.ciudad||'—'}</td>
+        <td style="color:var(--text-muted)">${c.region||'—'}</td>
+        <td>${c.nombre_contacto||'—'}</td>
+        <td style="font-size:.83rem">${c.correo_contacto||'—'}</td>
+        <td style="font-size:.83rem">${c.telefono_contacto||'—'}</td>
+        <td style="font-size:.83rem">${c.vigencia ? new Date(c.vigencia+'T00:00:00').toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
+        <td style="white-space:nowrap">
+          <button onclick='abrirModalConvenio(${JSON.stringify(c)})' style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer;margin-right:4px" onmouseover="this.style.borderColor='#6366f1';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Editar</button>
+          <button onclick="borrarConvenio('${c.id}')" style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Borrar</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  function abrirModalConvenio(c) {
+    document.getElementById('modal-convenio-titulo').textContent = c ? 'Editar convenio' : 'Nuevo convenio';
+    document.getElementById('convenio-id').value = c?.id || '';
+    document.getElementById('convenio-institucion').value = c?.institucion || '';
+    document.getElementById('convenio-tipo').value = c?.tipo || 'publica';
+    document.getElementById('convenio-ciudad').value = c?.ciudad || '';
+    document.getElementById('convenio-region').value = c?.region || '';
+    document.getElementById('convenio-nombre-contacto').value = c?.nombre_contacto || '';
+    document.getElementById('convenio-correo').value = c?.correo_contacto || '';
+    document.getElementById('convenio-telefono').value = c?.telefono_contacto || '';
+    document.getElementById('convenio-vigencia').value = c?.vigencia || '';
+    document.getElementById('convenio-error').style.display = 'none';
+    document.getElementById('modal-convenio').style.display = 'flex';
+  }
+
+  function cerrarModalConvenio() {
+    document.getElementById('modal-convenio').style.display = 'none';
+  }
+
+  async function guardarConvenio() {
+    const id = document.getElementById('convenio-id').value;
+    const body = {
+      institucion: document.getElementById('convenio-institucion').value.trim(),
+      tipo: document.getElementById('convenio-tipo').value,
+      ciudad: document.getElementById('convenio-ciudad').value.trim() || null,
+      region: document.getElementById('convenio-region').value.trim() || null,
+      nombre_contacto: document.getElementById('convenio-nombre-contacto').value.trim() || null,
+      correo_contacto: document.getElementById('convenio-correo').value.trim() || null,
+      telefono_contacto: document.getElementById('convenio-telefono').value.trim() || null,
+      vigencia: document.getElementById('convenio-vigencia').value || null,
+    };
+    if (!body.institucion) {
+      document.getElementById('convenio-error').textContent = 'El nombre de la institución es requerido.';
+      document.getElementById('convenio-error').style.display = 'block';
+      return;
+    }
+    if (id) body.id = id;
+    const r = await fetch('/api/admin/convenios', {
+      method: id ? 'PATCH' : 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) {
+      const err = await r.json();
+      document.getElementById('convenio-error').textContent = err.error || 'Error al guardar.';
+      document.getElementById('convenio-error').style.display = 'block';
+      return;
+    }
+    cerrarModalConvenio();
+    loaded.delete('convenios');
+    cargarConvenios();
+  }
+
+  async function borrarConvenio(id) {
+    if (!confirm('¿Eliminar este convenio?')) return;
+    await fetch('/api/admin/convenios', {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    loaded.delete('convenios');
+    cargarConvenios();
+  }
+
   async function cargarEmailLogs() {
     const tbody = document.getElementById('tbody-email-logs');
     const { data, error } = await fetch('/api/admin/email-logs', {
@@ -2118,7 +2278,7 @@
     } catch {}
   }
 
-  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_disponibles:cargarBecasDisponibles, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos, redes_sociales:cargarRedesSociales, temas_auto:cargarTemasAuto, email_logs:cargarEmailLogs };
+  const loaders = { stats:cargarStats, users:cargarUsers, admins:cargarAdmins, becas_disponibles:cargarBecasDisponibles, becas_profesionales:cargarBecasProfesionales, becas_cursos:cargarBecasCursos, test_results:cargarTestResults, riasec:cargarRiasec, valeria_review:cargarValeriaReview, gestion_cursos:cargarGestionCursos, convenios:cargarConvenios, redes_sociales:cargarRedesSociales, temas_auto:cargarTemasAuto, email_logs:cargarEmailLogs };
   const loaded = new Set();
 
   function setSeccion(sec, el) {
