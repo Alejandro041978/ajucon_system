@@ -33,11 +33,12 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   if (!verifyAdmin(req)) return res.status(403).json({ error: 'No autorizado.' });
 
-  const { filas } = req.body;
-  // filas: [{nombre, apellido, email, curso, grado, ciudad}]
+  const { filas, convenio_id } = req.body;
+  // filas: [{nombre, apellido, email, curso, dni, celular, grado, ciudad, fecha_registro}]
   if (!Array.isArray(filas) || filas.length === 0) {
     return res.status(400).json({ error: 'No hay filas para importar.' });
   }
+  const hoy = new Date().toISOString().slice(0, 10);
 
   // Cargar todos los cursos para match por nombre
   const { data: cursosDB } = await supabase.from('cursos').select('id, nombre, moodle_curso_id');
@@ -47,7 +48,7 @@ export default async function handler(req, res) {
   const resultados = [];
 
   for (const fila of filas) {
-    const { nombre, apellido, email, curso: cursoNombre, grado, ciudad } = fila;
+    const { nombre, apellido, email, curso: cursoNombre, dni, celular, grado, ciudad, fecha_registro } = fila;
     const result = { email, nombre: `${nombre} ${apellido}`, curso: cursoNombre, ok: false, mensaje: '' };
 
     if (!nombre || !apellido || !email || !cursoNombre) {
@@ -70,12 +71,20 @@ export default async function handler(req, res) {
 
       if (userExist) {
         userId = userExist.id;
-        await supabase.from('users').update({ nombre, apellido, ...(grado && { grado }), ...(ciudad && { ciudad }) }).eq('id', userId);
+        await supabase.from('users').update({
+          nombre, apellido,
+          ...(grado && { grado }),
+          ...(ciudad && { ciudad }),
+          ...(dni && { dni }),
+          ...(celular && { telefono: celular }),
+        }).eq('id', userId);
       } else {
         const { data: newUser, error: userErr } = await supabase.from('users').insert({
           nombre, apellido, email,
           grado: grado || 'No especificado',
           ciudad: ciudad || 'Tacna',
+          ...(dni && { dni }),
+          ...(celular && { telefono: celular }),
         }).select('id').single();
         if (userErr) { result.mensaje = `Error al crear usuario: ${userErr.message}`; resultados.push(result); continue; }
         userId = newUser.id;
@@ -136,6 +145,8 @@ export default async function handler(req, res) {
         moodle_curso_id: curso.moodle_curso_id,
         moodle_user_id: moodleUserId,
         estado: 'aprobado',
+        convenio_id: convenio_id || null,
+        fecha_registro: fecha_registro || hoy,
       });
       if (inscErr) { result.mensaje = `Error al registrar inscripción: ${inscErr.message}`; resultados.push(result); continue; }
 
