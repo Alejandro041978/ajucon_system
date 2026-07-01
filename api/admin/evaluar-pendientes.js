@@ -25,7 +25,6 @@ export default async function handler(req, res) {
   if (!pendientes?.length) return res.status(200).json({ evaluadas: 0 });
 
   let evaluadas = 0;
-  const errores = [];
 
   for (const p of pendientes) {
     try {
@@ -77,9 +76,9 @@ Responde SOLO con el JSON, sin texto adicional.`;
 
       evaluadas++;
     } catch (err) {
-      errores.push({ id: p.id, error: err.message });
+      console.error('[EVAL ERROR]', p.id, err.message);
     }
   }
 
-  return res.status(200).json({ evaluadas, total: pendientes.length, errores });
+  return res.status(200).json({ evaluadas, total: pendientes.length });
 }
