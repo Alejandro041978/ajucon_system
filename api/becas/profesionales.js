@@ -41,8 +41,8 @@ Responde SOLO con el JSON, sin texto adicional.`;
     messages: [{ role: 'user', content: prompt }],
   });
 
-  const texto = msg.content[0].text.trim();
-  const resultado = JSON.parse(texto);
+  const raw = msg.content[0].text.trim().replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+  const resultado = JSON.parse(raw);
 
   const estado = resultado.aprobada ? 'aprobada' : 'rechazada';
   await supabase.from('becas_profesionales').update({
