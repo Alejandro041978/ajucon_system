@@ -934,7 +934,7 @@
 
   function badgeEstado(estado, tabla, id) {
     const opciones = tabla === 'becas_profesionales'
-      ? ['en_revision','aprobada','rechazada']
+      ? ['pendiente','en_revision','aprobada','rechazada']
       : ['pendiente','en_revision','aprobada','rechazada'];
     return `<select class="estado-select" onchange="setEstado('${tabla}','${id}',this.value)">
       ${opciones.map(e =>

@@ -26,7 +26,7 @@ export default async function handler(req, res) {
 
   const { tabla, id, estado } = req.body;
   const tablas = ['becas_profesionales', 'becas_cursos'];
-  const estadosBP = ['en_revision', 'aprobada', 'rechazada'];
+  const estadosBP = ['pendiente', 'en_revision', 'aprobada', 'rechazada'];
   const estadosBC = ['pendiente', 'en_revision', 'aprobada', 'rechazada'];
   const estadosValidos = tabla === 'becas_profesionales' ? estadosBP : estadosBC;
 
