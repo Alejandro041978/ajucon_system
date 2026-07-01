@@ -11,16 +11,19 @@ function generateCode() {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { nombre, apellido, email, grado, ciudad, colegio, telefono } = req.body;
+  const { nombre, apellido, dni, email, grado, ciudad, colegio, telefono } = req.body;
 
-  if (!nombre || !apellido || !email || !grado || !ciudad) {
+  if (!nombre || !apellido || !dni || !email || !grado || !ciudad) {
     return res.status(400).json({ error: 'Faltan campos requeridos.' });
+  }
+  if (!/^\d{8}$/.test(dni)) {
+    return res.status(400).json({ error: 'El DNI debe tener exactamente 8 dígitos.' });
   }
 
   const { error: upsertError } = await supabase
     .from('users')
     .upsert(
-      { nombre, apellido, email, grado, ciudad, colegio: colegio || null, telefono: telefono || null },
+      { nombre, apellido, dni, email, grado, ciudad, colegio: colegio || null, telefono: telefono || null },
       { onConflict: 'email' }
     );
 
