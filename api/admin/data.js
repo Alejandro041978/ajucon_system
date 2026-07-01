@@ -112,7 +112,7 @@ export default async function handler(req, res) {
       supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'aprobada'),
       supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'pendiente'),
       supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'rechazada'),
-      applyDesde(supabase.from('inscripciones_cursos').select('id', { count: 'exact', head: true })),
+      supabase.from('inscripciones_cursos').select('id', { count: 'exact', head: true }),
       supabase.from('cursos').select('id', { count: 'exact', head: true }).eq('activo', true),
       applyDesde(supabase.from('test_results').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('reportes_vocacionales').select('id', { count: 'exact', head: true })),
