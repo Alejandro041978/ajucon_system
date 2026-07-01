@@ -158,7 +158,7 @@ export default async function handler(req, res) {
         curso_nombre: curso.nombre,
         moodle_curso_id: curso.moodle_curso_id,
         moodle_user_id: moodleUserId,
-        estado: 'aprobado',
+        estado: 'inscrito',
         convenio_id,
         fecha_registro: normalizarFecha(fecha_registro),
       });

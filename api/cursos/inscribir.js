@@ -133,7 +133,7 @@ export default async function handler(req, res) {
     curso_nombre,
     moodle_curso_id: MOODLE_COURSE_ID,
     moodle_user_id: moodleUserId,
-    estado: 'aprobado',
+    estado: 'inscrito',
   });
 
   if (dbError) {
