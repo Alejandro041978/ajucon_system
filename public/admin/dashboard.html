@@ -15,19 +15,30 @@
   <style>
     body { display: flex; min-height: 100vh; }
 
-    /* ===== Sidebar — siempre oscuro ===== */
+    /* ===== Sidebar ===== */
     .sidebar {
       width: 220px; flex-shrink: 0;
       background: #161b27;
       border-right: 1px solid #1e293b;
       padding: 24px 0;
       display: flex; flex-direction: column;
+      transition: background .2s, border-color .2s;
     }
-    .sidebar .logo { padding: 0 20px 24px; font-size: 1.1rem; font-weight: 800; color: #6366f1; border-bottom: 1px solid #1e293b; margin-bottom: 16px; }
+    [data-theme="light"] .sidebar {
+      background: #f1f5f9;
+      border-right-color: #e2e8f0;
+    }
+    .sidebar .logo { padding: 0 20px 24px; font-size: 1.1rem; font-weight: 800; color: #6366f1; border-bottom: 1px solid #1e293b; margin-bottom: 8px; }
+    [data-theme="light"] .sidebar .logo { border-bottom-color: #e2e8f0; }
     .sidebar .logo span { font-size: .7rem; font-weight: 400; color: #475569; display: block; }
-    .nav-item { padding: 10px 20px; cursor: pointer; font-size: .9rem; color: #64748b; border-left: 3px solid transparent; transition: all .15s; }
+    .nav-group { padding: 12px 20px 4px; font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #334155; }
+    [data-theme="light"] .nav-group { color: #64748b; }
+    .nav-item { padding: 8px 20px; cursor: pointer; font-size: .88rem; color: #64748b; border-left: 3px solid transparent; transition: all .15s; }
+    [data-theme="light"] .nav-item { color: #334155; }
     .nav-item:hover { color: #e2e8f0; background: #0d1117; }
+    [data-theme="light"] .nav-item:hover { color: #1e293b; background: #e2e8f0; }
     .nav-item.active { color: #818cf8; border-left-color: #818cf8; background: #0d1117; font-weight: 600; }
+    [data-theme="light"] .nav-item.active { color: #6366f1; border-left-color: #6366f1; background: #e0e7ff; }
     .sidebar-footer { margin-top: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; }
     .btn-theme {
       width: 100%; padding: 8px;
@@ -35,8 +46,10 @@
       border-radius: 8px; color: #64748b; cursor: pointer; font-size: .82rem;
       transition: border-color .2s, color .2s;
     }
+    [data-theme="light"] .btn-theme { border-color: #cbd5e1; color: #475569; }
     .btn-theme:hover { border-color: #818cf8; color: #818cf8; }
     .btn-logout { width: 100%; padding: 8px; background: none; border: 1px solid #1e293b; border-radius: 8px; color: #64748b; cursor: pointer; font-size: .85rem; transition: border-color .2s, color .2s; }
+    [data-theme="light"] .btn-logout { border-color: #cbd5e1; color: #475569; }
     .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
 
     /* ===== Main — cambia con el tema ===== */
@@ -156,17 +169,27 @@
 <div class="sidebar">
   <div class="logo">AJUCON <span>Panel Admin</span></div>
   <div class="nav-item active" onclick="setSeccion('stats', this)">📊 Resumen</div>
-  <div class="nav-item" onclick="setSeccion('users', this)">👤 Usuarios</div>
-  <div class="nav-item" id="nav-admins" style="display:none" onclick="setSeccion('admins', this)">🔐 Administradores</div>
+
+  <div class="nav-group">Jóvenes con Futuro</div>
   <div class="nav-item" onclick="setSeccion('becas_disponibles', this)">🏷️ Becas Disponibles</div>
   <div class="nav-item" onclick="setSeccion('becas_profesionales', this)">🎓 Becas Profesionales</div>
+
+  <div class="nav-group">Jóvenes Perú</div>
   <div class="nav-item" onclick="setSeccion('becas_cursos', this)">💻 Becas Cursos</div>
   <div class="nav-item" onclick="setSeccion('gestion_cursos', this)">⚙️ Gestión de Cursos</div>
+
+  <div class="nav-group">Vocatium 360</div>
   <div class="nav-item" onclick="setSeccion('test_results', this)">✏️ Test CHASIDE</div>
   <div class="nav-item" onclick="setSeccion('riasec', this)">🧠 Perfiles RIASEC</div>
   <div class="nav-item" onclick="setSeccion('valeria_review', this)">🔍 Revisor Valeria</div>
+
+  <div class="nav-group">Marketing</div>
   <div class="nav-item" onclick="setSeccion('redes_sociales', this)">📱 Redes Sociales</div>
   <div class="nav-item" onclick="setSeccion('temas_auto', this)">🤖 Temas Auto</div>
+
+  <div class="nav-group">Configuración</div>
+  <div class="nav-item" onclick="setSeccion('users', this)">👤 Usuarios</div>
+  <div class="nav-item" id="nav-admins" style="display:none" onclick="setSeccion('admins', this)">🔐 Administradores</div>
   <div class="nav-item" onclick="setSeccion('email_logs', this)" id="nav-email-logs">📧 Emails <span id="badge-email-error" style="display:none;background:#ef4444;color:white;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px">!</span></div>
   <div class="sidebar-footer">
     <button class="btn-theme" id="theme-btn" onclick="toggleAdminTheme()">☀️ Modo claro</button>
