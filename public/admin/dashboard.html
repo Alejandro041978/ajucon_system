@@ -231,6 +231,8 @@
         <div class="stats">
           <div class="stat-card"><div class="num" id="stat-bc">—</div><div class="label">Cursos gratuitos otorgados</div></div>
           <div class="stat-card"><div class="num" id="stat-cursos-disp">—</div><div class="label">Cursos gratuitos disponibles</div></div>
+          <div class="stat-card"><div class="num" id="stat-conv-suscritos">—</div><div class="label">Convenios suscritos</div></div>
+          <div class="stat-card"><div class="num" id="stat-conv-efectivos">—</div><div class="label">Convenios efectivos</div></div>
         </div>
       </div>
       <div class="stats-section">
@@ -1049,7 +1051,7 @@
   }
 
   async function cargarStats() {
-    ['stat-usuarios','stat-bp','stat-bp-otorgadas','stat-bp-pendientes','stat-bp-rechazadas','stat-bc','stat-cursos-disp','stat-tr','stat-rv','stat-sm','stat-sa'].forEach(id => {
+    ['stat-usuarios','stat-bp','stat-bp-otorgadas','stat-bp-pendientes','stat-bp-rechazadas','stat-bc','stat-cursos-disp','stat-conv-suscritos','stat-conv-efectivos','stat-tr','stat-rv','stat-sm','stat-sa'].forEach(id => {
       document.getElementById(id).textContent = '…';
     });
     const d = await api(`stats&periodo=${statsPeriodo}`); if (!d) return;
@@ -1061,6 +1063,8 @@
     document.getElementById('stat-bp-rechazadas').textContent = d.becas_rechazadas ?? 0;
     document.getElementById('stat-bc').textContent = d.becas_cursos ?? 0;
     document.getElementById('stat-cursos-disp').textContent = d.cursos_disponibles ?? 0;
+    document.getElementById('stat-conv-suscritos').textContent = d.convenios_suscritos ?? 0;
+    document.getElementById('stat-conv-efectivos').textContent = d.convenios_efectivos ?? 0;
     document.getElementById('stat-tr').textContent = d.test_results ?? 0;
     document.getElementById('stat-rv').textContent = d.reportes_ia ?? 0;
     document.getElementById('stat-sm').textContent = d.social_manual ?? 0;

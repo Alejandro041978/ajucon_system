@@ -106,7 +106,7 @@ export default async function handler(req, res) {
       return desde ? query.gte(col, desde) : query;
     }
 
-    const [u, bp, bpOtorgadas, bpPendientes, bpRechazadas, bc, cursosDisp, tr, rv, spManual, spAuto] = await Promise.all([
+    const [u, bp, bpOtorgadas, bpPendientes, bpRechazadas, bc, cursosDisp, tr, rv, spManual, spAuto, convSuscritos, convInsc] = await Promise.all([
       applyDesde(supabase.from('users').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true })),
       supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'aprobada'),
@@ -118,16 +118,22 @@ export default async function handler(req, res) {
       applyDesde(supabase.from('reportes_vocacionales').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('social_posts').select('id', { count: 'exact', head: true }).eq('estado', 'publicado').neq('creado_por', 'auto'), 'publicado_en'),
       applyDesde(supabase.from('social_posts').select('id', { count: 'exact', head: true }).eq('estado', 'publicado').eq('creado_por', 'auto'), 'publicado_en'),
+      supabase.from('convenios').select('id', { count: 'exact', head: true }).eq('activo', true),
+      supabase.from('inscripciones_cursos').select('convenio_id').not('convenio_id', 'is', null),
     ]);
+
+    const conveniosEfectivos = new Set((convInsc.data || []).map(r => r.convenio_id)).size;
+
     return res.status(200).json({
       usuarios: u.count,
       becas_profesionales: bp.count,
       becas_otorgadas: bpOtorgadas.count,
       becas_pendientes: bpPendientes.count,
-
       becas_rechazadas: bpRechazadas.count,
       becas_cursos: bc.count,
       cursos_disponibles: cursosDisp.count,
+      convenios_suscritos: convSuscritos.count,
+      convenios_efectivos: conveniosEfectivos,
       test_results: tr.count,
       reportes_ia: rv.count,
       social_manual: spManual.count,
