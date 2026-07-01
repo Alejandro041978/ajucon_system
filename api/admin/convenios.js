@@ -25,12 +25,12 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { institucion, tipo, ciudad, region, nombre_contacto, correo_contacto, telefono_contacto, vigencia } = req.body;
+    const { institucion, tipo, ciudad, region, nombre_contacto, correo_contacto, telefono_contacto, activo } = req.body;
     if (!institucion || !tipo) return res.status(400).json({ error: 'Institución y tipo son requeridos.' });
     const { data, error } = await supabase.from('convenios').insert({
       institucion, tipo, ciudad: ciudad || null, region: region || null,
       nombre_contacto: nombre_contacto || null, correo_contacto: correo_contacto || null,
-      telefono_contacto: telefono_contacto || null, vigencia: vigencia || null,
+      telefono_contacto: telefono_contacto || null, activo: activo !== false,
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json(data);

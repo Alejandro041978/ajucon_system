@@ -803,7 +803,7 @@
         <thead>
           <tr>
             <th>Institución</th><th>Tipo</th><th>Ciudad</th><th>Región</th>
-            <th>Contacto</th><th>Correo</th><th>Teléfono</th><th>Vigencia</th><th></th>
+            <th>Contacto</th><th>Correo</th><th>Teléfono</th><th>Estado</th><th></th>
           </tr>
         </thead>
         <tbody id="tbody-convenios"><tr><td colspan="9" class="empty">Cargando...</td></tr></tbody>
@@ -848,9 +848,9 @@
           <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Correo del contacto</label>
           <input id="convenio-correo" type="email" placeholder="correo@institución.pe" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
         </div>
-        <div style="grid-column:1/-1">
-          <label style="font-size:.8rem;color:var(--text-muted);display:block;margin-bottom:4px">Vigencia</label>
-          <input id="convenio-vigencia" type="date" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;box-sizing:border-box" />
+        <div style="grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:10px 0">
+          <input type="checkbox" id="convenio-activo" style="width:18px;height:18px;accent-color:#6366f1;cursor:pointer" checked />
+          <label for="convenio-activo" style="font-size:.9rem;color:var(--text);cursor:pointer">Convenio activo</label>
         </div>
       </div>
       <div id="convenio-error" style="display:none;color:#ef4444;font-size:.85rem;margin-top:12px"></div>
@@ -2154,7 +2154,7 @@
         <td>${c.nombre_contacto||'—'}</td>
         <td style="font-size:.83rem">${c.correo_contacto||'—'}</td>
         <td style="font-size:.83rem">${c.telefono_contacto||'—'}</td>
-        <td style="font-size:.83rem">${c.vigencia ? new Date(c.vigencia+'T00:00:00').toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>
+        <td><span style="padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;background:${c.activo?'#dcfce7':'#fee2e2'};color:${c.activo?'#15803d':'#b91c1c'}">${c.activo?'Activo':'Inactivo'}</span></td>
         <td style="white-space:nowrap">
           <button onclick='abrirModalConvenio(${JSON.stringify(c)})' style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer;margin-right:4px" onmouseover="this.style.borderColor='#6366f1';this.style.color='#818cf8'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Editar</button>
           <button onclick="borrarConvenio('${c.id}')" style="padding:4px 10px;background:none;border:1px solid #334155;border-radius:6px;color:#94a3b8;font-size:.78rem;cursor:pointer" onmouseover="this.style.borderColor='#ef4444';this.style.color='#ef4444'" onmouseout="this.style.borderColor='#334155';this.style.color='#94a3b8'">Borrar</button>
@@ -2172,7 +2172,7 @@
     document.getElementById('convenio-nombre-contacto').value = c?.nombre_contacto || '';
     document.getElementById('convenio-correo').value = c?.correo_contacto || '';
     document.getElementById('convenio-telefono').value = c?.telefono_contacto || '';
-    document.getElementById('convenio-vigencia').value = c?.vigencia || '';
+    document.getElementById('convenio-activo').checked = c ? c.activo !== false : true;
     document.getElementById('convenio-error').style.display = 'none';
     document.getElementById('modal-convenio').style.display = 'flex';
   }
@@ -2191,7 +2191,7 @@
       nombre_contacto: document.getElementById('convenio-nombre-contacto').value.trim() || null,
       correo_contacto: document.getElementById('convenio-correo').value.trim() || null,
       telefono_contacto: document.getElementById('convenio-telefono').value.trim() || null,
-      vigencia: document.getElementById('convenio-vigencia').value || null,
+      activo: document.getElementById('convenio-activo').checked,
     };
     if (!body.institucion) {
       document.getElementById('convenio-error').textContent = 'El nombre de la institución es requerido.';
