@@ -175,6 +175,10 @@
         <option value="">— Selecciona tu institución —</option>
         ${opcionesConvenios}
       </select>
+      <p style="font-size:.82rem;color:var(--text-muted);margin-top:10px;line-height:1.5">
+        Si tu institución no está en la lista porque no tiene convenio con AJUCON, pueden comunicarse al correo
+        <a href="mailto:info@ajucon.org.pe" style="color:#db2777;font-weight:600">info@ajucon.org.pe</a>.
+      </p>
 
       <div id="bloque-clave" style="display:none;margin-top:16px">
         <div id="glosa-convenio" style="background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:12px 16px;font-size:.85rem;color:#92400e;margin-bottom:14px;line-height:1.6"></div>
@@ -202,8 +206,9 @@
     if (!sel.value) { bloque.style.display = 'none'; actualizarBoton(); return; }
     const contacto = opt.dataset.contacto;
     const telefono = opt.dataset.telefono;
+    const institucion = opt.text;
     document.getElementById('glosa-convenio').innerHTML =
-      `🔑 Si no dispones de la clave de acceso para tu institución, comunícate con <strong>${contacto || 'el responsable'}</strong>${telefono ? ` al teléfono <strong>${telefono}</strong>` : ''}.`;
+      `🔑 Si no dispones de la clave de acceso para tu institución <strong>${institucion}</strong>, comunícate con <strong>${contacto || 'el responsable'}</strong>${telefono ? ` al teléfono <strong>${telefono}</strong>` : ''}.`;
     bloque.style.display = 'block';
     actualizarBoton();
   }
