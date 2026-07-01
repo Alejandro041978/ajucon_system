@@ -109,9 +109,9 @@ export default async function handler(req, res) {
     const [u, bp, bpOtorgadas, bpEnRevision, bpRechazadas, bc, cursosDisp, tr, rv, spManual, spAuto] = await Promise.all([
       applyDesde(supabase.from('users').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true })),
-      applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'aprobada')),
-      applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'en_revision')),
-      applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'rechazada')),
+      supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'aprobada'),
+      supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'en_revision'),
+      supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'rechazada'),
       applyDesde(supabase.from('inscripciones_cursos').select('id', { count: 'exact', head: true })),
       supabase.from('cursos').select('id', { count: 'exact', head: true }).eq('activo', true),
       applyDesde(supabase.from('test_results').select('id', { count: 'exact', head: true })),
