@@ -106,10 +106,12 @@ export default async function handler(req, res) {
       return desde ? query.gte(col, desde) : query;
     }
 
-    const [u, bp, bc, tr, rv, spManual, spAuto] = await Promise.all([
+    const [u, bp, bpOtorgadas, bc, cursosDisp, tr, rv, spManual, spAuto] = await Promise.all([
       applyDesde(supabase.from('users').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true })),
+      applyDesde(supabase.from('becas_profesionales').select('id', { count: 'exact', head: true }).eq('estado', 'aprobada')),
       applyDesde(supabase.from('inscripciones_cursos').select('id', { count: 'exact', head: true })),
+      supabase.from('becas_disponibles').select('id', { count: 'exact', head: true }).eq('activa', true),
       applyDesde(supabase.from('test_results').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('reportes_vocacionales').select('id', { count: 'exact', head: true })),
       applyDesde(supabase.from('social_posts').select('id', { count: 'exact', head: true }).eq('estado', 'publicado').neq('creado_por', 'auto'), 'publicado_en'),
@@ -118,7 +120,9 @@ export default async function handler(req, res) {
     return res.status(200).json({
       usuarios: u.count,
       becas_profesionales: bp.count,
+      becas_otorgadas: bpOtorgadas.count,
       becas_cursos: bc.count,
+      cursos_disponibles: cursosDisp.count,
       test_results: tr.count,
       reportes_ia: rv.count,
       social_manual: spManual.count,

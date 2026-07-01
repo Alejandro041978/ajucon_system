@@ -62,7 +62,9 @@
     .main h2 { font-size: 1.3rem; margin-bottom: 24px; color: var(--text); }
 
     /* Stats */
-    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stats-section { margin-bottom: 28px; }
+    .stats-section-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 12px; padding-left: 2px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
     .stat-card {
       background: var(--surface);
       border-radius: 12px; padding: 20px;
@@ -209,14 +211,41 @@
         <button id="btn-periodo-acumulado" onclick="setPeriodo('acumulado')" class="btn-periodo btn-periodo-active">Acumulado</button>
       </div>
     </div>
-    <div class="stats" id="stats-grid">
-      <div class="stat-card"><div class="num" id="stat-usuarios">—</div><div class="label">Usuarios registrados</div></div>
-      <div class="stat-card"><div class="num" id="stat-bp">—</div><div class="label">Becas Profesionales</div></div>
-      <div class="stat-card"><div class="num" id="stat-bc">—</div><div class="label">Becas Cursos</div></div>
-      <div class="stat-card"><div class="num" id="stat-tr">—</div><div class="label">Tests completados</div></div>
-      <div class="stat-card"><div class="num" id="stat-rv">—</div><div class="label">Reportes IA generados</div></div>
-      <div class="stat-card"><div class="num" id="stat-sm">—</div><div class="label">Posts manuales publicados</div></div>
-      <div class="stat-card"><div class="num" id="stat-sa">—</div><div class="label">Posts automáticos publicados</div></div>
+    <div id="stats-grid">
+      <div class="stats-section">
+        <div class="stats-section-title">Sistema</div>
+        <div class="stats">
+          <div class="stat-card"><div class="num" id="stat-usuarios">—</div><div class="label">Usuarios registrados</div></div>
+        </div>
+      </div>
+      <div class="stats-section">
+        <div class="stats-section-title">Vocatium 360</div>
+        <div class="stats">
+          <div class="stat-card"><div class="num" id="stat-tr">—</div><div class="label">Tests completados</div></div>
+          <div class="stat-card"><div class="num" id="stat-rv">—</div><div class="label">Reportes IA generados</div></div>
+        </div>
+      </div>
+      <div class="stats-section">
+        <div class="stats-section-title">Jóvenes Perú</div>
+        <div class="stats">
+          <div class="stat-card"><div class="num" id="stat-bc">—</div><div class="label">Cursos gratuitos otorgados</div></div>
+          <div class="stat-card"><div class="num" id="stat-cursos-disp">—</div><div class="label">Cursos gratuitos disponibles</div></div>
+        </div>
+      </div>
+      <div class="stats-section">
+        <div class="stats-section-title">Jóvenes con Futuro</div>
+        <div class="stats">
+          <div class="stat-card"><div class="num" id="stat-bp">—</div><div class="label">Postulaciones recibidas</div></div>
+          <div class="stat-card"><div class="num" id="stat-bp-otorgadas">—</div><div class="label">Becas otorgadas</div></div>
+        </div>
+      </div>
+      <div class="stats-section">
+        <div class="stats-section-title">Marketing</div>
+        <div class="stats">
+          <div class="stat-card"><div class="num" id="stat-sm">—</div><div class="label">Posts manuales publicados</div></div>
+          <div class="stat-card"><div class="num" id="stat-sa">—</div><div class="label">Posts automáticos publicados</div></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -922,13 +951,15 @@
   }
 
   async function cargarStats() {
-    ['stat-usuarios','stat-bp','stat-bc','stat-tr','stat-rv','stat-sm','stat-sa'].forEach(id => {
+    ['stat-usuarios','stat-bp','stat-bp-otorgadas','stat-bc','stat-cursos-disp','stat-tr','stat-rv','stat-sm','stat-sa'].forEach(id => {
       document.getElementById(id).textContent = '…';
     });
     const d = await api(`stats&periodo=${statsPeriodo}`); if (!d) return;
     document.getElementById('stat-usuarios').textContent = d.usuarios ?? 0;
     document.getElementById('stat-bp').textContent = d.becas_profesionales ?? 0;
+    document.getElementById('stat-bp-otorgadas').textContent = d.becas_otorgadas ?? 0;
     document.getElementById('stat-bc').textContent = d.becas_cursos ?? 0;
+    document.getElementById('stat-cursos-disp').textContent = d.cursos_disponibles ?? 0;
     document.getElementById('stat-tr').textContent = d.test_results ?? 0;
     document.getElementById('stat-rv').textContent = d.reportes_ia ?? 0;
     document.getElementById('stat-sm').textContent = d.social_manual ?? 0;
