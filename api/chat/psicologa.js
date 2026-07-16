@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const SYSTEM_PROMPT = `Eres Valeria, psicóloga vocacional de AJUCON, asociación de Tacna, Perú, que apoya a jóvenes peruanos en su orientación vocacional.
+const SYSTEM_PROMPT_FALLBACK = `Eres Valeria, psicóloga vocacional de AJUCON, asociación de Tacna, Perú, que apoya a jóvenes peruanos en su orientación vocacional.
 
 Tu metodología es el Modelo RIASEC de Holland, que clasifica los intereses vocacionales en seis dimensiones:
 - R (Realista): actividades manuales, técnicas, mecánicas, trabajo con herramientas, naturaleza
@@ -80,6 +80,16 @@ RIASEC_UPDATE:{"R":0,"I":0,"A":0,"S":0,"E":0,"C":0}
 Donde cada número es el incremento de puntos para esa dimensión en esta respuesta (0 = sin evidencia, 1 = evidencia leve, 2 = evidencia clara, 3 = evidencia fuerte).
 Solo incrementa las dimensiones que el estudiante reveló claramente en ESTE intercambio.`;
 
+async function getSystemPrompt() {
+  const { data } = await supabase
+    .from('valeria_config')
+    .select('prompt')
+    .order('version', { ascending: false })
+    .limit(1)
+    .single();
+  return data?.prompt || SYSTEM_PROMPT_FALLBACK;
+}
+
 function calcularCompletitud(scores) {
   // Cada dimensión tiene máximo 10 puntos. Total máximo = 60.
   const total = Object.values(scores).reduce((a, b) => a + Math.min(b, 10), 0);
@@ -102,10 +112,10 @@ export default async function handler(req, res) {
   const { mensaje, conversation_id } = req.body;
   if (!mensaje) return res.status(400).json({ error: 'Mensaje requerido.' });
 
-  // RONDA 1 — todo en paralelo: usuario, perfil RIASEC, historial o nueva conversación
+  // RONDA 1 — todo en paralelo: usuario, perfil RIASEC, historial, conv, prompt
   let convId = conversation_id;
 
-  const [{ data: usuario }, { data: perfilRaw }, historialResult, convResult] = await Promise.all([
+  const [{ data: usuario }, { data: perfilRaw }, historialResult, convResult, systemPromptFromDB] = await Promise.all([
     supabase.from('users').select('nombre, grado').eq('id', payload.id).single(),
     supabase.from('riasec_profiles').select('R,I,A,S,E,C,completitud').eq('user_id', payload.id).single(),
     convId
@@ -114,6 +124,7 @@ export default async function handler(req, res) {
     convId
       ? Promise.resolve({ data: { id: convId } })
       : supabase.from('conversations').insert({ user_id: payload.id, agente: 'psicologa' }).select('id').single(),
+    getSystemPrompt(),
   ]);
 
   // Resolver convId si es nueva conversación
@@ -137,15 +148,15 @@ export default async function handler(req, res) {
   const gradoEstudiante = usuario?.grado || '';
   const perfilContext = `\n[DATOS DEL ESTUDIANTE — Nombre: ${nombreEstudiante}, Grado: ${gradoEstudiante}]\n[PERFIL RIASEC ACTUAL — R:${perfil.R} I:${perfil.I} A:${perfil.A} S:${perfil.S} E:${perfil.E} C:${perfil.C} — Completitud: ${perfil.completitud}%]\nNOTA: Ya conoces el nombre y grado del estudiante. NO los preguntes. Salúdalo por su nombre directamente y pregunta qué lo trae aquí o qué le interesa explorar.\n`;
 
-  // RONDA 2 — llamada a Anthropic (la más lenta)
-  const response = await anthropic.messages.create({
+  // RONDA 2 — llamada a Anthropic
+  const responseReal = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 800,
-    system: SYSTEM_PROMPT + perfilContext,
+    system: systemPromptFromDB + perfilContext,
     messages: mensajesParaClaude,
   });
 
-  const rawText = response.content[0].text;
+  const rawText = responseReal.content[0].text;
   const updateMatch = rawText.match(/RIASEC_UPDATE:\s*(\{[^}]+\})/);
   const respuesta = rawText.replace(/\nRIASEC_UPDATE:[^\n]*/g, '').trim();
 
