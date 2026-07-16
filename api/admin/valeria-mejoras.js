@@ -83,7 +83,7 @@ ${reporte}`,
 
   // PATCH — aprobar o rechazar una mejora
   if (req.method === 'PATCH') {
-    const { id, estado } = req.body;
+    const { id, estado, conocimiento } = req.body;
     if (!id || !['aprobada', 'rechazada'].includes(estado)) {
       return res.status(400).json({ error: 'Parámetros inválidos.' });
     }
@@ -91,8 +91,7 @@ ${reporte}`,
     const { data: mejora } = await supabase.from('valeria_mejoras').select('*').eq('id', id).single();
     if (!mejora) return res.status(404).json({ error: 'Mejora no encontrada.' });
 
-    // Si se aprueba y es de tipo prompt, aplicar al prompt de Valeria
-    if (estado === 'aprobada' && mejora.tipo === 'prompt' && mejora.cambio_prompt) {
+    if (estado === 'aprobada') {
       const { data: config } = await supabase
         .from('valeria_config')
         .select('*')
@@ -101,16 +100,27 @@ ${reporte}`,
         .single();
 
       if (config) {
-        const nuevoPrompt = config.prompt + '\n\n== MEJORA APLICADA ==\n' + mejora.cambio_prompt;
-        const { error: insertErr } = await supabase.from('valeria_config').insert({
-          prompt: nuevoPrompt,
-          version: config.version + 1,
-        });
-        if (insertErr) return res.status(500).json({ error: insertErr.message });
+        let adicion = null;
+
+        if (mejora.tipo === 'prompt' && mejora.cambio_prompt) {
+          adicion = '\n\n== MEJORA DE COMPORTAMIENTO ==\n' + mejora.cambio_prompt;
+        } else if (mejora.tipo === 'conocimiento' && conocimiento) {
+          adicion = '\n\n== CONOCIMIENTO AGREGADO ==\n' + conocimiento;
+        }
+
+        if (adicion) {
+          const { error: insertErr } = await supabase.from('valeria_config').insert({
+            prompt: config.prompt + adicion,
+            version: config.version + 1,
+          });
+          if (insertErr) return res.status(500).json({ error: insertErr.message });
+        }
       }
     }
 
-    const { error } = await supabase.from('valeria_mejoras').update({ estado }).eq('id', id);
+    const updateData = { estado };
+    if (conocimiento) updateData.cambio_prompt = conocimiento;
+    const { error } = await supabase.from('valeria_mejoras').update(updateData).eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ ok: true });
   }
